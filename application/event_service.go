@@ -1,4 +1,4 @@
-package service
+package application
 
 import (
 	"study_event_go/domain/interfaces"

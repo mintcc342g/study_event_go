@@ -1,21 +1,23 @@
 package container
 
 import (
-	"study_event_go/service"
+	"study_event_go/application"
 )
 
+// ServiceContainer ...
 type ServiceContainer struct {
-	BattleSvc *service.BattleService
-	EventSvc  *service.EventService
+	BattleSvc *application.BattleService
+	EventSvc  *application.EventService
 }
 
 func newServiceContainer(repo *RepositoryContainer) *ServiceContainer {
 	return &ServiceContainer{
-		BattleSvc: service.NewBattleService(repo.StudentRepo),
-		EventSvc:  service.NewEventService(repo.RedisRepo),
+		BattleSvc: application.NewBattleService(repo.StudentRepo),
+		EventSvc:  application.NewEventService(repo.RedisRepo),
 	}
 }
 
+// InitServiceContainer ...
 func InitServiceContainer(repo *RepositoryContainer) *ServiceContainer {
 	return newServiceContainer(repo)
 }
