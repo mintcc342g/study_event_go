@@ -9,8 +9,17 @@ const (
 	SmallClass
 	MiddleClass
 	LargeClass
+	GiganticClass
 	UltraClass
-	SpecialClass
+)
+
+// HugeType ...
+type HugeType uint32
+
+// Huge's Types ...
+const (
+	NoneType HugeType = iota
+	SpecialType
 )
 
 // AlertLevel ...
