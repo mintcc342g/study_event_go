@@ -6,14 +6,14 @@ import (
 
 // ServiceContainer ...
 type ServiceContainer struct {
-	BattleSvc *application.BattleService
-	EventSvc  *application.EventService
+	ProtectionSvc *application.ProtectionService
+	EventSvc      *application.EventService
 }
 
 func newServiceContainer(repo *RepositoryContainer) *ServiceContainer {
 	return &ServiceContainer{
-		BattleSvc: application.NewBattleService(repo.StudentRepo),
-		EventSvc:  application.NewEventService(repo.RedisRepo),
+		ProtectionSvc: application.NewBattleService(repo.StudentRepo),
+		EventSvc:      application.NewEventService(repo.RedisRepo),
 	}
 }
 

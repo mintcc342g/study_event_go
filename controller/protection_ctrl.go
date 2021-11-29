@@ -12,18 +12,18 @@ import (
 
 // ProtectionController ...
 type ProtectionController struct {
-	battleSvc *application.BattleService
+	protectionSvc *application.ProtectionService
 }
 
 // NewProtectionController ...
-func NewProtectionController(battleSvc *application.BattleService) *ProtectionController {
+func NewProtectionController(protectionSvc *application.ProtectionService) *ProtectionController {
 	return &ProtectionController{
-		battleSvc: battleSvc,
+		protectionSvc: protectionSvc,
 	}
 }
 
-// Warning ...
-func (p *ProtectionController) Warning(c echo.Context) (err error) {
+// Alarm ...
+func (p *ProtectionController) Alarm(c echo.Context) (err error) {
 	// TODO: change logger
 
 	ctx := c.Request().Context()
@@ -42,17 +42,17 @@ func (p *ProtectionController) Warning(c echo.Context) (err error) {
 		return response(c, http.StatusBadRequest, "invalid request", nil)
 	}
 
-	warningDTO := &dto.Warning{}
-	if err := copier.Copy(warningDTO, request); err != nil {
+	alarmingDTO := &dto.Alarm{}
+	if err := copier.Copy(alarmingDTO, request); err != nil {
 		c.Logger().Error("ProtectionController Copy", "err", err)
 		return response(c, http.StatusInternalServerError, "internal server error", nil)
 	}
 
-	if err := p.battleSvc.Warning(ctx, warningDTO); err != nil {
-		c.Logger().Error("ProtectionController Warning", "err", err)
+	if err := p.protectionSvc.Alarm(ctx, alarmingDTO); err != nil {
+		c.Logger().Error("ProtectionController Alarm", "err", err)
 		// TODO: error handle
 		return response(c, http.StatusInternalServerError, "internal server error", err.Error())
 	}
 
-	return response(c, http.StatusOK, "Warning OK", nil)
+	return response(c, http.StatusOK, "Alarm OK", nil)
 }

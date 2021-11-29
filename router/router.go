@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// Route ...
 func Route(sys *echo.Group, ctrlContainer *container.ControllerContainer) {
-	sys.POST("/warning", ctrlContainer.Protection.Warning)
+	sys.POST("/alarm", ctrlContainer.Protection.Alarm)
 }
