@@ -29,6 +29,7 @@ func (p *ProtectionController) Alarm(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 
 	var request struct {
+		GardenID     uint64 `param:"id"`
 		CaveLocation string `json:"caveLocation"`
 		Huges        []struct {
 			HugeClass types.HugeClass `json:"hugeClass"`

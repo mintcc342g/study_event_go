@@ -12,7 +12,7 @@ type ServiceContainer struct {
 
 func newServiceContainer(repo *RepositoryContainer) *ServiceContainer {
 	return &ServiceContainer{
-		ProtectionSvc: application.NewBattleService(repo.StudentRepo),
+		ProtectionSvc: application.NewProtectionService(repo.LilyRepo, repo.GardenRepo, repo.EventRepo),
 		EventSvc:      application.NewEventService(repo.RedisRepo),
 	}
 }

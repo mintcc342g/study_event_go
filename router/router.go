@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Route ...
-func Route(sys *echo.Group, ctrlContainer *container.ControllerContainer) {
-	sys.POST("/alarm", ctrlContainer.Protection.Alarm)
+// GardenRoute ...
+func GardenRoute(sys *echo.Group, ctrlContainer *container.ControllerContainer) {
+	sys.POST("/:id/alarm", ctrlContainer.Protection.Alarm)
 }

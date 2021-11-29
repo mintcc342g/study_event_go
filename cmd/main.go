@@ -124,9 +124,9 @@ func initHandler(e *echo.Echo, ctrlContainer *container.ControllerContainer, sig
 
 	api := e.Group("/api")
 	ver := api.Group("/v1")
-	sys := ver.Group("/ludovico")
+	sys := ver.Group("/garden")
 
-	router.Route(sys, ctrlContainer)
+	router.GardenRoute(sys, ctrlContainer)
 
 	return nil
 }

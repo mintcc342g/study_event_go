@@ -9,13 +9,21 @@ import (
 
 // ProtectionService ...
 type ProtectionService struct {
-	studentRepo interfaces.StudentRepository
+	lilyRepo   interfaces.LilyRepository
+	gardenRepo interfaces.GardenRepository
+	eventRepo  interfaces.EventRepository
 }
 
-// NewBattleService ...
-func NewBattleService(studentRepo interfaces.StudentRepository) *ProtectionService {
+// NewProtectionService ...
+func NewProtectionService(
+	lilyRepo interfaces.LilyRepository,
+	gardenRepo interfaces.GardenRepository,
+	eventRepo interfaces.EventRepository,
+) *ProtectionService {
 	return &ProtectionService{
-		studentRepo: studentRepo,
+		lilyRepo:   lilyRepo,
+		gardenRepo: gardenRepo,
+		eventRepo:  eventRepo,
 	}
 }
 
@@ -23,24 +31,48 @@ func NewBattleService(studentRepo interfaces.StudentRepository) *ProtectionServi
 func (b *ProtectionService) Alarm(ctx context.Context, alarmDTO *dto.Alarm) (err error) {
 
 	// TODO: requestor check with ctx
+	// TODO: logger
+
+	garden, err := b.gardenRepo.Garden(ctx, alarmDTO.GardenID)
+	if err != nil {
+		return err
+	}
 
 	alarm := entity.NewAlarm(alarmDTO)
 
-	if alarm.IsSevere() {
-		return b.sendTempleRegion(ctx, alarm)
+	if alarm.IsSevere() && garden.IsLudovico() {
+		return b.sendTempleLegion(ctx, garden, alarm)
 	}
 
-	return b.startNormalBattle(ctx, alarm)
+	return b.startNormalBattle(ctx, garden, alarm)
 }
 
-// Sortie
+// sendTempleLegion
+func (b *ProtectionService) sendTempleLegion(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
 
-// sendTempleRegion
-func (b *ProtectionService) sendTempleRegion(ctx context.Context, alarm *entity.Alarm) (err error) {
+	lilies, err := b.lilyRepo.TopClassLilies(ctx, alarm.GardenID, alarm.MakeLegionMemberCount())
+	if err != nil {
+		return err
+	}
+
+	legion, err := garden.NewTempleLegion(lilies)
+	if err != nil {
+		return err
+	}
+
+	event := entity.NewSortieEvent(alarm, legion)
+
+	if err = b.eventRepo.SendLegionSortieEvent(ctx, event); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 // startNormalBattle
-func (b *ProtectionService) startNormalBattle(ctx context.Context, alarm *entity.Alarm) (err error) {
+func (b *ProtectionService) startNormalBattle(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
+
+	// TODO: send push notification to all lilies in the garden
+
 	return nil
 }

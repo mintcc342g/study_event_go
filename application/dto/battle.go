@@ -4,14 +4,15 @@ import "study_event_go/types"
 
 // Alarm ...
 type Alarm struct {
-	CaveLocation string           `json:"caveLocation"`
-	Huges        []*Huge          `json:"huges"`
-	TotalCount   uint32           `json:"totalCount"`
-	AlertLevel   types.AlertLevel `json:"alertLevel"`
+	GardenID     uint64
+	CaveLocation string
+	Huges        []*Huge
+	TotalCount   uint32
+	AlertLevel   types.AlertLevel
 }
 
 // Huge ...
 type Huge struct {
-	Class types.HugeClass `json:"class"`
-	Type  types.HugeType  `json:"type"`
+	Class types.HugeClass
+	Type  types.HugeType
 }

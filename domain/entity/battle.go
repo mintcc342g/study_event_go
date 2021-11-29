@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"math/rand"
 	"study_event_go/application/dto"
 	"study_event_go/domain/vo"
 	"study_event_go/types"
@@ -8,24 +9,27 @@ import (
 
 // Alarm ...
 type Alarm struct {
-	id           uint64
-	caveLocation string
-	huges        []*vo.Huge
-	totalCount   uint32
-	alertLevel   types.AlertLevel
+	ID           uint64
+	GardenID     uint64
+	CaveLocation string
+	Huges        []*vo.Huge
+	TotalCount   uint32
+	AlertLevel   types.AlertLevel
 }
 
 // NewAlarm ...
 func NewAlarm(alarmDTO *dto.Alarm) *Alarm {
+
 	alarm := &Alarm{
-		caveLocation: alarmDTO.CaveLocation,
-		totalCount:   alarmDTO.TotalCount,
-		alertLevel:   alarmDTO.AlertLevel,
-		huges:        []*vo.Huge{},
+		GardenID:     alarmDTO.GardenID,
+		CaveLocation: alarmDTO.CaveLocation,
+		TotalCount:   alarmDTO.TotalCount,
+		AlertLevel:   alarmDTO.AlertLevel,
+		Huges:        []*vo.Huge{},
 	}
 
 	for _, huge := range alarmDTO.Huges {
-		alarm.huges = append(alarm.huges, &vo.Huge{
+		alarm.Huges = append(alarm.Huges, &vo.Huge{
 			Class: huge.Class,
 			Type:  huge.Type,
 		})
@@ -35,6 +39,11 @@ func NewAlarm(alarmDTO *dto.Alarm) *Alarm {
 }
 
 // IsSevere ...
-func (w *Alarm) IsSevere() bool {
-	return w.alertLevel == types.LevelThree
+func (a *Alarm) IsSevere() bool {
+	return a.AlertLevel == types.LevelThree
+}
+
+// MakeLegionMemberCount ...
+func (a *Alarm) MakeLegionMemberCount() int {
+	return rand.Intn(types.TempleLegionMaxNumber-types.TempleLegionMinNumber) + types.TempleLegionMinNumber
 }
