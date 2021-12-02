@@ -23,11 +23,11 @@ func (g *Garden) NewTempleLegion(lilies []*Lily) (*Legion, error) {
 		return nil, errors.BadRequestf("invalid garden")
 	}
 
-	legion := &Legion{}
+	legion := &Legion{
+		Members: lilies,
+	}
 
 	for _, lily := range lilies {
-		legion.Members = append(legion.Members, lily)
-
 		if lily.rank == types.TempleLegionLeaderLank {
 			legion.LeaderID = lily.id
 		}
