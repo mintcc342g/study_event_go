@@ -28,7 +28,7 @@ func (g *Garden) NewTempleLegion(lilies []*Lily) (*Legion, error) {
 	}
 
 	for _, lily := range lilies {
-		if lily.rank == types.TempleLegionLeaderLank {
+		if lily.IsFirstPlace() {
 			legion.LeaderID = lily.id
 		}
 	}

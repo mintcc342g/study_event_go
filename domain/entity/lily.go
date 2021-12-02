@@ -2,6 +2,7 @@ package entity
 
 import (
 	"study_event_go/domain/vo"
+	"study_event_go/types"
 )
 
 // Lily ...
@@ -15,6 +16,11 @@ type Lily struct {
 	gardenID  uint64
 	rank      uint32
 	legionID  uint64
+}
+
+// IsFirstPlace ...
+func (l *Lily) IsFirstPlace() bool {
+	return l.rank == types.FirstPlace
 }
 
 // Skill ...

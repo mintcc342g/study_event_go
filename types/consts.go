@@ -13,5 +13,5 @@ const (
 
 // Lank ...
 const (
-	TempleLegionLeaderLank = 1
+	FirstPlace = 1
 )
