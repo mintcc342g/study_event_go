@@ -147,9 +147,9 @@ func handlerInit(e *echo.Echo, ctrlContainer *container.ControllerContainer, sig
 
 	api := e.Group("/api")
 	ver := api.Group("/v1")
-	sys := ver.Group("/garden")
+	sys := ver.Group("/assault-lily")
 
-	router.GardenRoute(sys, ctrlContainer)
+	router.AssaultLilyRoute(sys, ctrlContainer)
 
 	return nil
 }
