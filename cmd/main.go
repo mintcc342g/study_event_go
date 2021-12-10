@@ -12,7 +12,10 @@ import (
 	"study_event_go/cmd/container"
 	"study_event_go/conf"
 	"study_event_go/router"
+	"study_event_go/types"
 
+	"github.com/RichardKnop/machinery/v1"
+	"github.com/RichardKnop/machinery/v1/config"
 	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -48,16 +51,18 @@ func init() {
 
 func main() {
 	configs := conf.StudyEventGo
+
 	e := echoInit(configs)
 	signal := sigInit(e)
-	rds := initRedis(configs, e)
+	rds := redisInit(configs, e)
+	machineryServer := machineryInit(configs, e)
 
-	repoContainer := container.InitRepositoryContainer(rds)
+	repoContainer := container.InitRepositoryContainer(rds, machineryServer)
 	svcContainer := container.InitServiceContainer(repoContainer)
 	ctrlContainer := container.InitControllerContainer(svcContainer, repoContainer)
 
-	if err := initHandler(e, ctrlContainer, signal); err != nil {
-		e.Logger.Error("InitHandler Error")
+	if err := handlerInit(e, ctrlContainer, signal); err != nil {
+		e.Logger.Error("handlerInit Error")
 		os.Exit(1)
 	}
 
@@ -104,21 +109,39 @@ func sigInit(e *echo.Echo) chan os.Signal {
 	return quit
 }
 
-func initRedis(configs *conf.ViperConfig, e *echo.Echo) redis.Cmdable {
+func redisInit(configs *conf.ViperConfig, e *echo.Echo) redis.Cmdable {
 	host := configs.GetString("redis_host")
 	rds := redis.NewClient(&redis.Options{
 		Addr:     host,
 		Password: "",
 	})
 	if _, err := rds.Ping(context.Background()).Result(); err != nil {
-		e.Logger.Error("initRedis NewClient", "host", host, "err", err) // todo: logger
+		e.Logger.Error("redisInit NewClient", "host", host, "err", err) // todo: logger
 		os.Exit(1)
 	}
 
 	return rds
 }
 
-func initHandler(e *echo.Echo, ctrlContainer *container.ControllerContainer, signal <-chan os.Signal) error {
+func machineryInit(configs *conf.ViperConfig, e *echo.Echo) *machinery.Server {
+	broker := configs.GetString("broker_host")
+
+	mConf := &config.Config{
+		DefaultQueue:  types.DefaultMachineryQueue,
+		Broker:        broker,
+		ResultBackend: "eager",
+	}
+
+	server, err := machinery.NewServer(mConf)
+	if err != nil {
+		e.Logger.Error("machineryInit NewServer", "broker", broker, "err", err) // todo: logger
+		os.Exit(1)
+	}
+
+	return server
+}
+
+func handlerInit(e *echo.Echo, ctrlContainer *container.ControllerContainer, signal <-chan os.Signal) error {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 

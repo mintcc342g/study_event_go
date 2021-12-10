@@ -17,6 +17,7 @@ func init() {
 		"debug_route": false,
 		"port":        4567,
 		"redis_host":  "localhost:6379",
+		"broker_host": "redis://localhost:6379",
 	})
 }
 
