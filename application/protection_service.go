@@ -28,13 +28,13 @@ func NewProtectionService(
 }
 
 // Alarm ...
-func (b *ProtectionService) Alarm(ctx context.Context, alarmDTO *dto.Alarm) (err error) {
+func (p *ProtectionService) Alarm(ctx context.Context, alarmDTO *dto.Alarm) (err error) {
 
 	// TODO: requestor check with ctx
 	// TODO: logger
 	// TODO: db
 
-	garden, err := b.gardenRepo.Garden(ctx, alarmDTO.GardenID)
+	garden, err := p.gardenRepo.Garden(ctx, alarmDTO.GardenID)
 	if err != nil {
 		return err
 	}
@@ -42,16 +42,16 @@ func (b *ProtectionService) Alarm(ctx context.Context, alarmDTO *dto.Alarm) (err
 	alarm := entity.NewAlarm(alarmDTO)
 
 	if alarm.IsSevere() && garden.IsLudovico() {
-		return b.sendTempleLegion(ctx, garden, alarm)
+		return p.sendTempleLegion(ctx, garden, alarm)
 	}
 
-	return b.startNormalBattle(ctx, garden, alarm)
+	return p.startNormalBattle(ctx, garden, alarm)
 }
 
 // sendTempleLegion
-func (b *ProtectionService) sendTempleLegion(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
+func (p *ProtectionService) sendTempleLegion(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
 
-	lilies, err := b.lilyRepo.TopClassLilies(ctx, alarm.GardenID, alarm.MakeLegionMemberCount())
+	lilies, err := p.lilyRepo.TopClassLilies(ctx, alarm.GardenID, alarm.MakeLegionMemberCount())
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func (b *ProtectionService) sendTempleLegion(ctx context.Context, garden *entity
 
 	event := entity.NewSortieEvent(alarm, legion)
 
-	if err = b.eventRepo.SendLegionSortieEvent(ctx, event); err != nil {
+	if err = p.eventRepo.SendLegionSortieEvent(ctx, event); err != nil {
 		return err
 	}
 
@@ -71,7 +71,7 @@ func (b *ProtectionService) sendTempleLegion(ctx context.Context, garden *entity
 }
 
 // startNormalBattle
-func (b *ProtectionService) startNormalBattle(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
+func (p *ProtectionService) startNormalBattle(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
 
 	// TODO: send push notification to all lilies in the garden
 
