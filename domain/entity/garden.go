@@ -8,7 +8,7 @@ import (
 
 // Garden ...
 type Garden struct {
-	ID               uint64
+	ID               types.GardenID
 	Name             string
 	Location         string
 	MentorshipSystem *MentorshipSystem
@@ -38,17 +38,10 @@ func (g *Garden) NewTempleLegion(lilies []*Lily) (*Legion, error) {
 
 // EqualID ...
 func (g *Garden) EqualID(id uint64) bool {
-	return g.ID == id
+	return g.ID == types.GardenID(id)
 }
 
 // IsLudovico ...
 func (g *Garden) IsLudovico() bool {
 	return g.Name == types.LudovicoMissionSchool
 }
-
-// // Location ...
-// type Location struct {
-// 	id      uint64
-// 	country string
-// 	city    string
-// }

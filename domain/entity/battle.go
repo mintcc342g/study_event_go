@@ -9,8 +9,8 @@ import (
 
 // Alarm ...
 type Alarm struct {
-	ID           uint64
-	GardenID     uint64
+	ID           types.AlarmID
+	GardenID     types.GardenID
 	CaveLocation string
 	Huges        []*vo.Huge
 	TotalCount   uint32

@@ -4,7 +4,7 @@ import "study_event_go/types"
 
 // Alarm ...
 type Alarm struct {
-	GardenID     uint64
+	GardenID     types.GardenID
 	CaveLocation string
 	Huges        []*Huge
 	TotalCount   uint32

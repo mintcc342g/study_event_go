@@ -7,15 +7,15 @@ import (
 
 // Lily ...
 type Lily struct {
-	id        uint64
+	id        types.LilyID
 	name      *vo.Name
 	rareSkill *Skill
 	subSkill  *Skill
 	mainCharm *Charm
 	subCharm  *Charm
-	gardenID  uint64
+	gardenID  types.GardenID
 	rank      uint32
-	legionID  uint64
+	legionID  types.LegionID
 }
 
 // IsFirstPlace ...
@@ -25,22 +25,22 @@ func (l *Lily) IsFirstPlace() bool {
 
 // Skill ...
 type Skill struct {
-	id   uint64
+	id   types.SkillID
 	name string
 }
 
 // Charm ...
 type Charm struct {
-	id      uint64
+	id      types.CharmID
 	name    string
 	creator string
 }
 
 // Legion ...
 type Legion struct {
-	ID       uint64
-	GardenID uint64
+	ID       types.LegionID
+	GardenID types.GardenID
 	Name     string
-	LeaderID uint64
+	LeaderID types.LilyID
 	Members  []*Lily
 }

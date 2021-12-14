@@ -1,10 +1,13 @@
 package entity
 
-import "time"
+import (
+	"study_event_go/types"
+	"time"
+)
 
 // MentorshipSystem ...
 type MentorshipSystem struct {
-	id   uint64
+	id   types.MentorshipSystemID
 	name string
 }
 

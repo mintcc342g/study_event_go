@@ -4,6 +4,7 @@ import (
 	"context"
 	"study_event_go/domain/entity"
 	"study_event_go/domain/interfaces"
+	"study_event_go/types"
 )
 
 type gardenRepository struct {
@@ -14,7 +15,7 @@ func NewGardenRepository() interfaces.GardenRepository {
 	return &gardenRepository{}
 }
 
-func (g *gardenRepository) Garden(ctx context.Context, id uint64) (*entity.Garden, error) {
+func (g *gardenRepository) Garden(ctx context.Context, id types.GardenID) (*entity.Garden, error) {
 
 	// TODO: RDB
 
