@@ -11,12 +11,15 @@ import (
 
 	"study_event_go/cmd/container"
 	"study_event_go/conf"
+	"study_event_go/ent"
 	"study_event_go/router"
 	"study_event_go/types"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/RichardKnop/machinery/v1"
 	"github.com/RichardKnop/machinery/v1/config"
 	"github.com/go-redis/redis/v8"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -56,8 +59,14 @@ func main() {
 	signal := sigInit(e)
 	rds := redisInit(configs, e)
 	machineryServer := machineryInit(configs, e)
+	db := dbInit(configs, e)
 
-	repoContainer := container.InitRepositoryContainer(rds, machineryServer)
+	repoContainer, err := container.InitRepositoryContainer(db, rds, machineryServer)
+	if err != nil {
+		e.Logger.Error("InitRepositoryContainer Error")
+		os.Exit(1)
+	}
+
 	svcContainer := container.InitServiceContainer(repoContainer)
 	ctrlContainer := container.InitControllerContainer(svcContainer, repoContainer)
 
@@ -107,6 +116,28 @@ func sigInit(e *echo.Echo) chan os.Signal {
 		close(quit)
 	}()
 	return quit
+}
+
+func dbInit(configs *conf.ViperConfig, e *echo.Echo) *ent.Client {
+	dbURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?&charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=True&loc=UTC",
+		configs.GetString("db_user"),
+		configs.GetString("db_pass"),
+		configs.GetString("db_host"),
+		configs.GetInt("db_port"),
+		configs.GetString("db_name"),
+	)
+
+	drv, err := sql.Open(configs.GetString("db"), dbURI)
+	if err != nil {
+		e.Logger.Error("dbInit Open ", " uri: ", dbURI, " err: ", err) // todo: logger
+		os.Exit(1)
+	}
+
+	db := drv.DB()
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(100)
+	db.SetConnMaxLifetime(time.Hour)
+	return ent.NewClient(ent.Driver(drv))
 }
 
 func redisInit(configs *conf.ViperConfig, e *echo.Echo) redis.Cmdable {

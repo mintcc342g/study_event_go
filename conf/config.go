@@ -18,6 +18,12 @@ func init() {
 		"port":        4567,
 		"redis_host":  "localhost:6379",
 		"broker_host": "redis://localhost:6379",
+		"db":          "mysql",
+		"db_host":     "localhost",
+		"db_port":     3306,
+		"db_name":     "study_event_go",
+		"db_user":     "root",
+		"db_pass":     "",
 	})
 }
 

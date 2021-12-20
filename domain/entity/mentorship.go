@@ -7,8 +7,8 @@ import (
 
 // MentorshipSystem ...
 type MentorshipSystem struct {
-	id   types.MentorshipSystemID
-	name string
+	ID   types.MentorshipSystemID
+	Name string
 }
 
 // Mentorship ...

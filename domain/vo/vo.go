@@ -9,6 +9,11 @@ type Name struct {
 	Last   string
 }
 
+// FullName ...
+func (n *Name) FullName() string {
+	return n.First + " " + n.Middle + " " + n.Last
+}
+
 // Huge ...
 type Huge struct {
 	Class types.HugeClass
