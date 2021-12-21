@@ -9,9 +9,9 @@ import (
 // AssaultLilyRoute ...
 func AssaultLilyRoute(sys *echo.Group, ctrlContainer *container.ControllerContainer) {
 
-	sys.POST("/mentorship", ctrlContainer.Mentorship.New)
+	sys.POST("/mentorship", ctrlContainer.Mentorship.New) // TODO: check authority with jwt
+	sys.GET("/mentorship/:id", ctrlContainer.Mentorship.Get)
 	// sys.GET("/mentorship", ctrlContainer.Mentorship.List)
-	// sys.GET("/mentorship/:id", ctrlContainer.Mentorship.Get)
 	// sys.PUT("/mentorship/:id", ctrlContainer.Mentorship.Update)
 	// sys.DELETE("/mentorship/:id", ctrlContainer.Mentorship.Delete)
 

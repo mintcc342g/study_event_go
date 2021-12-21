@@ -5,6 +5,9 @@ import (
 	"study_event_go/domain/entity"
 	"study_event_go/domain/interfaces"
 	"study_event_go/ent"
+	"study_event_go/types"
+
+	"github.com/juju/errors"
 )
 
 type mentorshipRepository struct {
@@ -31,18 +34,37 @@ func (m *mentorshipRepository) New(ctx context.Context, mentorship *entity.Mento
 		UpdateDeletedAt().
 		ID(ctx)
 	if err != nil {
-		return nil, err
+		// logger
+		return nil, errors.New("internal server error")
 	}
 
-	entMode, err := m.conn.MentorshipSystem.Get(ctx, id)
+	entModel, err := m.conn.MentorshipSystem.Get(ctx, id)
 	if err != nil {
-		return nil, err
+		// logger
+		return nil, errors.New("internal server error")
 	}
 
-	mentorship.ID = entMode.ID
-	mentorship.Name = entMode.Name
-	mentorship.CreatedAt = entMode.CreatedAt
-	mentorship.UpdatedAt = entMode.UpdatedAt
+	mentorship.ID = entModel.ID
+	mentorship.Name = entModel.Name
+	mentorship.CreatedAt = entModel.CreatedAt
+	mentorship.UpdatedAt = entModel.UpdatedAt
 
 	return mentorship, nil
+}
+
+func (m *mentorshipRepository) Get(ctx context.Context, id types.MentorshipSystemID) (*entity.MentorshipSystem, error) {
+
+	entModel, err := m.conn.MentorshipSystem.Get(ctx, id)
+	if err != nil {
+		// logger
+		return nil, errors.NotFoundf("id[%d]", id)
+	}
+
+	return &entity.MentorshipSystem{
+		ID:        entModel.ID,
+		CreatedAt: entModel.CreatedAt,
+		UpdatedAt: entModel.UpdatedAt,
+		DeletedAt: entModel.DeletedAt,
+		Name:      entModel.Name,
+	}, nil
 }
