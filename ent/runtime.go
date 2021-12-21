@@ -2,8 +2,30 @@
 
 package ent
 
+import (
+	"study_event_go/ent/mentorshipsystem"
+	"study_event_go/ent/schema"
+	"time"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	mentorshipsystemFields := schema.MentorshipSystem{}.Fields()
+	_ = mentorshipsystemFields
+	// mentorshipsystemDescCreatedAt is the schema descriptor for created_at field.
+	mentorshipsystemDescCreatedAt := mentorshipsystemFields[1].Descriptor()
+	// mentorshipsystem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	mentorshipsystem.DefaultCreatedAt = mentorshipsystemDescCreatedAt.Default.(func() time.Time)
+	// mentorshipsystemDescUpdatedAt is the schema descriptor for updated_at field.
+	mentorshipsystemDescUpdatedAt := mentorshipsystemFields[2].Descriptor()
+	// mentorshipsystem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	mentorshipsystem.DefaultUpdatedAt = mentorshipsystemDescUpdatedAt.Default.(func() time.Time)
+	// mentorshipsystem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	mentorshipsystem.UpdateDefaultUpdatedAt = mentorshipsystemDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// mentorshipsystemDescName is the schema descriptor for name field.
+	mentorshipsystemDescName := mentorshipsystemFields[4].Descriptor()
+	// mentorshipsystem.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	mentorshipsystem.NameValidator = mentorshipsystemDescName.Validators[0].(func(string) error)
 }

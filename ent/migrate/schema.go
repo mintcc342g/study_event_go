@@ -32,7 +32,10 @@ var (
 	// MentorshipSystemsColumns holds the columns for the "mentorship_systems" table.
 	MentorshipSystemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
-		{Name: "name", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
 	}
 	// MentorshipSystemsTable holds the schema information for the "mentorship_systems" table.
 	MentorshipSystemsTable = &schema.Table{

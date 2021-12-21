@@ -2,6 +2,7 @@ package schema
 
 import (
 	"study_event_go/types"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
@@ -16,7 +17,10 @@ type MentorshipSystem struct {
 func (MentorshipSystem) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint64("id").GoType(types.MentorshipSystemID(0)),
-		field.String("name"),
+		field.Time("created_at").Default(time.Now),
+		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
+		field.Time("deleted_at").Nillable().Optional(),
+		field.String("name").Unique().NotEmpty(),
 	}
 }
 

@@ -23,7 +23,7 @@ Q = $(if $(filter 1,$V),,@)
 M = $(shell printf "\033[34;1m▶\033[0m")
 
 .PHONY: all
-all: build ; $(info $(M) building all steps… ) @ ## Build all steps
+all: gen build ; $(info $(M) building all steps… ) @ ## Build all steps
 
 .PHONY: build
 build: ; $(info $(M) building executable… ) @ ## Build program binary
@@ -37,3 +37,6 @@ buildw:
 		$(BUILDTAG) \
 		-o $(BIN)/$(PACKAGE)
 
+.PHONY: gen
+gen: ; $(info $(M) generate ent… )
+	$(GO) generate ./ent

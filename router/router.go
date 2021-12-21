@@ -9,6 +9,12 @@ import (
 // AssaultLilyRoute ...
 func AssaultLilyRoute(sys *echo.Group, ctrlContainer *container.ControllerContainer) {
 
+	sys.POST("/mentorship", ctrlContainer.Mentorship.New)
+	// sys.GET("/mentorship", ctrlContainer.Mentorship.List)
+	// sys.GET("/mentorship/:id", ctrlContainer.Mentorship.Get)
+	// sys.PUT("/mentorship/:id", ctrlContainer.Mentorship.Update)
+	// sys.DELETE("/mentorship/:id", ctrlContainer.Mentorship.Delete)
+
 	// TODO
 	// sys.POST("/garden", ctrlContainer.Garden.New)
 	// sys.GET("/garden", ctrlContainer.Garden.List)

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"study_event_go/ent/mentorshipsystem"
 	"study_event_go/ent/predicate"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -23,6 +24,46 @@ type MentorshipSystemUpdate struct {
 // Where appends a list predicates to the MentorshipSystemUpdate builder.
 func (msu *MentorshipSystemUpdate) Where(ps ...predicate.MentorshipSystem) *MentorshipSystemUpdate {
 	msu.mutation.Where(ps...)
+	return msu
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (msu *MentorshipSystemUpdate) SetCreatedAt(t time.Time) *MentorshipSystemUpdate {
+	msu.mutation.SetCreatedAt(t)
+	return msu
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (msu *MentorshipSystemUpdate) SetNillableCreatedAt(t *time.Time) *MentorshipSystemUpdate {
+	if t != nil {
+		msu.SetCreatedAt(*t)
+	}
+	return msu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (msu *MentorshipSystemUpdate) SetUpdatedAt(t time.Time) *MentorshipSystemUpdate {
+	msu.mutation.SetUpdatedAt(t)
+	return msu
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (msu *MentorshipSystemUpdate) SetDeletedAt(t time.Time) *MentorshipSystemUpdate {
+	msu.mutation.SetDeletedAt(t)
+	return msu
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (msu *MentorshipSystemUpdate) SetNillableDeletedAt(t *time.Time) *MentorshipSystemUpdate {
+	if t != nil {
+		msu.SetDeletedAt(*t)
+	}
+	return msu
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (msu *MentorshipSystemUpdate) ClearDeletedAt() *MentorshipSystemUpdate {
+	msu.mutation.ClearDeletedAt()
 	return msu
 }
 
@@ -43,13 +84,20 @@ func (msu *MentorshipSystemUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	msu.defaults()
 	if len(msu.hooks) == 0 {
+		if err = msu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = msu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*MentorshipSystemMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = msu.check(); err != nil {
+				return 0, err
 			}
 			msu.mutation = mutation
 			affected, err = msu.sqlSave(ctx)
@@ -91,6 +139,24 @@ func (msu *MentorshipSystemUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (msu *MentorshipSystemUpdate) defaults() {
+	if _, ok := msu.mutation.UpdatedAt(); !ok {
+		v := mentorshipsystem.UpdateDefaultUpdatedAt()
+		msu.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (msu *MentorshipSystemUpdate) check() error {
+	if v, ok := msu.mutation.Name(); ok {
+		if err := mentorshipsystem.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
+		}
+	}
+	return nil
+}
+
 func (msu *MentorshipSystemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -108,6 +174,33 @@ func (msu *MentorshipSystemUpdate) sqlSave(ctx context.Context) (n int, err erro
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := msu.mutation.CreatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: mentorshipsystem.FieldCreatedAt,
+		})
+	}
+	if value, ok := msu.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: mentorshipsystem.FieldUpdatedAt,
+		})
+	}
+	if value, ok := msu.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: mentorshipsystem.FieldDeletedAt,
+		})
+	}
+	if msu.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: mentorshipsystem.FieldDeletedAt,
+		})
 	}
 	if value, ok := msu.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -135,6 +228,46 @@ type MentorshipSystemUpdateOne struct {
 	mutation *MentorshipSystemMutation
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (msuo *MentorshipSystemUpdateOne) SetCreatedAt(t time.Time) *MentorshipSystemUpdateOne {
+	msuo.mutation.SetCreatedAt(t)
+	return msuo
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (msuo *MentorshipSystemUpdateOne) SetNillableCreatedAt(t *time.Time) *MentorshipSystemUpdateOne {
+	if t != nil {
+		msuo.SetCreatedAt(*t)
+	}
+	return msuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (msuo *MentorshipSystemUpdateOne) SetUpdatedAt(t time.Time) *MentorshipSystemUpdateOne {
+	msuo.mutation.SetUpdatedAt(t)
+	return msuo
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (msuo *MentorshipSystemUpdateOne) SetDeletedAt(t time.Time) *MentorshipSystemUpdateOne {
+	msuo.mutation.SetDeletedAt(t)
+	return msuo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (msuo *MentorshipSystemUpdateOne) SetNillableDeletedAt(t *time.Time) *MentorshipSystemUpdateOne {
+	if t != nil {
+		msuo.SetDeletedAt(*t)
+	}
+	return msuo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (msuo *MentorshipSystemUpdateOne) ClearDeletedAt() *MentorshipSystemUpdateOne {
+	msuo.mutation.ClearDeletedAt()
+	return msuo
+}
+
 // SetName sets the "name" field.
 func (msuo *MentorshipSystemUpdateOne) SetName(s string) *MentorshipSystemUpdateOne {
 	msuo.mutation.SetName(s)
@@ -159,13 +292,20 @@ func (msuo *MentorshipSystemUpdateOne) Save(ctx context.Context) (*MentorshipSys
 		err  error
 		node *MentorshipSystem
 	)
+	msuo.defaults()
 	if len(msuo.hooks) == 0 {
+		if err = msuo.check(); err != nil {
+			return nil, err
+		}
 		node, err = msuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*MentorshipSystemMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = msuo.check(); err != nil {
+				return nil, err
 			}
 			msuo.mutation = mutation
 			node, err = msuo.sqlSave(ctx)
@@ -207,6 +347,24 @@ func (msuo *MentorshipSystemUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (msuo *MentorshipSystemUpdateOne) defaults() {
+	if _, ok := msuo.mutation.UpdatedAt(); !ok {
+		v := mentorshipsystem.UpdateDefaultUpdatedAt()
+		msuo.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (msuo *MentorshipSystemUpdateOne) check() error {
+	if v, ok := msuo.mutation.Name(); ok {
+		if err := mentorshipsystem.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
+		}
+	}
+	return nil
+}
+
 func (msuo *MentorshipSystemUpdateOne) sqlSave(ctx context.Context) (_node *MentorshipSystem, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -241,6 +399,33 @@ func (msuo *MentorshipSystemUpdateOne) sqlSave(ctx context.Context) (_node *Ment
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := msuo.mutation.CreatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: mentorshipsystem.FieldCreatedAt,
+		})
+	}
+	if value, ok := msuo.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: mentorshipsystem.FieldUpdatedAt,
+		})
+	}
+	if value, ok := msuo.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: mentorshipsystem.FieldDeletedAt,
+		})
+	}
+	if msuo.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: mentorshipsystem.FieldDeletedAt,
+		})
 	}
 	if value, ok := msuo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

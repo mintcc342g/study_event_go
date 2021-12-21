@@ -254,12 +254,12 @@ func (msq *MentorshipSystemQuery) Clone() *MentorshipSystemQuery {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.MentorshipSystem.Query().
-//		GroupBy(mentorshipsystem.FieldName).
+//		GroupBy(mentorshipsystem.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -281,11 +281,11 @@ func (msq *MentorshipSystemQuery) GroupBy(field string, fields ...string) *Mento
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.MentorshipSystem.Query().
-//		Select(mentorshipsystem.FieldName).
+//		Select(mentorshipsystem.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (msq *MentorshipSystemQuery) Select(fields ...string) *MentorshipSystemSelect {

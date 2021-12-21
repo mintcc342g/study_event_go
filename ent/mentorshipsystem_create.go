@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"study_event_go/ent/mentorshipsystem"
 	"study_event_go/types"
+	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -18,6 +20,49 @@ type MentorshipSystemCreate struct {
 	config
 	mutation *MentorshipSystemMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (msc *MentorshipSystemCreate) SetCreatedAt(t time.Time) *MentorshipSystemCreate {
+	msc.mutation.SetCreatedAt(t)
+	return msc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (msc *MentorshipSystemCreate) SetNillableCreatedAt(t *time.Time) *MentorshipSystemCreate {
+	if t != nil {
+		msc.SetCreatedAt(*t)
+	}
+	return msc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (msc *MentorshipSystemCreate) SetUpdatedAt(t time.Time) *MentorshipSystemCreate {
+	msc.mutation.SetUpdatedAt(t)
+	return msc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (msc *MentorshipSystemCreate) SetNillableUpdatedAt(t *time.Time) *MentorshipSystemCreate {
+	if t != nil {
+		msc.SetUpdatedAt(*t)
+	}
+	return msc
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (msc *MentorshipSystemCreate) SetDeletedAt(t time.Time) *MentorshipSystemCreate {
+	msc.mutation.SetDeletedAt(t)
+	return msc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (msc *MentorshipSystemCreate) SetNillableDeletedAt(t *time.Time) *MentorshipSystemCreate {
+	if t != nil {
+		msc.SetDeletedAt(*t)
+	}
+	return msc
 }
 
 // SetName sets the "name" field.
@@ -43,6 +88,7 @@ func (msc *MentorshipSystemCreate) Save(ctx context.Context) (*MentorshipSystem,
 		err  error
 		node *MentorshipSystem
 	)
+	msc.defaults()
 	if len(msc.hooks) == 0 {
 		if err = msc.check(); err != nil {
 			return nil, err
@@ -100,10 +146,33 @@ func (msc *MentorshipSystemCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (msc *MentorshipSystemCreate) defaults() {
+	if _, ok := msc.mutation.CreatedAt(); !ok {
+		v := mentorshipsystem.DefaultCreatedAt()
+		msc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := msc.mutation.UpdatedAt(); !ok {
+		v := mentorshipsystem.DefaultUpdatedAt()
+		msc.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (msc *MentorshipSystemCreate) check() error {
+	if _, ok := msc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
+	}
+	if _, ok := msc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
+	}
 	if _, ok := msc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
+	}
+	if v, ok := msc.mutation.Name(); ok {
+		if err := mentorshipsystem.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "name": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -134,9 +203,34 @@ func (msc *MentorshipSystemCreate) createSpec() (*MentorshipSystem, *sqlgraph.Cr
 			},
 		}
 	)
+	_spec.OnConflict = msc.conflict
 	if id, ok := msc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := msc.mutation.CreatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: mentorshipsystem.FieldCreatedAt,
+		})
+		_node.CreatedAt = value
+	}
+	if value, ok := msc.mutation.UpdatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: mentorshipsystem.FieldUpdatedAt,
+		})
+		_node.UpdatedAt = value
+	}
+	if value, ok := msc.mutation.DeletedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: mentorshipsystem.FieldDeletedAt,
+		})
+		_node.DeletedAt = &value
 	}
 	if value, ok := msc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -149,10 +243,262 @@ func (msc *MentorshipSystemCreate) createSpec() (*MentorshipSystem, *sqlgraph.Cr
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.MentorshipSystem.Create().
+//		SetCreatedAt(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.MentorshipSystemUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (msc *MentorshipSystemCreate) OnConflict(opts ...sql.ConflictOption) *MentorshipSystemUpsertOne {
+	msc.conflict = opts
+	return &MentorshipSystemUpsertOne{
+		create: msc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.MentorshipSystem.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (msc *MentorshipSystemCreate) OnConflictColumns(columns ...string) *MentorshipSystemUpsertOne {
+	msc.conflict = append(msc.conflict, sql.ConflictColumns(columns...))
+	return &MentorshipSystemUpsertOne{
+		create: msc,
+	}
+}
+
+type (
+	// MentorshipSystemUpsertOne is the builder for "upsert"-ing
+	//  one MentorshipSystem node.
+	MentorshipSystemUpsertOne struct {
+		create *MentorshipSystemCreate
+	}
+
+	// MentorshipSystemUpsert is the "OnConflict" setter.
+	MentorshipSystemUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetCreatedAt sets the "created_at" field.
+func (u *MentorshipSystemUpsert) SetCreatedAt(v time.Time) *MentorshipSystemUpsert {
+	u.Set(mentorshipsystem.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *MentorshipSystemUpsert) UpdateCreatedAt() *MentorshipSystemUpsert {
+	u.SetExcluded(mentorshipsystem.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *MentorshipSystemUpsert) SetUpdatedAt(v time.Time) *MentorshipSystemUpsert {
+	u.Set(mentorshipsystem.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *MentorshipSystemUpsert) UpdateUpdatedAt() *MentorshipSystemUpsert {
+	u.SetExcluded(mentorshipsystem.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *MentorshipSystemUpsert) SetDeletedAt(v time.Time) *MentorshipSystemUpsert {
+	u.Set(mentorshipsystem.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *MentorshipSystemUpsert) UpdateDeletedAt() *MentorshipSystemUpsert {
+	u.SetExcluded(mentorshipsystem.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *MentorshipSystemUpsert) ClearDeletedAt() *MentorshipSystemUpsert {
+	u.SetNull(mentorshipsystem.FieldDeletedAt)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *MentorshipSystemUpsert) SetName(v string) *MentorshipSystemUpsert {
+	u.Set(mentorshipsystem.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *MentorshipSystemUpsert) UpdateName() *MentorshipSystemUpsert {
+	u.SetExcluded(mentorshipsystem.FieldName)
+	return u
+}
+
+// UpdateNewValues updates the fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.MentorshipSystem.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(mentorshipsystem.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *MentorshipSystemUpsertOne) UpdateNewValues() *MentorshipSystemUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(mentorshipsystem.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//  client.MentorshipSystem.Create().
+//      OnConflict(sql.ResolveWithIgnore()).
+//      Exec(ctx)
+//
+func (u *MentorshipSystemUpsertOne) Ignore() *MentorshipSystemUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *MentorshipSystemUpsertOne) DoNothing() *MentorshipSystemUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the MentorshipSystemCreate.OnConflict
+// documentation for more info.
+func (u *MentorshipSystemUpsertOne) Update(set func(*MentorshipSystemUpsert)) *MentorshipSystemUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&MentorshipSystemUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *MentorshipSystemUpsertOne) SetCreatedAt(v time.Time) *MentorshipSystemUpsertOne {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *MentorshipSystemUpsertOne) UpdateCreatedAt() *MentorshipSystemUpsertOne {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *MentorshipSystemUpsertOne) SetUpdatedAt(v time.Time) *MentorshipSystemUpsertOne {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *MentorshipSystemUpsertOne) UpdateUpdatedAt() *MentorshipSystemUpsertOne {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *MentorshipSystemUpsertOne) SetDeletedAt(v time.Time) *MentorshipSystemUpsertOne {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *MentorshipSystemUpsertOne) UpdateDeletedAt() *MentorshipSystemUpsertOne {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *MentorshipSystemUpsertOne) ClearDeletedAt() *MentorshipSystemUpsertOne {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *MentorshipSystemUpsertOne) SetName(v string) *MentorshipSystemUpsertOne {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *MentorshipSystemUpsertOne) UpdateName() *MentorshipSystemUpsertOne {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.UpdateName()
+	})
+}
+
+// Exec executes the query.
+func (u *MentorshipSystemUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for MentorshipSystemCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *MentorshipSystemUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *MentorshipSystemUpsertOne) ID(ctx context.Context) (id types.MentorshipSystemID, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *MentorshipSystemUpsertOne) IDX(ctx context.Context) types.MentorshipSystemID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // MentorshipSystemCreateBulk is the builder for creating many MentorshipSystem entities in bulk.
 type MentorshipSystemCreateBulk struct {
 	config
 	builders []*MentorshipSystemCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the MentorshipSystem entities in the database.
@@ -163,6 +509,7 @@ func (mscb *MentorshipSystemCreateBulk) Save(ctx context.Context) ([]*Mentorship
 	for i := range mscb.builders {
 		func(i int, root context.Context) {
 			builder := mscb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MentorshipSystemMutation)
 				if !ok {
@@ -178,6 +525,7 @@ func (mscb *MentorshipSystemCreateBulk) Save(ctx context.Context) ([]*Mentorship
 					_, err = mutators[i+1].Mutate(root, mscb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = mscb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, mscb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -228,6 +576,185 @@ func (mscb *MentorshipSystemCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (mscb *MentorshipSystemCreateBulk) ExecX(ctx context.Context) {
 	if err := mscb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.MentorshipSystem.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.MentorshipSystemUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (mscb *MentorshipSystemCreateBulk) OnConflict(opts ...sql.ConflictOption) *MentorshipSystemUpsertBulk {
+	mscb.conflict = opts
+	return &MentorshipSystemUpsertBulk{
+		create: mscb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.MentorshipSystem.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (mscb *MentorshipSystemCreateBulk) OnConflictColumns(columns ...string) *MentorshipSystemUpsertBulk {
+	mscb.conflict = append(mscb.conflict, sql.ConflictColumns(columns...))
+	return &MentorshipSystemUpsertBulk{
+		create: mscb,
+	}
+}
+
+// MentorshipSystemUpsertBulk is the builder for "upsert"-ing
+// a bulk of MentorshipSystem nodes.
+type MentorshipSystemUpsertBulk struct {
+	create *MentorshipSystemCreateBulk
+}
+
+// UpdateNewValues updates the fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.MentorshipSystem.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(mentorshipsystem.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *MentorshipSystemUpsertBulk) UpdateNewValues() *MentorshipSystemUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(mentorshipsystem.FieldID)
+				return
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.MentorshipSystem.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+//
+func (u *MentorshipSystemUpsertBulk) Ignore() *MentorshipSystemUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *MentorshipSystemUpsertBulk) DoNothing() *MentorshipSystemUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the MentorshipSystemCreateBulk.OnConflict
+// documentation for more info.
+func (u *MentorshipSystemUpsertBulk) Update(set func(*MentorshipSystemUpsert)) *MentorshipSystemUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&MentorshipSystemUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *MentorshipSystemUpsertBulk) SetCreatedAt(v time.Time) *MentorshipSystemUpsertBulk {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *MentorshipSystemUpsertBulk) UpdateCreatedAt() *MentorshipSystemUpsertBulk {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *MentorshipSystemUpsertBulk) SetUpdatedAt(v time.Time) *MentorshipSystemUpsertBulk {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *MentorshipSystemUpsertBulk) UpdateUpdatedAt() *MentorshipSystemUpsertBulk {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *MentorshipSystemUpsertBulk) SetDeletedAt(v time.Time) *MentorshipSystemUpsertBulk {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *MentorshipSystemUpsertBulk) UpdateDeletedAt() *MentorshipSystemUpsertBulk {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *MentorshipSystemUpsertBulk) ClearDeletedAt() *MentorshipSystemUpsertBulk {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *MentorshipSystemUpsertBulk) SetName(v string) *MentorshipSystemUpsertBulk {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *MentorshipSystemUpsertBulk) UpdateName() *MentorshipSystemUpsertBulk {
+	return u.Update(func(s *MentorshipSystemUpsert) {
+		s.UpdateName()
+	})
+}
+
+// Exec executes the query.
+func (u *MentorshipSystemUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MentorshipSystemCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for MentorshipSystemCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *MentorshipSystemUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

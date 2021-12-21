@@ -10,6 +10,7 @@ import (
 	"study_event_go/ent/mentorshipsystem"
 	"study_event_go/types"
 
+	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 )
@@ -19,6 +20,7 @@ type GardenCreate struct {
 	config
 	mutation *GardenMutation
 	hooks    []Hook
+	conflict []sql.ConflictOption
 }
 
 // SetName sets the "name" field.
@@ -163,6 +165,7 @@ func (gc *GardenCreate) createSpec() (*Garden, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
+	_spec.OnConflict = gc.conflict
 	if id, ok := gc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
@@ -206,10 +209,236 @@ func (gc *GardenCreate) createSpec() (*Garden, *sqlgraph.CreateSpec) {
 	return _node, _spec
 }
 
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Garden.Create().
+//		SetName(v).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.GardenUpsert) {
+//			SetName(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (gc *GardenCreate) OnConflict(opts ...sql.ConflictOption) *GardenUpsertOne {
+	gc.conflict = opts
+	return &GardenUpsertOne{
+		create: gc,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Garden.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (gc *GardenCreate) OnConflictColumns(columns ...string) *GardenUpsertOne {
+	gc.conflict = append(gc.conflict, sql.ConflictColumns(columns...))
+	return &GardenUpsertOne{
+		create: gc,
+	}
+}
+
+type (
+	// GardenUpsertOne is the builder for "upsert"-ing
+	//  one Garden node.
+	GardenUpsertOne struct {
+		create *GardenCreate
+	}
+
+	// GardenUpsert is the "OnConflict" setter.
+	GardenUpsert struct {
+		*sql.UpdateSet
+	}
+)
+
+// SetName sets the "name" field.
+func (u *GardenUpsert) SetName(v string) *GardenUpsert {
+	u.Set(garden.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *GardenUpsert) UpdateName() *GardenUpsert {
+	u.SetExcluded(garden.FieldName)
+	return u
+}
+
+// SetLocation sets the "location" field.
+func (u *GardenUpsert) SetLocation(v string) *GardenUpsert {
+	u.Set(garden.FieldLocation, v)
+	return u
+}
+
+// UpdateLocation sets the "location" field to the value that was provided on create.
+func (u *GardenUpsert) UpdateLocation() *GardenUpsert {
+	u.SetExcluded(garden.FieldLocation)
+	return u
+}
+
+// SetMentorshipSystemID sets the "mentorship_system_id" field.
+func (u *GardenUpsert) SetMentorshipSystemID(v types.MentorshipSystemID) *GardenUpsert {
+	u.Set(garden.FieldMentorshipSystemID, v)
+	return u
+}
+
+// UpdateMentorshipSystemID sets the "mentorship_system_id" field to the value that was provided on create.
+func (u *GardenUpsert) UpdateMentorshipSystemID() *GardenUpsert {
+	u.SetExcluded(garden.FieldMentorshipSystemID)
+	return u
+}
+
+// ClearMentorshipSystemID clears the value of the "mentorship_system_id" field.
+func (u *GardenUpsert) ClearMentorshipSystemID() *GardenUpsert {
+	u.SetNull(garden.FieldMentorshipSystemID)
+	return u
+}
+
+// UpdateNewValues updates the fields using the new values that were set on create except the ID field.
+// Using this option is equivalent to using:
+//
+//	client.Garden.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(garden.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *GardenUpsertOne) UpdateNewValues() *GardenUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(garden.FieldID)
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//  client.Garden.Create().
+//      OnConflict(sql.ResolveWithIgnore()).
+//      Exec(ctx)
+//
+func (u *GardenUpsertOne) Ignore() *GardenUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *GardenUpsertOne) DoNothing() *GardenUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the GardenCreate.OnConflict
+// documentation for more info.
+func (u *GardenUpsertOne) Update(set func(*GardenUpsert)) *GardenUpsertOne {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&GardenUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *GardenUpsertOne) SetName(v string) *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *GardenUpsertOne) UpdateName() *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetLocation sets the "location" field.
+func (u *GardenUpsertOne) SetLocation(v string) *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetLocation(v)
+	})
+}
+
+// UpdateLocation sets the "location" field to the value that was provided on create.
+func (u *GardenUpsertOne) UpdateLocation() *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateLocation()
+	})
+}
+
+// SetMentorshipSystemID sets the "mentorship_system_id" field.
+func (u *GardenUpsertOne) SetMentorshipSystemID(v types.MentorshipSystemID) *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetMentorshipSystemID(v)
+	})
+}
+
+// UpdateMentorshipSystemID sets the "mentorship_system_id" field to the value that was provided on create.
+func (u *GardenUpsertOne) UpdateMentorshipSystemID() *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateMentorshipSystemID()
+	})
+}
+
+// ClearMentorshipSystemID clears the value of the "mentorship_system_id" field.
+func (u *GardenUpsertOne) ClearMentorshipSystemID() *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.ClearMentorshipSystemID()
+	})
+}
+
+// Exec executes the query.
+func (u *GardenUpsertOne) Exec(ctx context.Context) error {
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for GardenCreate.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *GardenUpsertOne) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// Exec executes the UPSERT query and returns the inserted/updated ID.
+func (u *GardenUpsertOne) ID(ctx context.Context) (id types.GardenID, err error) {
+	node, err := u.create.Save(ctx)
+	if err != nil {
+		return id, err
+	}
+	return node.ID, nil
+}
+
+// IDX is like ID, but panics if an error occurs.
+func (u *GardenUpsertOne) IDX(ctx context.Context) types.GardenID {
+	id, err := u.ID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // GardenCreateBulk is the builder for creating many Garden entities in bulk.
 type GardenCreateBulk struct {
 	config
 	builders []*GardenCreate
+	conflict []sql.ConflictOption
 }
 
 // Save creates the Garden entities in the database.
@@ -235,6 +464,7 @@ func (gcb *GardenCreateBulk) Save(ctx context.Context) ([]*Garden, error) {
 					_, err = mutators[i+1].Mutate(root, gcb.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
+					spec.OnConflict = gcb.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
 					if err = sqlgraph.BatchCreate(ctx, gcb.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
@@ -285,6 +515,171 @@ func (gcb *GardenCreateBulk) Exec(ctx context.Context) error {
 // ExecX is like Exec, but panics if an error occurs.
 func (gcb *GardenCreateBulk) ExecX(ctx context.Context) {
 	if err := gcb.Exec(ctx); err != nil {
+		panic(err)
+	}
+}
+
+// OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
+// of the `INSERT` statement. For example:
+//
+//	client.Garden.CreateBulk(builders...).
+//		OnConflict(
+//			// Update the row with the new values
+//			// the was proposed for insertion.
+//			sql.ResolveWithNewValues(),
+//		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.GardenUpsert) {
+//			SetName(v+v).
+//		}).
+//		Exec(ctx)
+//
+func (gcb *GardenCreateBulk) OnConflict(opts ...sql.ConflictOption) *GardenUpsertBulk {
+	gcb.conflict = opts
+	return &GardenUpsertBulk{
+		create: gcb,
+	}
+}
+
+// OnConflictColumns calls `OnConflict` and configures the columns
+// as conflict target. Using this option is equivalent to using:
+//
+//	client.Garden.Create().
+//		OnConflict(sql.ConflictColumns(columns...)).
+//		Exec(ctx)
+//
+func (gcb *GardenCreateBulk) OnConflictColumns(columns ...string) *GardenUpsertBulk {
+	gcb.conflict = append(gcb.conflict, sql.ConflictColumns(columns...))
+	return &GardenUpsertBulk{
+		create: gcb,
+	}
+}
+
+// GardenUpsertBulk is the builder for "upsert"-ing
+// a bulk of Garden nodes.
+type GardenUpsertBulk struct {
+	create *GardenCreateBulk
+}
+
+// UpdateNewValues updates the fields using the new values that
+// were set on create. Using this option is equivalent to using:
+//
+//	client.Garden.Create().
+//		OnConflict(
+//			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(garden.FieldID)
+//			}),
+//		).
+//		Exec(ctx)
+//
+func (u *GardenUpsertBulk) UpdateNewValues() *GardenUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(garden.FieldID)
+				return
+			}
+		}
+	}))
+	return u
+}
+
+// Ignore sets each column to itself in case of conflict.
+// Using this option is equivalent to using:
+//
+//	client.Garden.Create().
+//		OnConflict(sql.ResolveWithIgnore()).
+//		Exec(ctx)
+//
+func (u *GardenUpsertBulk) Ignore() *GardenUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
+	return u
+}
+
+// DoNothing configures the conflict_action to `DO NOTHING`.
+// Supported only by SQLite and PostgreSQL.
+func (u *GardenUpsertBulk) DoNothing() *GardenUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.DoNothing())
+	return u
+}
+
+// Update allows overriding fields `UPDATE` values. See the GardenCreateBulk.OnConflict
+// documentation for more info.
+func (u *GardenUpsertBulk) Update(set func(*GardenUpsert)) *GardenUpsertBulk {
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
+		set(&GardenUpsert{UpdateSet: update})
+	}))
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *GardenUpsertBulk) SetName(v string) *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *GardenUpsertBulk) UpdateName() *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetLocation sets the "location" field.
+func (u *GardenUpsertBulk) SetLocation(v string) *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetLocation(v)
+	})
+}
+
+// UpdateLocation sets the "location" field to the value that was provided on create.
+func (u *GardenUpsertBulk) UpdateLocation() *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateLocation()
+	})
+}
+
+// SetMentorshipSystemID sets the "mentorship_system_id" field.
+func (u *GardenUpsertBulk) SetMentorshipSystemID(v types.MentorshipSystemID) *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetMentorshipSystemID(v)
+	})
+}
+
+// UpdateMentorshipSystemID sets the "mentorship_system_id" field to the value that was provided on create.
+func (u *GardenUpsertBulk) UpdateMentorshipSystemID() *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateMentorshipSystemID()
+	})
+}
+
+// ClearMentorshipSystemID clears the value of the "mentorship_system_id" field.
+func (u *GardenUpsertBulk) ClearMentorshipSystemID() *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.ClearMentorshipSystemID()
+	})
+}
+
+// Exec executes the query.
+func (u *GardenUpsertBulk) Exec(ctx context.Context) error {
+	for i, b := range u.create.builders {
+		if len(b.conflict) != 0 {
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the GardenCreateBulk instead", i)
+		}
+	}
+	if len(u.create.conflict) == 0 {
+		return errors.New("ent: missing options for GardenCreateBulk.OnConflict")
+	}
+	return u.create.Exec(ctx)
+}
+
+// ExecX is like Exec, but panics if an error occurs.
+func (u *GardenUpsertBulk) ExecX(ctx context.Context) {
+	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"study_event_go/ent/mentorshipsystem"
 	"study_event_go/types"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -16,6 +17,12 @@ type MentorshipSystem struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID types.MentorshipSystemID `json:"id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 }
@@ -29,6 +36,8 @@ func (*MentorshipSystem) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case mentorshipsystem.FieldName:
 			values[i] = new(sql.NullString)
+		case mentorshipsystem.FieldCreatedAt, mentorshipsystem.FieldUpdatedAt, mentorshipsystem.FieldDeletedAt:
+			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type MentorshipSystem", columns[i])
 		}
@@ -50,6 +59,25 @@ func (ms *MentorshipSystem) assignValues(columns []string, values []interface{})
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ms.ID = types.MentorshipSystemID(value.Int64)
+		case mentorshipsystem.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				ms.CreatedAt = value.Time
+			}
+		case mentorshipsystem.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				ms.UpdatedAt = value.Time
+			}
+		case mentorshipsystem.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				ms.DeletedAt = new(time.Time)
+				*ms.DeletedAt = value.Time
+			}
 		case mentorshipsystem.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -84,6 +112,14 @@ func (ms *MentorshipSystem) String() string {
 	var builder strings.Builder
 	builder.WriteString("MentorshipSystem(")
 	builder.WriteString(fmt.Sprintf("id=%v", ms.ID))
+	builder.WriteString(", created_at=")
+	builder.WriteString(ms.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", updated_at=")
+	builder.WriteString(ms.UpdatedAt.Format(time.ANSIC))
+	if v := ms.DeletedAt; v != nil {
+		builder.WriteString(", deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", name=")
 	builder.WriteString(ms.Name)
 	builder.WriteByte(')')
