@@ -1,7 +1,7 @@
 package container
 
 import (
-	"study_event_go/controller"
+	"study-event-go/controller"
 )
 
 // ControllerContainer ...

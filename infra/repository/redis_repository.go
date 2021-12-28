@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"study_event_go/domain/interfaces"
+	"study-event-go/domain/interfaces"
 
 	"github.com/go-redis/redis/v8"
 )

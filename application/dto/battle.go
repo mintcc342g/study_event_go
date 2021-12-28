@@ -1,6 +1,6 @@
 package dto
 
-import "study_event_go/types"
+import "study-event-go/types"
 
 // Alarm ...
 type Alarm struct {

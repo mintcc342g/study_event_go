@@ -5,7 +5,7 @@ package hook
 import (
 	"context"
 	"fmt"
-	"study_event_go/ent"
+	"study-event-go/ent"
 )
 
 // The GardenFunc type is an adapter to allow the use of ordinary

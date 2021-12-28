@@ -5,8 +5,8 @@ package ent
 import (
 	"context"
 	"fmt"
-	"study_event_go/ent/garden"
-	"study_event_go/ent/predicate"
+	"study-event-go/ent/garden"
+	"study-event-go/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

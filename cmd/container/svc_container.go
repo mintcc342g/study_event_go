@@ -1,7 +1,7 @@
 package container
 
 import (
-	"study_event_go/application"
+	"study-event-go/application"
 )
 
 // ServiceContainer ...

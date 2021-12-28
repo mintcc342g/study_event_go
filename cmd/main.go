@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"study_event_go/cmd/container"
-	"study_event_go/conf"
-	"study_event_go/ent"
-	"study_event_go/router"
-	"study_event_go/types"
+	"study-event-go/cmd/container"
+	"study-event-go/conf"
+	"study-event-go/ent"
+	"study-event-go/router"
+	"study-event-go/types"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/RichardKnop/machinery/v1"

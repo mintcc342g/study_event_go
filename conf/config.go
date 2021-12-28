@@ -21,7 +21,7 @@ func init() {
 		"db":          "mysql",
 		"db_host":     "localhost",
 		"db_port":     3306,
-		"db_name":     "study_event_go",
+		"db_name":     "lily",
 		"db_user":     "root",
 		"db_pass":     "",
 	})

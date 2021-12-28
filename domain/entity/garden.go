@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"study_event_go/types"
+	"study-event-go/types"
 
 	"github.com/juju/errors"
 )

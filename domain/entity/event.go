@@ -1,6 +1,6 @@
 package entity
 
-import "study_event_go/domain/vo"
+import "study-event-go/domain/vo"
 
 // SortieEvent ...
 type SortieEvent struct {

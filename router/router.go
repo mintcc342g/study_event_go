@@ -1,7 +1,7 @@
 package router
 
 import (
-	"study_event_go/cmd/container"
+	"study-event-go/cmd/container"
 
 	"github.com/labstack/echo/v4"
 )

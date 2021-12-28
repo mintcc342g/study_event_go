@@ -4,9 +4,9 @@ package enttest
 
 import (
 	"context"
-	"study_event_go/ent"
+	"study-event-go/ent"
 	// required by schema hooks.
-	_ "study_event_go/ent/runtime"
+	_ "study-event-go/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

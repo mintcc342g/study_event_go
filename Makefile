@@ -1,10 +1,10 @@
-PACKAGE = study_event_go
+PACKAGE = study-event-go
 BUILDPATH ?= $(CURDIR)
 BASE	= $(BUILDPATH)
 BIN		= $(BASE)/bin
 
 ifeq ($(OS),Windows_NT)
-	PACKAGE = study_event_go.exe
+	PACKAGE = study-event-go.exe
 else
 	UNAME := $(shell uname)
 	ifeq ($(UNAME), Linux)
@@ -36,6 +36,11 @@ buildw:
 	$Q cd $(BASE)/cmd && $(GOBUILD) build -i \
 		$(BUILDTAG) \
 		-o $(BIN)/$(PACKAGE)
+
+## TODO: edit filter-out
+.PHONY: ent
+ent:
+	$(GO) run entgo.io/ent/cmd/ent init $(filter-out $@,$(MAKECMDGOALS))
 
 .PHONY: gen
 gen: ; $(info $(M) generate ent… )

@@ -2,10 +2,10 @@ package container
 
 import (
 	"context"
-	"study_event_go/domain/interfaces"
-	"study_event_go/ent"
-	"study_event_go/ent/migrate"
-	"study_event_go/infra/repository"
+	"study-event-go/domain/interfaces"
+	"study-event-go/ent"
+	"study-event-go/ent/migrate"
+	"study-event-go/infra/repository"
 
 	"github.com/RichardKnop/machinery/v1"
 	"github.com/go-redis/redis/v8"

@@ -5,8 +5,8 @@ package ent
 import (
 	"errors"
 	"fmt"
-	"study_event_go/ent/garden"
-	"study_event_go/ent/mentorshipsystem"
+	"study-event-go/ent/garden"
+	"study-event-go/ent/mentorshipsystem"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"

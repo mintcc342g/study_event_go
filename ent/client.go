@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"log"
 
-	"study_event_go/ent/migrate"
-	"study_event_go/types"
+	"study-event-go/ent/migrate"
+	"study-event-go/types"
 
-	"study_event_go/ent/garden"
-	"study_event_go/ent/mentorshipsystem"
+	"study-event-go/ent/garden"
+	"study-event-go/ent/mentorshipsystem"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"

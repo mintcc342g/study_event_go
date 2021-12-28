@@ -2,7 +2,7 @@ package interfaces
 
 import (
 	"context"
-	"study_event_go/domain/entity"
+	"study-event-go/domain/entity"
 )
 
 // EventRepository ...

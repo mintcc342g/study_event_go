@@ -2,9 +2,9 @@ package controller
 
 import (
 	"net/http"
-	"study_event_go/application"
-	"study_event_go/application/dto"
-	"study_event_go/types"
+	"study-event-go/application"
+	"study-event-go/application/dto"
+	"study-event-go/types"
 
 	"github.com/jinzhu/copier"
 	"github.com/labstack/echo/v4"

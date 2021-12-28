@@ -7,9 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"study_event_go/ent/mentorshipsystem"
-	"study_event_go/ent/predicate"
-	"study_event_go/types"
+	"study-event-go/ent/mentorshipsystem"
+	"study-event-go/ent/predicate"
+	"study-event-go/types"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

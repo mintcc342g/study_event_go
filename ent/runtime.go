@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"study_event_go/ent/mentorshipsystem"
-	"study_event_go/ent/schema"
+	"study-event-go/ent/mentorshipsystem"
+	"study-event-go/ent/schema"
 	"time"
 )
 

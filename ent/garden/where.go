@@ -3,8 +3,8 @@
 package garden
 
 import (
-	"study_event_go/ent/predicate"
-	"study_event_go/types"
+	"study-event-go/ent/predicate"
+	"study-event-go/types"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

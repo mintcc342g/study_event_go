@@ -1,7 +1,7 @@
 package application
 
 import (
-	"study_event_go/domain/interfaces"
+	"study-event-go/domain/interfaces"
 )
 
 // EventService ...

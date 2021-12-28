@@ -1,8 +1,8 @@
 package entity
 
 import (
-	"study_event_go/domain/vo"
-	"study_event_go/types"
+	"study-event-go/domain/vo"
+	"study-event-go/types"
 )
 
 // Lily ...

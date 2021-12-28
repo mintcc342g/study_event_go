@@ -2,9 +2,9 @@ package entity
 
 import (
 	"math/rand"
-	"study_event_go/application/dto"
-	"study_event_go/domain/vo"
-	"study_event_go/types"
+	"study-event-go/application/dto"
+	"study-event-go/domain/vo"
+	"study-event-go/types"
 )
 
 // Alarm ...

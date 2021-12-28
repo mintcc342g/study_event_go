@@ -6,9 +6,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"study_event_go/ent/garden"
-	"study_event_go/ent/mentorshipsystem"
-	"study_event_go/types"
+	"study-event-go/ent/garden"
+	"study-event-go/ent/mentorshipsystem"
+	"study-event-go/types"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

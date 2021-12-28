@@ -2,8 +2,8 @@ package entity
 
 import (
 	"strings"
-	"study_event_go/application/dto"
-	"study_event_go/types"
+	"study-event-go/application/dto"
+	"study-event-go/types"
 	"time"
 )
 

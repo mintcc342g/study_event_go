@@ -1,7 +1,7 @@
 package schema
 
 import (
-	"study_event_go/types"
+	"study-event-go/types"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"

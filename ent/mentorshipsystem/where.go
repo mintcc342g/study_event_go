@@ -3,8 +3,8 @@
 package mentorshipsystem
 
 import (
-	"study_event_go/ent/predicate"
-	"study_event_go/types"
+	"study-event-go/ent/predicate"
+	"study-event-go/types"
 	"time"
 
 	"entgo.io/ent/dialect/sql"

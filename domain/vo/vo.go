@@ -1,6 +1,6 @@
 package vo
 
-import "study_event_go/types"
+import "study-event-go/types"
 
 // Name ...
 type Name struct {

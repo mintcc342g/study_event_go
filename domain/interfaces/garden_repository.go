@@ -2,8 +2,8 @@ package interfaces
 
 import (
 	"context"
-	"study_event_go/domain/entity"
-	"study_event_go/types"
+	"study-event-go/domain/entity"
+	"study-event-go/types"
 )
 
 // GardenRepository ...

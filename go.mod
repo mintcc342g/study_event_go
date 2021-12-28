@@ -1,4 +1,4 @@
-module study_event_go
+module study-event-go
 
 go 1.15
 

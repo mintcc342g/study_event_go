@@ -2,10 +2,10 @@ package application
 
 import (
 	"context"
-	"study_event_go/application/dto"
-	"study_event_go/domain/entity"
-	"study_event_go/domain/interfaces"
-	"study_event_go/types"
+	"study-event-go/application/dto"
+	"study-event-go/domain/entity"
+	"study-event-go/domain/interfaces"
+	"study-event-go/types"
 )
 
 // MentorshipService ...
