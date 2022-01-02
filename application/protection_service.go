@@ -39,7 +39,10 @@ func (p *ProtectionService) Alarm(ctx context.Context, alarmDTO *dto.Alarm) (err
 		return err
 	}
 
-	alarm := entity.NewAlarm(alarmDTO)
+	alarm, err := entity.NewAlarm(alarmDTO)
+	if err != nil {
+		return err
+	}
 
 	if alarm.IsSevere() && garden.IsLudovico() {
 		return p.sendTempleLegion(ctx, garden, alarm)

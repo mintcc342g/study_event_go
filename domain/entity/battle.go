@@ -2,9 +2,12 @@ package entity
 
 import (
 	"math/rand"
+	"strings"
 	"study-event-go/application/dto"
 	"study-event-go/domain/vo"
 	"study-event-go/types"
+
+	"github.com/juju/errors"
 )
 
 // Alarm ...
@@ -18,7 +21,10 @@ type Alarm struct {
 }
 
 // NewAlarm ...
-func NewAlarm(alarmDTO *dto.Alarm) *Alarm {
+func NewAlarm(alarmDTO *dto.Alarm) (*Alarm, error) {
+	if err := validateAlarmDTO(alarmDTO); err != nil {
+		return nil, err
+	}
 
 	alarm := &Alarm{
 		GardenID:     alarmDTO.GardenID,
@@ -35,7 +41,29 @@ func NewAlarm(alarmDTO *dto.Alarm) *Alarm {
 		})
 	}
 
-	return alarm
+	return alarm, nil
+}
+
+func validateAlarmDTO(alarmDTO *dto.Alarm) error {
+	if alarmDTO.GardenID == 0 {
+		return errors.BadRequestf("invalid garden ID")
+	}
+
+	alarmDTO.CaveLocation = strings.TrimSpace(alarmDTO.CaveLocation)
+
+	if alarmDTO.CaveLocation == "" {
+		return errors.BadRequestf("invalid cave location")
+	}
+
+	if alarmDTO.TotalCount == 0 {
+		return errors.BadRequestf("invalid total count")
+	}
+
+	if len(alarmDTO.Huges) <= 0 {
+		return errors.BadRequestf("invalid huges")
+	}
+
+	return nil
 }
 
 // IsSevere ...
