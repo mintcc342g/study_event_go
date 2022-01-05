@@ -15,6 +15,7 @@ var StudyEventGo *ViperConfig
 func init() {
 	StudyEventGo = readConfig(map[string]interface{}{
 		"debug_route": false,
+		"debug_db":    true,
 		"port":        4567,
 		"redis_host":  "localhost:6379",
 		"broker_host": "redis://localhost:6379",

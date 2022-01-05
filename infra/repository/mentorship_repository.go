@@ -68,3 +68,28 @@ func (m *mentorshipRepository) Get(ctx context.Context, id types.MentorshipSyste
 		Name:      entModel.Name,
 	}, nil
 }
+
+func (m *mentorshipRepository) List(ctx context.Context, offset uint32) ([]*entity.MentorshipSystem, error) {
+
+	entModels, err := m.conn.MentorshipSystem.
+		Query().
+		Limit(10).
+		Offset(int(offset)).
+		All(ctx)
+	if err != nil {
+		return nil, errors.Errorf("internal server error")
+	}
+
+	mentorships := make([]*entity.MentorshipSystem, len(entModels))
+	for i, v := range entModels {
+		mentorships[i] = &entity.MentorshipSystem{
+			ID:        v.ID,
+			CreatedAt: v.CreatedAt,
+			UpdatedAt: v.UpdatedAt,
+			DeletedAt: v.DeletedAt,
+			Name:      v.Name,
+		}
+	}
+
+	return mentorships, nil
+}

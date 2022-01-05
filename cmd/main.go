@@ -137,6 +137,11 @@ func dbInit(configs *conf.ViperConfig, e *echo.Echo) *ent.Client {
 	db.SetMaxIdleConns(10)
 	db.SetMaxOpenConns(100)
 	db.SetConnMaxLifetime(time.Hour)
+
+	if configs.GetBool("debug_db") {
+		return ent.NewClient(ent.Driver(drv)).Debug()
+	}
+
 	return ent.NewClient(ent.Driver(drv))
 }
 

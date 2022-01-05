@@ -98,7 +98,7 @@ endif
 .PHONY: gen
 gen:
 ifeq ($(OS),Windows_NT)
-	@echo tidy packages...
+	@echo generate ent...
 else
 	$(info $(M) generate ent… ) @
 endif

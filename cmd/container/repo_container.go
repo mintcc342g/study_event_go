@@ -33,7 +33,7 @@ func newRepositoryContainer(db *ent.Client, redis redis.Cmdable, machineryServer
 // InitRepositoryContainer ...
 func InitRepositoryContainer(db *ent.Client, redis redis.Cmdable, machineryServer *machinery.Server) (*RepositoryContainer, error) {
 	ctx := context.Background()
-	if err := db.Debug().Schema.Create(
+	if err := db.Schema.Create(
 		ctx,
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),

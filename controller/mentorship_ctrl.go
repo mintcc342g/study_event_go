@@ -75,3 +75,27 @@ func (m *MentorshipController) Get(c echo.Context) (err error) {
 
 	return response(c, http.StatusOK, "Get Mentorship OK", mentorshipDTO)
 }
+
+// List ...
+func (m *MentorshipController) List(c echo.Context) (err error) {
+	// TODO: change logger
+
+	ctx := c.Request().Context()
+
+	var request struct {
+		Offset uint32 `query:"offset"`
+	}
+	if err = c.Bind(&request); err != nil {
+		c.Logger().Error("MentorshipController Bind", "err", err)
+		return response(c, http.StatusBadRequest, "invalid request", nil)
+	}
+
+	mentorshipDTO, err := m.mentorshipSvc.List(ctx, request.Offset)
+	if err != nil {
+		c.Logger().Error("MentorshipController List", "err", err)
+		// TODO: error handle
+		return response(c, http.StatusInternalServerError, "internal server error", err.Error())
+	}
+
+	return response(c, http.StatusOK, "List Mentorship OK", mentorshipDTO)
+}
