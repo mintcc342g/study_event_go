@@ -12,7 +12,7 @@ func AssaultLilyRoute(sys *echo.Group, ctrlContainer *container.ControllerContai
 	sys.POST("/mentorship", ctrlContainer.Mentorship.New) // TODO: check authority with jwt
 	sys.GET("/mentorship/:id", ctrlContainer.Mentorship.Get)
 	sys.GET("/mentorship", ctrlContainer.Mentorship.List)
-	// sys.PUT("/mentorship/:id", ctrlContainer.Mentorship.Update)
+	sys.PUT("/mentorship/:id", ctrlContainer.Mentorship.Update)
 	// sys.DELETE("/mentorship/:id", ctrlContainer.Mentorship.Delete)
 
 	// TODO

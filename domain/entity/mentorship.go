@@ -5,6 +5,8 @@ import (
 	"study-event-go/application/dto"
 	"study-event-go/types"
 	"time"
+
+	"github.com/juju/errors"
 )
 
 // MentorshipSystem ...
@@ -28,10 +30,34 @@ type GardenMentorship struct {
 }
 
 // NewMentorship ...
-func NewMentorship(req *dto.Mentorship) *MentorshipSystem {
-	return &MentorshipSystem{
-		Name: strings.TrimSpace(strings.ToLower(req.Name)),
+func NewMentorship(req *dto.Mentorship) (*MentorshipSystem, error) {
+	if err := validateMentorshipDTO(req); err != nil {
+		return nil, err
 	}
+
+	return &MentorshipSystem{
+		Name: req.Name,
+	}, nil
+}
+
+// Update ...
+func (m *MentorshipSystem) Update(req *dto.Mentorship) error {
+	if err := validateMentorshipDTO(req); err != nil {
+		return err
+	}
+
+	m.Name = req.Name
+
+	return nil
+}
+
+func validateMentorshipDTO(req *dto.Mentorship) error {
+	req.Name = strings.TrimSpace(strings.ToLower(req.Name))
+	if req.Name == "" {
+		return errors.BadRequestf("invalid name")
+	}
+
+	return nil
 }
 
 // DTO ...

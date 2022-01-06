@@ -6,7 +6,6 @@ import (
 	"study-event-go/application/dto"
 	"study-event-go/types"
 
-	"github.com/jinzhu/copier"
 	"github.com/labstack/echo/v4"
 )
 
@@ -36,10 +35,8 @@ func (m *MentorshipController) New(c echo.Context) (err error) {
 		return response(c, http.StatusBadRequest, "invalid request", nil)
 	}
 
-	mentorshipDTO := &dto.Mentorship{}
-	if err = copier.Copy(mentorshipDTO, request); err != nil {
-		c.Logger().Error("MentorshipController Copy", "err", err)
-		return response(c, http.StatusInternalServerError, "internal server error", nil)
+	mentorshipDTO := &dto.Mentorship{
+		Name: request.Name,
 	}
 
 	mentorshipDTO, err = m.mentorshipSvc.New(ctx, mentorshipDTO)
@@ -97,5 +94,35 @@ func (m *MentorshipController) List(c echo.Context) (err error) {
 		return response(c, http.StatusInternalServerError, "internal server error", err.Error())
 	}
 
-	return response(c, http.StatusOK, "List Mentorship OK", mentorshipDTO)
+	return response(c, http.StatusOK, "List Mentorships OK", mentorshipDTO)
+}
+
+// Update ...
+func (m *MentorshipController) Update(c echo.Context) (err error) {
+	// TODO: change logger
+
+	ctx := c.Request().Context()
+
+	var request struct {
+		ID   types.MentorshipSystemID `param:"id"`
+		Name string                   `json:"name"`
+	}
+	if err = c.Bind(&request); err != nil {
+		c.Logger().Error("MentorshipController Bind", "err", err)
+		return response(c, http.StatusBadRequest, "invalid request", nil)
+	}
+
+	mentorshipDTO := &dto.Mentorship{
+		ID:   request.ID,
+		Name: request.Name,
+	}
+
+	mentorshipDTO, err = m.mentorshipSvc.Update(ctx, mentorshipDTO)
+	if err != nil {
+		c.Logger().Error("MentorshipController Update", "err", err)
+		// TODO: error handle
+		return response(c, http.StatusInternalServerError, "internal server error", err.Error())
+	}
+
+	return response(c, http.StatusOK, "Update Mentorship OK", mentorshipDTO)
 }

@@ -6,6 +6,8 @@ import (
 	"study-event-go/domain/entity"
 	"study-event-go/domain/interfaces"
 	"study-event-go/types"
+
+	"github.com/juju/errors"
 )
 
 // MentorshipService ...
@@ -27,8 +29,17 @@ func NewMentorshipService(
 // New ...
 func (m *MentorshipService) New(ctx context.Context, mentorshipDTO *dto.Mentorship) (*dto.Mentorship, error) {
 
-	mentorship, err := m.mentorshipRepo.New(ctx, entity.NewMentorship(mentorshipDTO))
+	_, err := m.mentorshipRepo.GetByName(ctx, mentorshipDTO.Name)
+	if !errors.IsNotFound(err) {
+		return nil, err
+	}
+
+	mentorship, err := entity.NewMentorship(mentorshipDTO)
 	if err != nil {
+		return nil, err
+	}
+
+	if mentorship, err = m.mentorshipRepo.New(ctx, mentorship); err != nil {
 		return nil, err
 	}
 
@@ -68,4 +79,28 @@ func (m *MentorshipService) List(ctx context.Context, offset uint32) ([]*dto.Men
 	}
 
 	return results, nil
+}
+
+// Update ...
+func (m *MentorshipService) Update(ctx context.Context, mentorshipDTO *dto.Mentorship) (*dto.Mentorship, error) {
+
+	_, err := m.mentorshipRepo.GetByName(ctx, mentorshipDTO.Name)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+
+	mentorship, err := m.mentorshipRepo.Get(ctx, mentorshipDTO.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = mentorship.Update(mentorshipDTO); err != nil {
+		return nil, err
+	}
+
+	if mentorship, err = m.mentorshipRepo.Update(ctx, mentorship); err != nil {
+		return nil, err
+	}
+
+	return mentorship.DTO(), nil
 }
