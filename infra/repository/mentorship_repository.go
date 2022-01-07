@@ -54,7 +54,12 @@ func (m *mentorshipRepository) New(ctx context.Context, mentorship *entity.Mento
 
 func (m *mentorshipRepository) Get(ctx context.Context, id types.MentorshipID) (*entity.Mentorship, error) {
 
-	entModel, err := m.conn.Mentorship.Get(ctx, id)
+	entModel, err := m.conn.Mentorship.
+		Query().
+		Where(
+			entMentorship.ID(id),
+			entMentorship.DeletedAtIsNil()).
+		Only(ctx)
 	if err != nil {
 		// logger
 		return nil, errors.NotFoundf("id[%d]", id)
@@ -96,6 +101,8 @@ func (m *mentorshipRepository) List(ctx context.Context, offset uint32) ([]*enti
 
 	entModels, err := m.conn.Mentorship.
 		Query().
+		Where(
+			entMentorship.DeletedAtIsNil()).
 		Limit(10).
 		Offset(int(offset)).
 		All(ctx)
