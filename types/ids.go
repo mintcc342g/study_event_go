@@ -14,4 +14,4 @@ type CharmID ID
 
 type LegionID ID
 
-type MentorshipSystemID ID
+type MentorshipID ID

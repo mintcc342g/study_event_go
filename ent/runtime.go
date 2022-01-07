@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"study-event-go/ent/mentorshipsystem"
+	"study-event-go/ent/mentorship"
 	"study-event-go/ent/schema"
 	"time"
 )
@@ -12,20 +12,20 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	mentorshipsystemFields := schema.MentorshipSystem{}.Fields()
-	_ = mentorshipsystemFields
-	// mentorshipsystemDescCreatedAt is the schema descriptor for created_at field.
-	mentorshipsystemDescCreatedAt := mentorshipsystemFields[1].Descriptor()
-	// mentorshipsystem.DefaultCreatedAt holds the default value on creation for the created_at field.
-	mentorshipsystem.DefaultCreatedAt = mentorshipsystemDescCreatedAt.Default.(func() time.Time)
-	// mentorshipsystemDescUpdatedAt is the schema descriptor for updated_at field.
-	mentorshipsystemDescUpdatedAt := mentorshipsystemFields[2].Descriptor()
-	// mentorshipsystem.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	mentorshipsystem.DefaultUpdatedAt = mentorshipsystemDescUpdatedAt.Default.(func() time.Time)
-	// mentorshipsystem.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	mentorshipsystem.UpdateDefaultUpdatedAt = mentorshipsystemDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// mentorshipsystemDescName is the schema descriptor for name field.
-	mentorshipsystemDescName := mentorshipsystemFields[4].Descriptor()
-	// mentorshipsystem.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	mentorshipsystem.NameValidator = mentorshipsystemDescName.Validators[0].(func(string) error)
+	mentorshipFields := schema.Mentorship{}.Fields()
+	_ = mentorshipFields
+	// mentorshipDescCreatedAt is the schema descriptor for created_at field.
+	mentorshipDescCreatedAt := mentorshipFields[1].Descriptor()
+	// mentorship.DefaultCreatedAt holds the default value on creation for the created_at field.
+	mentorship.DefaultCreatedAt = mentorshipDescCreatedAt.Default.(func() time.Time)
+	// mentorshipDescUpdatedAt is the schema descriptor for updated_at field.
+	mentorshipDescUpdatedAt := mentorshipFields[2].Descriptor()
+	// mentorship.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	mentorship.DefaultUpdatedAt = mentorshipDescUpdatedAt.Default.(func() time.Time)
+	// mentorship.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	mentorship.UpdateDefaultUpdatedAt = mentorshipDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// mentorshipDescName is the schema descriptor for name field.
+	mentorshipDescName := mentorshipFields[4].Descriptor()
+	// mentorship.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	mentorship.NameValidator = mentorshipDescName.Validators[0].(func(string) error)
 }

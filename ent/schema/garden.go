@@ -19,8 +19,8 @@ func (Garden) Fields() []ent.Field {
 		field.Uint64("id").GoType(types.GardenID(0)),
 		field.String("name"),
 		field.String("location"),
-		field.Uint64("mentorship_system_id").
-			GoType(types.MentorshipSystemID(0)).
+		field.Uint64("mentorship_id").
+			GoType(types.MentorshipID(0)).
 			Optional().
 			Nillable(),
 	}
@@ -29,9 +29,9 @@ func (Garden) Fields() []ent.Field {
 // Edges of the Garden.
 func (Garden) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("mentorship_system", MentorshipSystem.Type).
-			StorageKey(edge.Symbol("garden_mentorship_system")).
-			Field("mentorship_system_id").
+		edge.To("mentorship", Mentorship.Type).
+			StorageKey(edge.Symbol("garden_mentorship")).
+			Field("mentorship_id").
 			Unique(),
 	}
 }

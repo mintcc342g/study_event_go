@@ -13,7 +13,7 @@ var (
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "location", Type: field.TypeString},
-		{Name: "mentorship_system_id", Type: field.TypeUint64, Nullable: true},
+		{Name: "mentorship_id", Type: field.TypeUint64, Nullable: true},
 	}
 	// GardensTable holds the schema information for the "gardens" table.
 	GardensTable = &schema.Table{
@@ -22,34 +22,34 @@ var (
 		PrimaryKey: []*schema.Column{GardensColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "garden_mentorship_system",
+				Symbol:     "garden_mentorship",
 				Columns:    []*schema.Column{GardensColumns[3]},
-				RefColumns: []*schema.Column{MentorshipSystemsColumns[0]},
+				RefColumns: []*schema.Column{MentorshipsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
 	}
-	// MentorshipSystemsColumns holds the columns for the "mentorship_systems" table.
-	MentorshipSystemsColumns = []*schema.Column{
+	// MentorshipsColumns holds the columns for the "mentorships" table.
+	MentorshipsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
 	}
-	// MentorshipSystemsTable holds the schema information for the "mentorship_systems" table.
-	MentorshipSystemsTable = &schema.Table{
-		Name:       "mentorship_systems",
-		Columns:    MentorshipSystemsColumns,
-		PrimaryKey: []*schema.Column{MentorshipSystemsColumns[0]},
+	// MentorshipsTable holds the schema information for the "mentorships" table.
+	MentorshipsTable = &schema.Table{
+		Name:       "mentorships",
+		Columns:    MentorshipsColumns,
+		PrimaryKey: []*schema.Column{MentorshipsColumns[0]},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		GardensTable,
-		MentorshipSystemsTable,
+		MentorshipsTable,
 	}
 )
 
 func init() {
-	GardensTable.ForeignKeys[0].RefTable = MentorshipSystemsTable
+	GardensTable.ForeignKeys[0].RefTable = MentorshipsTable
 }

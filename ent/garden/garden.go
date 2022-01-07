@@ -11,19 +11,19 @@ const (
 	FieldName = "name"
 	// FieldLocation holds the string denoting the location field in the database.
 	FieldLocation = "location"
-	// FieldMentorshipSystemID holds the string denoting the mentorship_system_id field in the database.
-	FieldMentorshipSystemID = "mentorship_system_id"
-	// EdgeMentorshipSystem holds the string denoting the mentorship_system edge name in mutations.
-	EdgeMentorshipSystem = "mentorship_system"
+	// FieldMentorshipID holds the string denoting the mentorship_id field in the database.
+	FieldMentorshipID = "mentorship_id"
+	// EdgeMentorship holds the string denoting the mentorship edge name in mutations.
+	EdgeMentorship = "mentorship"
 	// Table holds the table name of the garden in the database.
 	Table = "gardens"
-	// MentorshipSystemTable is the table that holds the mentorship_system relation/edge.
-	MentorshipSystemTable = "gardens"
-	// MentorshipSystemInverseTable is the table name for the MentorshipSystem entity.
-	// It exists in this package in order to avoid circular dependency with the "mentorshipsystem" package.
-	MentorshipSystemInverseTable = "mentorship_systems"
-	// MentorshipSystemColumn is the table column denoting the mentorship_system relation/edge.
-	MentorshipSystemColumn = "mentorship_system_id"
+	// MentorshipTable is the table that holds the mentorship relation/edge.
+	MentorshipTable = "gardens"
+	// MentorshipInverseTable is the table name for the Mentorship entity.
+	// It exists in this package in order to avoid circular dependency with the "mentorship" package.
+	MentorshipInverseTable = "mentorships"
+	// MentorshipColumn is the table column denoting the mentorship relation/edge.
+	MentorshipColumn = "mentorship_id"
 )
 
 // Columns holds all SQL columns for garden fields.
@@ -31,7 +31,7 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldLocation,
-	FieldMentorshipSystemID,
+	FieldMentorshipID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

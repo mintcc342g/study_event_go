@@ -11,7 +11,7 @@ import (
 	"study-event-go/types"
 
 	"study-event-go/ent/garden"
-	"study-event-go/ent/mentorshipsystem"
+	"study-event-go/ent/mentorship"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -25,8 +25,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Garden is the client for interacting with the Garden builders.
 	Garden *GardenClient
-	// MentorshipSystem is the client for interacting with the MentorshipSystem builders.
-	MentorshipSystem *MentorshipSystemClient
+	// Mentorship is the client for interacting with the Mentorship builders.
+	Mentorship *MentorshipClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -41,7 +41,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Garden = NewGardenClient(c.config)
-	c.MentorshipSystem = NewMentorshipSystemClient(c.config)
+	c.Mentorship = NewMentorshipClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -73,10 +73,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:              ctx,
-		config:           cfg,
-		Garden:           NewGardenClient(cfg),
-		MentorshipSystem: NewMentorshipSystemClient(cfg),
+		ctx:        ctx,
+		config:     cfg,
+		Garden:     NewGardenClient(cfg),
+		Mentorship: NewMentorshipClient(cfg),
 	}, nil
 }
 
@@ -94,9 +94,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:           cfg,
-		Garden:           NewGardenClient(cfg),
-		MentorshipSystem: NewMentorshipSystemClient(cfg),
+		config:     cfg,
+		Garden:     NewGardenClient(cfg),
+		Mentorship: NewMentorshipClient(cfg),
 	}, nil
 }
 
@@ -127,7 +127,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Garden.Use(hooks...)
-	c.MentorshipSystem.Use(hooks...)
+	c.Mentorship.Use(hooks...)
 }
 
 // GardenClient is a client for the Garden schema.
@@ -215,15 +215,15 @@ func (c *GardenClient) GetX(ctx context.Context, id types.GardenID) *Garden {
 	return obj
 }
 
-// QueryMentorshipSystem queries the mentorship_system edge of a Garden.
-func (c *GardenClient) QueryMentorshipSystem(ga *Garden) *MentorshipSystemQuery {
-	query := &MentorshipSystemQuery{config: c.config}
+// QueryMentorship queries the mentorship edge of a Garden.
+func (c *GardenClient) QueryMentorship(ga *Garden) *MentorshipQuery {
+	query := &MentorshipQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := ga.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(garden.Table, garden.FieldID, id),
-			sqlgraph.To(mentorshipsystem.Table, mentorshipsystem.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, garden.MentorshipSystemTable, garden.MentorshipSystemColumn),
+			sqlgraph.To(mentorship.Table, mentorship.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, garden.MentorshipTable, garden.MentorshipColumn),
 		)
 		fromV = sqlgraph.Neighbors(ga.driver.Dialect(), step)
 		return fromV, nil
@@ -236,84 +236,84 @@ func (c *GardenClient) Hooks() []Hook {
 	return c.hooks.Garden
 }
 
-// MentorshipSystemClient is a client for the MentorshipSystem schema.
-type MentorshipSystemClient struct {
+// MentorshipClient is a client for the Mentorship schema.
+type MentorshipClient struct {
 	config
 }
 
-// NewMentorshipSystemClient returns a client for the MentorshipSystem from the given config.
-func NewMentorshipSystemClient(c config) *MentorshipSystemClient {
-	return &MentorshipSystemClient{config: c}
+// NewMentorshipClient returns a client for the Mentorship from the given config.
+func NewMentorshipClient(c config) *MentorshipClient {
+	return &MentorshipClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `mentorshipsystem.Hooks(f(g(h())))`.
-func (c *MentorshipSystemClient) Use(hooks ...Hook) {
-	c.hooks.MentorshipSystem = append(c.hooks.MentorshipSystem, hooks...)
+// A call to `Use(f, g, h)` equals to `mentorship.Hooks(f(g(h())))`.
+func (c *MentorshipClient) Use(hooks ...Hook) {
+	c.hooks.Mentorship = append(c.hooks.Mentorship, hooks...)
 }
 
-// Create returns a create builder for MentorshipSystem.
-func (c *MentorshipSystemClient) Create() *MentorshipSystemCreate {
-	mutation := newMentorshipSystemMutation(c.config, OpCreate)
-	return &MentorshipSystemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a create builder for Mentorship.
+func (c *MentorshipClient) Create() *MentorshipCreate {
+	mutation := newMentorshipMutation(c.config, OpCreate)
+	return &MentorshipCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of MentorshipSystem entities.
-func (c *MentorshipSystemClient) CreateBulk(builders ...*MentorshipSystemCreate) *MentorshipSystemCreateBulk {
-	return &MentorshipSystemCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Mentorship entities.
+func (c *MentorshipClient) CreateBulk(builders ...*MentorshipCreate) *MentorshipCreateBulk {
+	return &MentorshipCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for MentorshipSystem.
-func (c *MentorshipSystemClient) Update() *MentorshipSystemUpdate {
-	mutation := newMentorshipSystemMutation(c.config, OpUpdate)
-	return &MentorshipSystemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Mentorship.
+func (c *MentorshipClient) Update() *MentorshipUpdate {
+	mutation := newMentorshipMutation(c.config, OpUpdate)
+	return &MentorshipUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *MentorshipSystemClient) UpdateOne(ms *MentorshipSystem) *MentorshipSystemUpdateOne {
-	mutation := newMentorshipSystemMutation(c.config, OpUpdateOne, withMentorshipSystem(ms))
-	return &MentorshipSystemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *MentorshipClient) UpdateOne(m *Mentorship) *MentorshipUpdateOne {
+	mutation := newMentorshipMutation(c.config, OpUpdateOne, withMentorship(m))
+	return &MentorshipUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *MentorshipSystemClient) UpdateOneID(id types.MentorshipSystemID) *MentorshipSystemUpdateOne {
-	mutation := newMentorshipSystemMutation(c.config, OpUpdateOne, withMentorshipSystemID(id))
-	return &MentorshipSystemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *MentorshipClient) UpdateOneID(id types.MentorshipID) *MentorshipUpdateOne {
+	mutation := newMentorshipMutation(c.config, OpUpdateOne, withMentorshipID(id))
+	return &MentorshipUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for MentorshipSystem.
-func (c *MentorshipSystemClient) Delete() *MentorshipSystemDelete {
-	mutation := newMentorshipSystemMutation(c.config, OpDelete)
-	return &MentorshipSystemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Mentorship.
+func (c *MentorshipClient) Delete() *MentorshipDelete {
+	mutation := newMentorshipMutation(c.config, OpDelete)
+	return &MentorshipDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a delete builder for the given entity.
-func (c *MentorshipSystemClient) DeleteOne(ms *MentorshipSystem) *MentorshipSystemDeleteOne {
-	return c.DeleteOneID(ms.ID)
+func (c *MentorshipClient) DeleteOne(m *Mentorship) *MentorshipDeleteOne {
+	return c.DeleteOneID(m.ID)
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *MentorshipSystemClient) DeleteOneID(id types.MentorshipSystemID) *MentorshipSystemDeleteOne {
-	builder := c.Delete().Where(mentorshipsystem.ID(id))
+func (c *MentorshipClient) DeleteOneID(id types.MentorshipID) *MentorshipDeleteOne {
+	builder := c.Delete().Where(mentorship.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &MentorshipSystemDeleteOne{builder}
+	return &MentorshipDeleteOne{builder}
 }
 
-// Query returns a query builder for MentorshipSystem.
-func (c *MentorshipSystemClient) Query() *MentorshipSystemQuery {
-	return &MentorshipSystemQuery{
+// Query returns a query builder for Mentorship.
+func (c *MentorshipClient) Query() *MentorshipQuery {
+	return &MentorshipQuery{
 		config: c.config,
 	}
 }
 
-// Get returns a MentorshipSystem entity by its id.
-func (c *MentorshipSystemClient) Get(ctx context.Context, id types.MentorshipSystemID) (*MentorshipSystem, error) {
-	return c.Query().Where(mentorshipsystem.ID(id)).Only(ctx)
+// Get returns a Mentorship entity by its id.
+func (c *MentorshipClient) Get(ctx context.Context, id types.MentorshipID) (*Mentorship, error) {
+	return c.Query().Where(mentorship.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *MentorshipSystemClient) GetX(ctx context.Context, id types.MentorshipSystemID) *MentorshipSystem {
+func (c *MentorshipClient) GetX(ctx context.Context, id types.MentorshipID) *Mentorship {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -322,6 +322,6 @@ func (c *MentorshipSystemClient) GetX(ctx context.Context, id types.MentorshipSy
 }
 
 // Hooks returns the client hooks.
-func (c *MentorshipSystemClient) Hooks() []Hook {
-	return c.hooks.MentorshipSystem
+func (c *MentorshipClient) Hooks() []Hook {
+	return c.hooks.Mentorship
 }

@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"study-event-go/ent/garden"
-	"study-event-go/ent/mentorshipsystem"
+	"study-event-go/ent/mentorship"
 	"study-event-go/types"
 
 	"entgo.io/ent/dialect/sql"
@@ -35,16 +35,16 @@ func (gc *GardenCreate) SetLocation(s string) *GardenCreate {
 	return gc
 }
 
-// SetMentorshipSystemID sets the "mentorship_system_id" field.
-func (gc *GardenCreate) SetMentorshipSystemID(tsi types.MentorshipSystemID) *GardenCreate {
-	gc.mutation.SetMentorshipSystemID(tsi)
+// SetMentorshipID sets the "mentorship_id" field.
+func (gc *GardenCreate) SetMentorshipID(ti types.MentorshipID) *GardenCreate {
+	gc.mutation.SetMentorshipID(ti)
 	return gc
 }
 
-// SetNillableMentorshipSystemID sets the "mentorship_system_id" field if the given value is not nil.
-func (gc *GardenCreate) SetNillableMentorshipSystemID(tsi *types.MentorshipSystemID) *GardenCreate {
-	if tsi != nil {
-		gc.SetMentorshipSystemID(*tsi)
+// SetNillableMentorshipID sets the "mentorship_id" field if the given value is not nil.
+func (gc *GardenCreate) SetNillableMentorshipID(ti *types.MentorshipID) *GardenCreate {
+	if ti != nil {
+		gc.SetMentorshipID(*ti)
 	}
 	return gc
 }
@@ -55,9 +55,9 @@ func (gc *GardenCreate) SetID(ti types.GardenID) *GardenCreate {
 	return gc
 }
 
-// SetMentorshipSystem sets the "mentorship_system" edge to the MentorshipSystem entity.
-func (gc *GardenCreate) SetMentorshipSystem(m *MentorshipSystem) *GardenCreate {
-	return gc.SetMentorshipSystemID(m.ID)
+// SetMentorship sets the "mentorship" edge to the Mentorship entity.
+func (gc *GardenCreate) SetMentorship(m *Mentorship) *GardenCreate {
+	return gc.SetMentorshipID(m.ID)
 }
 
 // Mutation returns the GardenMutation object of the builder.
@@ -186,24 +186,24 @@ func (gc *GardenCreate) createSpec() (*Garden, *sqlgraph.CreateSpec) {
 		})
 		_node.Location = value
 	}
-	if nodes := gc.mutation.MentorshipSystemIDs(); len(nodes) > 0 {
+	if nodes := gc.mutation.MentorshipIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   garden.MentorshipSystemTable,
-			Columns: []string{garden.MentorshipSystemColumn},
+			Table:   garden.MentorshipTable,
+			Columns: []string{garden.MentorshipColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
-					Column: mentorshipsystem.FieldID,
+					Column: mentorship.FieldID,
 				},
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.MentorshipSystemID = &nodes[0]
+		_node.MentorshipID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -284,21 +284,21 @@ func (u *GardenUpsert) UpdateLocation() *GardenUpsert {
 	return u
 }
 
-// SetMentorshipSystemID sets the "mentorship_system_id" field.
-func (u *GardenUpsert) SetMentorshipSystemID(v types.MentorshipSystemID) *GardenUpsert {
-	u.Set(garden.FieldMentorshipSystemID, v)
+// SetMentorshipID sets the "mentorship_id" field.
+func (u *GardenUpsert) SetMentorshipID(v types.MentorshipID) *GardenUpsert {
+	u.Set(garden.FieldMentorshipID, v)
 	return u
 }
 
-// UpdateMentorshipSystemID sets the "mentorship_system_id" field to the value that was provided on create.
-func (u *GardenUpsert) UpdateMentorshipSystemID() *GardenUpsert {
-	u.SetExcluded(garden.FieldMentorshipSystemID)
+// UpdateMentorshipID sets the "mentorship_id" field to the value that was provided on create.
+func (u *GardenUpsert) UpdateMentorshipID() *GardenUpsert {
+	u.SetExcluded(garden.FieldMentorshipID)
 	return u
 }
 
-// ClearMentorshipSystemID clears the value of the "mentorship_system_id" field.
-func (u *GardenUpsert) ClearMentorshipSystemID() *GardenUpsert {
-	u.SetNull(garden.FieldMentorshipSystemID)
+// ClearMentorshipID clears the value of the "mentorship_id" field.
+func (u *GardenUpsert) ClearMentorshipID() *GardenUpsert {
+	u.SetNull(garden.FieldMentorshipID)
 	return u
 }
 
@@ -380,24 +380,24 @@ func (u *GardenUpsertOne) UpdateLocation() *GardenUpsertOne {
 	})
 }
 
-// SetMentorshipSystemID sets the "mentorship_system_id" field.
-func (u *GardenUpsertOne) SetMentorshipSystemID(v types.MentorshipSystemID) *GardenUpsertOne {
+// SetMentorshipID sets the "mentorship_id" field.
+func (u *GardenUpsertOne) SetMentorshipID(v types.MentorshipID) *GardenUpsertOne {
 	return u.Update(func(s *GardenUpsert) {
-		s.SetMentorshipSystemID(v)
+		s.SetMentorshipID(v)
 	})
 }
 
-// UpdateMentorshipSystemID sets the "mentorship_system_id" field to the value that was provided on create.
-func (u *GardenUpsertOne) UpdateMentorshipSystemID() *GardenUpsertOne {
+// UpdateMentorshipID sets the "mentorship_id" field to the value that was provided on create.
+func (u *GardenUpsertOne) UpdateMentorshipID() *GardenUpsertOne {
 	return u.Update(func(s *GardenUpsert) {
-		s.UpdateMentorshipSystemID()
+		s.UpdateMentorshipID()
 	})
 }
 
-// ClearMentorshipSystemID clears the value of the "mentorship_system_id" field.
-func (u *GardenUpsertOne) ClearMentorshipSystemID() *GardenUpsertOne {
+// ClearMentorshipID clears the value of the "mentorship_id" field.
+func (u *GardenUpsertOne) ClearMentorshipID() *GardenUpsertOne {
 	return u.Update(func(s *GardenUpsert) {
-		s.ClearMentorshipSystemID()
+		s.ClearMentorshipID()
 	})
 }
 
@@ -643,24 +643,24 @@ func (u *GardenUpsertBulk) UpdateLocation() *GardenUpsertBulk {
 	})
 }
 
-// SetMentorshipSystemID sets the "mentorship_system_id" field.
-func (u *GardenUpsertBulk) SetMentorshipSystemID(v types.MentorshipSystemID) *GardenUpsertBulk {
+// SetMentorshipID sets the "mentorship_id" field.
+func (u *GardenUpsertBulk) SetMentorshipID(v types.MentorshipID) *GardenUpsertBulk {
 	return u.Update(func(s *GardenUpsert) {
-		s.SetMentorshipSystemID(v)
+		s.SetMentorshipID(v)
 	})
 }
 
-// UpdateMentorshipSystemID sets the "mentorship_system_id" field to the value that was provided on create.
-func (u *GardenUpsertBulk) UpdateMentorshipSystemID() *GardenUpsertBulk {
+// UpdateMentorshipID sets the "mentorship_id" field to the value that was provided on create.
+func (u *GardenUpsertBulk) UpdateMentorshipID() *GardenUpsertBulk {
 	return u.Update(func(s *GardenUpsert) {
-		s.UpdateMentorshipSystemID()
+		s.UpdateMentorshipID()
 	})
 }
 
-// ClearMentorshipSystemID clears the value of the "mentorship_system_id" field.
-func (u *GardenUpsertBulk) ClearMentorshipSystemID() *GardenUpsertBulk {
+// ClearMentorshipID clears the value of the "mentorship_id" field.
+func (u *GardenUpsertBulk) ClearMentorshipID() *GardenUpsertBulk {
 	return u.Update(func(s *GardenUpsert) {
-		s.ClearMentorshipSystemID()
+		s.ClearMentorshipID()
 	})
 }
 

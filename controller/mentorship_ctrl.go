@@ -56,7 +56,7 @@ func (m *MentorshipController) Get(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 
 	var request struct {
-		ID types.MentorshipSystemID `param:"id"`
+		ID types.MentorshipID `param:"id"`
 	}
 	if err = c.Bind(&request); err != nil {
 		c.Logger().Error("MentorshipController Bind", "err", err)
@@ -104,8 +104,8 @@ func (m *MentorshipController) Update(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 
 	var request struct {
-		ID   types.MentorshipSystemID `param:"id"`
-		Name string                   `json:"name"`
+		ID   types.MentorshipID `param:"id"`
+		Name string             `json:"name"`
 	}
 	if err = c.Bind(&request); err != nil {
 		c.Logger().Error("MentorshipController Bind", "err", err)
@@ -125,4 +125,28 @@ func (m *MentorshipController) Update(c echo.Context) (err error) {
 	}
 
 	return response(c, http.StatusOK, "Update Mentorship OK", mentorshipDTO)
+}
+
+// Delete ...
+func (m *MentorshipController) Delete(c echo.Context) (err error) {
+	// TODO: change logger
+
+	ctx := c.Request().Context()
+
+	var request struct {
+		ID types.MentorshipID `param:"id"`
+	}
+	if err = c.Bind(&request); err != nil {
+		c.Logger().Error("MentorshipController Bind", "err", err)
+		return response(c, http.StatusBadRequest, "invalid request", nil)
+	}
+
+	mentorshipDTO, err := m.mentorshipSvc.SoftDelete(ctx, request.ID)
+	if err != nil {
+		c.Logger().Error("MentorshipController Delete", "err", err)
+		// TODO: error handle
+		return response(c, http.StatusInternalServerError, "internal server error", err.Error())
+	}
+
+	return response(c, http.StatusOK, "Delete Mentorship OK", mentorshipDTO)
 }

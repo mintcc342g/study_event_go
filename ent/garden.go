@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"study-event-go/ent/garden"
-	"study-event-go/ent/mentorshipsystem"
+	"study-event-go/ent/mentorship"
 	"study-event-go/types"
 
 	"entgo.io/ent/dialect/sql"
@@ -21,8 +21,8 @@ type Garden struct {
 	Name string `json:"name,omitempty"`
 	// Location holds the value of the "location" field.
 	Location string `json:"location,omitempty"`
-	// MentorshipSystemID holds the value of the "mentorship_system_id" field.
-	MentorshipSystemID *types.MentorshipSystemID `json:"mentorship_system_id,omitempty"`
+	// MentorshipID holds the value of the "mentorship_id" field.
+	MentorshipID *types.MentorshipID `json:"mentorship_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GardenQuery when eager-loading is set.
 	Edges GardenEdges `json:"edges"`
@@ -30,25 +30,25 @@ type Garden struct {
 
 // GardenEdges holds the relations/edges for other nodes in the graph.
 type GardenEdges struct {
-	// MentorshipSystem holds the value of the mentorship_system edge.
-	MentorshipSystem *MentorshipSystem `json:"mentorship_system,omitempty"`
+	// Mentorship holds the value of the mentorship edge.
+	Mentorship *Mentorship `json:"mentorship,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// MentorshipSystemOrErr returns the MentorshipSystem value or an error if the edge
+// MentorshipOrErr returns the Mentorship value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e GardenEdges) MentorshipSystemOrErr() (*MentorshipSystem, error) {
+func (e GardenEdges) MentorshipOrErr() (*Mentorship, error) {
 	if e.loadedTypes[0] {
-		if e.MentorshipSystem == nil {
-			// The edge mentorship_system was loaded in eager-loading,
+		if e.Mentorship == nil {
+			// The edge mentorship was loaded in eager-loading,
 			// but was not found.
-			return nil, &NotFoundError{label: mentorshipsystem.Label}
+			return nil, &NotFoundError{label: mentorship.Label}
 		}
-		return e.MentorshipSystem, nil
+		return e.Mentorship, nil
 	}
-	return nil, &NotLoadedError{edge: "mentorship_system"}
+	return nil, &NotLoadedError{edge: "mentorship"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -56,7 +56,7 @@ func (*Garden) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case garden.FieldID, garden.FieldMentorshipSystemID:
+		case garden.FieldID, garden.FieldMentorshipID:
 			values[i] = new(sql.NullInt64)
 		case garden.FieldName, garden.FieldLocation:
 			values[i] = new(sql.NullString)
@@ -93,21 +93,21 @@ func (ga *Garden) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				ga.Location = value.String
 			}
-		case garden.FieldMentorshipSystemID:
+		case garden.FieldMentorshipID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field mentorship_system_id", values[i])
+				return fmt.Errorf("unexpected type %T for field mentorship_id", values[i])
 			} else if value.Valid {
-				ga.MentorshipSystemID = new(types.MentorshipSystemID)
-				*ga.MentorshipSystemID = types.MentorshipSystemID(value.Int64)
+				ga.MentorshipID = new(types.MentorshipID)
+				*ga.MentorshipID = types.MentorshipID(value.Int64)
 			}
 		}
 	}
 	return nil
 }
 
-// QueryMentorshipSystem queries the "mentorship_system" edge of the Garden entity.
-func (ga *Garden) QueryMentorshipSystem() *MentorshipSystemQuery {
-	return (&GardenClient{config: ga.config}).QueryMentorshipSystem(ga)
+// QueryMentorship queries the "mentorship" edge of the Garden entity.
+func (ga *Garden) QueryMentorship() *MentorshipQuery {
+	return (&GardenClient{config: ga.config}).QueryMentorship(ga)
 }
 
 // Update returns a builder for updating this Garden.
@@ -137,8 +137,8 @@ func (ga *Garden) String() string {
 	builder.WriteString(ga.Name)
 	builder.WriteString(", location=")
 	builder.WriteString(ga.Location)
-	if v := ga.MentorshipSystemID; v != nil {
-		builder.WriteString(", mentorship_system_id=")
+	if v := ga.MentorshipID; v != nil {
+		builder.WriteString(", mentorship_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteByte(')')

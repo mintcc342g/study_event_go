@@ -21,15 +21,15 @@ func (f GardenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return f(ctx, mv)
 }
 
-// The MentorshipSystemFunc type is an adapter to allow the use of ordinary
-// function as MentorshipSystem mutator.
-type MentorshipSystemFunc func(context.Context, *ent.MentorshipSystemMutation) (ent.Value, error)
+// The MentorshipFunc type is an adapter to allow the use of ordinary
+// function as Mentorship mutator.
+type MentorshipFunc func(context.Context, *ent.MentorshipMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f MentorshipSystemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.MentorshipSystemMutation)
+func (f MentorshipFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.MentorshipMutation)
 	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MentorshipSystemMutation", m)
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MentorshipMutation", m)
 	}
 	return f(ctx, mv)
 }

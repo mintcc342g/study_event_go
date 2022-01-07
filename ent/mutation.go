@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 	"study-event-go/ent/garden"
-	"study-event-go/ent/mentorshipsystem"
+	"study-event-go/ent/mentorship"
 	"study-event-go/ent/predicate"
 	"study-event-go/types"
 	"sync"
@@ -24,24 +24,24 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeGarden           = "Garden"
-	TypeMentorshipSystem = "MentorshipSystem"
+	TypeGarden     = "Garden"
+	TypeMentorship = "Mentorship"
 )
 
 // GardenMutation represents an operation that mutates the Garden nodes in the graph.
 type GardenMutation struct {
 	config
-	op                       Op
-	typ                      string
-	id                       *types.GardenID
-	name                     *string
-	location                 *string
-	clearedFields            map[string]struct{}
-	mentorship_system        *types.MentorshipSystemID
-	clearedmentorship_system bool
-	done                     bool
-	oldValue                 func(context.Context) (*Garden, error)
-	predicates               []predicate.Garden
+	op                Op
+	typ               string
+	id                *types.GardenID
+	name              *string
+	location          *string
+	clearedFields     map[string]struct{}
+	mentorship        *types.MentorshipID
+	clearedmentorship bool
+	done              bool
+	oldValue          func(context.Context) (*Garden, error)
+	predicates        []predicate.Garden
 }
 
 var _ ent.Mutation = (*GardenMutation)(nil)
@@ -201,79 +201,79 @@ func (m *GardenMutation) ResetLocation() {
 	m.location = nil
 }
 
-// SetMentorshipSystemID sets the "mentorship_system_id" field.
-func (m *GardenMutation) SetMentorshipSystemID(tsi types.MentorshipSystemID) {
-	m.mentorship_system = &tsi
+// SetMentorshipID sets the "mentorship_id" field.
+func (m *GardenMutation) SetMentorshipID(ti types.MentorshipID) {
+	m.mentorship = &ti
 }
 
-// MentorshipSystemID returns the value of the "mentorship_system_id" field in the mutation.
-func (m *GardenMutation) MentorshipSystemID() (r types.MentorshipSystemID, exists bool) {
-	v := m.mentorship_system
+// MentorshipID returns the value of the "mentorship_id" field in the mutation.
+func (m *GardenMutation) MentorshipID() (r types.MentorshipID, exists bool) {
+	v := m.mentorship
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldMentorshipSystemID returns the old "mentorship_system_id" field's value of the Garden entity.
+// OldMentorshipID returns the old "mentorship_id" field's value of the Garden entity.
 // If the Garden object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GardenMutation) OldMentorshipSystemID(ctx context.Context) (v *types.MentorshipSystemID, err error) {
+func (m *GardenMutation) OldMentorshipID(ctx context.Context) (v *types.MentorshipID, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldMentorshipSystemID is only allowed on UpdateOne operations")
+		return v, fmt.Errorf("OldMentorshipID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldMentorshipSystemID requires an ID field in the mutation")
+		return v, fmt.Errorf("OldMentorshipID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMentorshipSystemID: %w", err)
+		return v, fmt.Errorf("querying old value for OldMentorshipID: %w", err)
 	}
-	return oldValue.MentorshipSystemID, nil
+	return oldValue.MentorshipID, nil
 }
 
-// ClearMentorshipSystemID clears the value of the "mentorship_system_id" field.
-func (m *GardenMutation) ClearMentorshipSystemID() {
-	m.mentorship_system = nil
-	m.clearedFields[garden.FieldMentorshipSystemID] = struct{}{}
+// ClearMentorshipID clears the value of the "mentorship_id" field.
+func (m *GardenMutation) ClearMentorshipID() {
+	m.mentorship = nil
+	m.clearedFields[garden.FieldMentorshipID] = struct{}{}
 }
 
-// MentorshipSystemIDCleared returns if the "mentorship_system_id" field was cleared in this mutation.
-func (m *GardenMutation) MentorshipSystemIDCleared() bool {
-	_, ok := m.clearedFields[garden.FieldMentorshipSystemID]
+// MentorshipIDCleared returns if the "mentorship_id" field was cleared in this mutation.
+func (m *GardenMutation) MentorshipIDCleared() bool {
+	_, ok := m.clearedFields[garden.FieldMentorshipID]
 	return ok
 }
 
-// ResetMentorshipSystemID resets all changes to the "mentorship_system_id" field.
-func (m *GardenMutation) ResetMentorshipSystemID() {
-	m.mentorship_system = nil
-	delete(m.clearedFields, garden.FieldMentorshipSystemID)
+// ResetMentorshipID resets all changes to the "mentorship_id" field.
+func (m *GardenMutation) ResetMentorshipID() {
+	m.mentorship = nil
+	delete(m.clearedFields, garden.FieldMentorshipID)
 }
 
-// ClearMentorshipSystem clears the "mentorship_system" edge to the MentorshipSystem entity.
-func (m *GardenMutation) ClearMentorshipSystem() {
-	m.clearedmentorship_system = true
+// ClearMentorship clears the "mentorship" edge to the Mentorship entity.
+func (m *GardenMutation) ClearMentorship() {
+	m.clearedmentorship = true
 }
 
-// MentorshipSystemCleared reports if the "mentorship_system" edge to the MentorshipSystem entity was cleared.
-func (m *GardenMutation) MentorshipSystemCleared() bool {
-	return m.MentorshipSystemIDCleared() || m.clearedmentorship_system
+// MentorshipCleared reports if the "mentorship" edge to the Mentorship entity was cleared.
+func (m *GardenMutation) MentorshipCleared() bool {
+	return m.MentorshipIDCleared() || m.clearedmentorship
 }
 
-// MentorshipSystemIDs returns the "mentorship_system" edge IDs in the mutation.
+// MentorshipIDs returns the "mentorship" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// MentorshipSystemID instead. It exists only for internal usage by the builders.
-func (m *GardenMutation) MentorshipSystemIDs() (ids []types.MentorshipSystemID) {
-	if id := m.mentorship_system; id != nil {
+// MentorshipID instead. It exists only for internal usage by the builders.
+func (m *GardenMutation) MentorshipIDs() (ids []types.MentorshipID) {
+	if id := m.mentorship; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetMentorshipSystem resets all changes to the "mentorship_system" edge.
-func (m *GardenMutation) ResetMentorshipSystem() {
-	m.mentorship_system = nil
-	m.clearedmentorship_system = false
+// ResetMentorship resets all changes to the "mentorship" edge.
+func (m *GardenMutation) ResetMentorship() {
+	m.mentorship = nil
+	m.clearedmentorship = false
 }
 
 // Where appends a list predicates to the GardenMutation builder.
@@ -302,8 +302,8 @@ func (m *GardenMutation) Fields() []string {
 	if m.location != nil {
 		fields = append(fields, garden.FieldLocation)
 	}
-	if m.mentorship_system != nil {
-		fields = append(fields, garden.FieldMentorshipSystemID)
+	if m.mentorship != nil {
+		fields = append(fields, garden.FieldMentorshipID)
 	}
 	return fields
 }
@@ -317,8 +317,8 @@ func (m *GardenMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case garden.FieldLocation:
 		return m.Location()
-	case garden.FieldMentorshipSystemID:
-		return m.MentorshipSystemID()
+	case garden.FieldMentorshipID:
+		return m.MentorshipID()
 	}
 	return nil, false
 }
@@ -332,8 +332,8 @@ func (m *GardenMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldName(ctx)
 	case garden.FieldLocation:
 		return m.OldLocation(ctx)
-	case garden.FieldMentorshipSystemID:
-		return m.OldMentorshipSystemID(ctx)
+	case garden.FieldMentorshipID:
+		return m.OldMentorshipID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Garden field %s", name)
 }
@@ -357,12 +357,12 @@ func (m *GardenMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetLocation(v)
 		return nil
-	case garden.FieldMentorshipSystemID:
-		v, ok := value.(types.MentorshipSystemID)
+	case garden.FieldMentorshipID:
+		v, ok := value.(types.MentorshipID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetMentorshipSystemID(v)
+		m.SetMentorshipID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Garden field %s", name)
@@ -397,8 +397,8 @@ func (m *GardenMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *GardenMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(garden.FieldMentorshipSystemID) {
-		fields = append(fields, garden.FieldMentorshipSystemID)
+	if m.FieldCleared(garden.FieldMentorshipID) {
+		fields = append(fields, garden.FieldMentorshipID)
 	}
 	return fields
 }
@@ -414,8 +414,8 @@ func (m *GardenMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *GardenMutation) ClearField(name string) error {
 	switch name {
-	case garden.FieldMentorshipSystemID:
-		m.ClearMentorshipSystemID()
+	case garden.FieldMentorshipID:
+		m.ClearMentorshipID()
 		return nil
 	}
 	return fmt.Errorf("unknown Garden nullable field %s", name)
@@ -431,8 +431,8 @@ func (m *GardenMutation) ResetField(name string) error {
 	case garden.FieldLocation:
 		m.ResetLocation()
 		return nil
-	case garden.FieldMentorshipSystemID:
-		m.ResetMentorshipSystemID()
+	case garden.FieldMentorshipID:
+		m.ResetMentorshipID()
 		return nil
 	}
 	return fmt.Errorf("unknown Garden field %s", name)
@@ -441,8 +441,8 @@ func (m *GardenMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *GardenMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.mentorship_system != nil {
-		edges = append(edges, garden.EdgeMentorshipSystem)
+	if m.mentorship != nil {
+		edges = append(edges, garden.EdgeMentorship)
 	}
 	return edges
 }
@@ -451,8 +451,8 @@ func (m *GardenMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *GardenMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case garden.EdgeMentorshipSystem:
-		if id := m.mentorship_system; id != nil {
+	case garden.EdgeMentorship:
+		if id := m.mentorship; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -476,8 +476,8 @@ func (m *GardenMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *GardenMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedmentorship_system {
-		edges = append(edges, garden.EdgeMentorshipSystem)
+	if m.clearedmentorship {
+		edges = append(edges, garden.EdgeMentorship)
 	}
 	return edges
 }
@@ -486,8 +486,8 @@ func (m *GardenMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *GardenMutation) EdgeCleared(name string) bool {
 	switch name {
-	case garden.EdgeMentorshipSystem:
-		return m.clearedmentorship_system
+	case garden.EdgeMentorship:
+		return m.clearedmentorship
 	}
 	return false
 }
@@ -496,8 +496,8 @@ func (m *GardenMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *GardenMutation) ClearEdge(name string) error {
 	switch name {
-	case garden.EdgeMentorshipSystem:
-		m.ClearMentorshipSystem()
+	case garden.EdgeMentorship:
+		m.ClearMentorship()
 		return nil
 	}
 	return fmt.Errorf("unknown Garden unique edge %s", name)
@@ -507,40 +507,40 @@ func (m *GardenMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *GardenMutation) ResetEdge(name string) error {
 	switch name {
-	case garden.EdgeMentorshipSystem:
-		m.ResetMentorshipSystem()
+	case garden.EdgeMentorship:
+		m.ResetMentorship()
 		return nil
 	}
 	return fmt.Errorf("unknown Garden edge %s", name)
 }
 
-// MentorshipSystemMutation represents an operation that mutates the MentorshipSystem nodes in the graph.
-type MentorshipSystemMutation struct {
+// MentorshipMutation represents an operation that mutates the Mentorship nodes in the graph.
+type MentorshipMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *types.MentorshipSystemID
+	id            *types.MentorshipID
 	created_at    *time.Time
 	updated_at    *time.Time
 	deleted_at    *time.Time
 	name          *string
 	clearedFields map[string]struct{}
 	done          bool
-	oldValue      func(context.Context) (*MentorshipSystem, error)
-	predicates    []predicate.MentorshipSystem
+	oldValue      func(context.Context) (*Mentorship, error)
+	predicates    []predicate.Mentorship
 }
 
-var _ ent.Mutation = (*MentorshipSystemMutation)(nil)
+var _ ent.Mutation = (*MentorshipMutation)(nil)
 
-// mentorshipsystemOption allows management of the mutation configuration using functional options.
-type mentorshipsystemOption func(*MentorshipSystemMutation)
+// mentorshipOption allows management of the mutation configuration using functional options.
+type mentorshipOption func(*MentorshipMutation)
 
-// newMentorshipSystemMutation creates new mutation for the MentorshipSystem entity.
-func newMentorshipSystemMutation(c config, op Op, opts ...mentorshipsystemOption) *MentorshipSystemMutation {
-	m := &MentorshipSystemMutation{
+// newMentorshipMutation creates new mutation for the Mentorship entity.
+func newMentorshipMutation(c config, op Op, opts ...mentorshipOption) *MentorshipMutation {
+	m := &MentorshipMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeMentorshipSystem,
+		typ:           TypeMentorship,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -549,20 +549,20 @@ func newMentorshipSystemMutation(c config, op Op, opts ...mentorshipsystemOption
 	return m
 }
 
-// withMentorshipSystemID sets the ID field of the mutation.
-func withMentorshipSystemID(id types.MentorshipSystemID) mentorshipsystemOption {
-	return func(m *MentorshipSystemMutation) {
+// withMentorshipID sets the ID field of the mutation.
+func withMentorshipID(id types.MentorshipID) mentorshipOption {
+	return func(m *MentorshipMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *MentorshipSystem
+			value *Mentorship
 		)
-		m.oldValue = func(ctx context.Context) (*MentorshipSystem, error) {
+		m.oldValue = func(ctx context.Context) (*Mentorship, error) {
 			once.Do(func() {
 				if m.done {
 					err = fmt.Errorf("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().MentorshipSystem.Get(ctx, id)
+					value, err = m.Client().Mentorship.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -571,10 +571,10 @@ func withMentorshipSystemID(id types.MentorshipSystemID) mentorshipsystemOption 
 	}
 }
 
-// withMentorshipSystem sets the old MentorshipSystem of the mutation.
-func withMentorshipSystem(node *MentorshipSystem) mentorshipsystemOption {
-	return func(m *MentorshipSystemMutation) {
-		m.oldValue = func(context.Context) (*MentorshipSystem, error) {
+// withMentorship sets the old Mentorship of the mutation.
+func withMentorship(node *Mentorship) mentorshipOption {
+	return func(m *MentorshipMutation) {
+		m.oldValue = func(context.Context) (*Mentorship, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -583,7 +583,7 @@ func withMentorshipSystem(node *MentorshipSystem) mentorshipsystemOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m MentorshipSystemMutation) Client() *Client {
+func (m MentorshipMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -591,7 +591,7 @@ func (m MentorshipSystemMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m MentorshipSystemMutation) Tx() (*Tx, error) {
+func (m MentorshipMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
 	}
@@ -601,14 +601,14 @@ func (m MentorshipSystemMutation) Tx() (*Tx, error) {
 }
 
 // SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of MentorshipSystem entities.
-func (m *MentorshipSystemMutation) SetID(id types.MentorshipSystemID) {
+// operation is only accepted on creation of Mentorship entities.
+func (m *MentorshipMutation) SetID(id types.MentorshipID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *MentorshipSystemMutation) ID() (id types.MentorshipSystemID, exists bool) {
+func (m *MentorshipMutation) ID() (id types.MentorshipID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -616,12 +616,12 @@ func (m *MentorshipSystemMutation) ID() (id types.MentorshipSystemID, exists boo
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (m *MentorshipSystemMutation) SetCreatedAt(t time.Time) {
+func (m *MentorshipMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
 }
 
 // CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *MentorshipSystemMutation) CreatedAt() (r time.Time, exists bool) {
+func (m *MentorshipMutation) CreatedAt() (r time.Time, exists bool) {
 	v := m.created_at
 	if v == nil {
 		return
@@ -629,10 +629,10 @@ func (m *MentorshipSystemMutation) CreatedAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldCreatedAt returns the old "created_at" field's value of the MentorshipSystem entity.
-// If the MentorshipSystem object wasn't provided to the builder, the object is fetched from the database.
+// OldCreatedAt returns the old "created_at" field's value of the Mentorship entity.
+// If the Mentorship object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MentorshipSystemMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *MentorshipMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -647,17 +647,17 @@ func (m *MentorshipSystemMutation) OldCreatedAt(ctx context.Context) (v time.Tim
 }
 
 // ResetCreatedAt resets all changes to the "created_at" field.
-func (m *MentorshipSystemMutation) ResetCreatedAt() {
+func (m *MentorshipMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (m *MentorshipSystemMutation) SetUpdatedAt(t time.Time) {
+func (m *MentorshipMutation) SetUpdatedAt(t time.Time) {
 	m.updated_at = &t
 }
 
 // UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *MentorshipSystemMutation) UpdatedAt() (r time.Time, exists bool) {
+func (m *MentorshipMutation) UpdatedAt() (r time.Time, exists bool) {
 	v := m.updated_at
 	if v == nil {
 		return
@@ -665,10 +665,10 @@ func (m *MentorshipSystemMutation) UpdatedAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldUpdatedAt returns the old "updated_at" field's value of the MentorshipSystem entity.
-// If the MentorshipSystem object wasn't provided to the builder, the object is fetched from the database.
+// OldUpdatedAt returns the old "updated_at" field's value of the Mentorship entity.
+// If the Mentorship object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MentorshipSystemMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *MentorshipMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -683,17 +683,17 @@ func (m *MentorshipSystemMutation) OldUpdatedAt(ctx context.Context) (v time.Tim
 }
 
 // ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *MentorshipSystemMutation) ResetUpdatedAt() {
+func (m *MentorshipMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (m *MentorshipSystemMutation) SetDeletedAt(t time.Time) {
+func (m *MentorshipMutation) SetDeletedAt(t time.Time) {
 	m.deleted_at = &t
 }
 
 // DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *MentorshipSystemMutation) DeletedAt() (r time.Time, exists bool) {
+func (m *MentorshipMutation) DeletedAt() (r time.Time, exists bool) {
 	v := m.deleted_at
 	if v == nil {
 		return
@@ -701,10 +701,10 @@ func (m *MentorshipSystemMutation) DeletedAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldDeletedAt returns the old "deleted_at" field's value of the MentorshipSystem entity.
-// If the MentorshipSystem object wasn't provided to the builder, the object is fetched from the database.
+// OldDeletedAt returns the old "deleted_at" field's value of the Mentorship entity.
+// If the Mentorship object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MentorshipSystemMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+func (m *MentorshipMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldDeletedAt is only allowed on UpdateOne operations")
 	}
@@ -719,30 +719,30 @@ func (m *MentorshipSystemMutation) OldDeletedAt(ctx context.Context) (v *time.Ti
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *MentorshipSystemMutation) ClearDeletedAt() {
+func (m *MentorshipMutation) ClearDeletedAt() {
 	m.deleted_at = nil
-	m.clearedFields[mentorshipsystem.FieldDeletedAt] = struct{}{}
+	m.clearedFields[mentorship.FieldDeletedAt] = struct{}{}
 }
 
 // DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *MentorshipSystemMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[mentorshipsystem.FieldDeletedAt]
+func (m *MentorshipMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[mentorship.FieldDeletedAt]
 	return ok
 }
 
 // ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *MentorshipSystemMutation) ResetDeletedAt() {
+func (m *MentorshipMutation) ResetDeletedAt() {
 	m.deleted_at = nil
-	delete(m.clearedFields, mentorshipsystem.FieldDeletedAt)
+	delete(m.clearedFields, mentorship.FieldDeletedAt)
 }
 
 // SetName sets the "name" field.
-func (m *MentorshipSystemMutation) SetName(s string) {
+func (m *MentorshipMutation) SetName(s string) {
 	m.name = &s
 }
 
 // Name returns the value of the "name" field in the mutation.
-func (m *MentorshipSystemMutation) Name() (r string, exists bool) {
+func (m *MentorshipMutation) Name() (r string, exists bool) {
 	v := m.name
 	if v == nil {
 		return
@@ -750,10 +750,10 @@ func (m *MentorshipSystemMutation) Name() (r string, exists bool) {
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the MentorshipSystem entity.
-// If the MentorshipSystem object wasn't provided to the builder, the object is fetched from the database.
+// OldName returns the old "name" field's value of the Mentorship entity.
+// If the Mentorship object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MentorshipSystemMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *MentorshipMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldName is only allowed on UpdateOne operations")
 	}
@@ -768,41 +768,41 @@ func (m *MentorshipSystemMutation) OldName(ctx context.Context) (v string, err e
 }
 
 // ResetName resets all changes to the "name" field.
-func (m *MentorshipSystemMutation) ResetName() {
+func (m *MentorshipMutation) ResetName() {
 	m.name = nil
 }
 
-// Where appends a list predicates to the MentorshipSystemMutation builder.
-func (m *MentorshipSystemMutation) Where(ps ...predicate.MentorshipSystem) {
+// Where appends a list predicates to the MentorshipMutation builder.
+func (m *MentorshipMutation) Where(ps ...predicate.Mentorship) {
 	m.predicates = append(m.predicates, ps...)
 }
 
 // Op returns the operation name.
-func (m *MentorshipSystemMutation) Op() Op {
+func (m *MentorshipMutation) Op() Op {
 	return m.op
 }
 
-// Type returns the node type of this mutation (MentorshipSystem).
-func (m *MentorshipSystemMutation) Type() string {
+// Type returns the node type of this mutation (Mentorship).
+func (m *MentorshipMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *MentorshipSystemMutation) Fields() []string {
+func (m *MentorshipMutation) Fields() []string {
 	fields := make([]string, 0, 4)
 	if m.created_at != nil {
-		fields = append(fields, mentorshipsystem.FieldCreatedAt)
+		fields = append(fields, mentorship.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
-		fields = append(fields, mentorshipsystem.FieldUpdatedAt)
+		fields = append(fields, mentorship.FieldUpdatedAt)
 	}
 	if m.deleted_at != nil {
-		fields = append(fields, mentorshipsystem.FieldDeletedAt)
+		fields = append(fields, mentorship.FieldDeletedAt)
 	}
 	if m.name != nil {
-		fields = append(fields, mentorshipsystem.FieldName)
+		fields = append(fields, mentorship.FieldName)
 	}
 	return fields
 }
@@ -810,15 +810,15 @@ func (m *MentorshipSystemMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *MentorshipSystemMutation) Field(name string) (ent.Value, bool) {
+func (m *MentorshipMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case mentorshipsystem.FieldCreatedAt:
+	case mentorship.FieldCreatedAt:
 		return m.CreatedAt()
-	case mentorshipsystem.FieldUpdatedAt:
+	case mentorship.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case mentorshipsystem.FieldDeletedAt:
+	case mentorship.FieldDeletedAt:
 		return m.DeletedAt()
-	case mentorshipsystem.FieldName:
+	case mentorship.FieldName:
 		return m.Name()
 	}
 	return nil, false
@@ -827,47 +827,47 @@ func (m *MentorshipSystemMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *MentorshipSystemMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *MentorshipMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case mentorshipsystem.FieldCreatedAt:
+	case mentorship.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case mentorshipsystem.FieldUpdatedAt:
+	case mentorship.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case mentorshipsystem.FieldDeletedAt:
+	case mentorship.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
-	case mentorshipsystem.FieldName:
+	case mentorship.FieldName:
 		return m.OldName(ctx)
 	}
-	return nil, fmt.Errorf("unknown MentorshipSystem field %s", name)
+	return nil, fmt.Errorf("unknown Mentorship field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *MentorshipSystemMutation) SetField(name string, value ent.Value) error {
+func (m *MentorshipMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case mentorshipsystem.FieldCreatedAt:
+	case mentorship.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
 		return nil
-	case mentorshipsystem.FieldUpdatedAt:
+	case mentorship.FieldUpdatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
 		return nil
-	case mentorshipsystem.FieldDeletedAt:
+	case mentorship.FieldDeletedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
 		return nil
-	case mentorshipsystem.FieldName:
+	case mentorship.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -875,123 +875,123 @@ func (m *MentorshipSystemMutation) SetField(name string, value ent.Value) error 
 		m.SetName(v)
 		return nil
 	}
-	return fmt.Errorf("unknown MentorshipSystem field %s", name)
+	return fmt.Errorf("unknown Mentorship field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *MentorshipSystemMutation) AddedFields() []string {
+func (m *MentorshipMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *MentorshipSystemMutation) AddedField(name string) (ent.Value, bool) {
+func (m *MentorshipMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *MentorshipSystemMutation) AddField(name string, value ent.Value) error {
+func (m *MentorshipMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown MentorshipSystem numeric field %s", name)
+	return fmt.Errorf("unknown Mentorship numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *MentorshipSystemMutation) ClearedFields() []string {
+func (m *MentorshipMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(mentorshipsystem.FieldDeletedAt) {
-		fields = append(fields, mentorshipsystem.FieldDeletedAt)
+	if m.FieldCleared(mentorship.FieldDeletedAt) {
+		fields = append(fields, mentorship.FieldDeletedAt)
 	}
 	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *MentorshipSystemMutation) FieldCleared(name string) bool {
+func (m *MentorshipMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *MentorshipSystemMutation) ClearField(name string) error {
+func (m *MentorshipMutation) ClearField(name string) error {
 	switch name {
-	case mentorshipsystem.FieldDeletedAt:
+	case mentorship.FieldDeletedAt:
 		m.ClearDeletedAt()
 		return nil
 	}
-	return fmt.Errorf("unknown MentorshipSystem nullable field %s", name)
+	return fmt.Errorf("unknown Mentorship nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *MentorshipSystemMutation) ResetField(name string) error {
+func (m *MentorshipMutation) ResetField(name string) error {
 	switch name {
-	case mentorshipsystem.FieldCreatedAt:
+	case mentorship.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
-	case mentorshipsystem.FieldUpdatedAt:
+	case mentorship.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
-	case mentorshipsystem.FieldDeletedAt:
+	case mentorship.FieldDeletedAt:
 		m.ResetDeletedAt()
 		return nil
-	case mentorshipsystem.FieldName:
+	case mentorship.FieldName:
 		m.ResetName()
 		return nil
 	}
-	return fmt.Errorf("unknown MentorshipSystem field %s", name)
+	return fmt.Errorf("unknown Mentorship field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *MentorshipSystemMutation) AddedEdges() []string {
+func (m *MentorshipMutation) AddedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *MentorshipSystemMutation) AddedIDs(name string) []ent.Value {
+func (m *MentorshipMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *MentorshipSystemMutation) RemovedEdges() []string {
+func (m *MentorshipMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *MentorshipSystemMutation) RemovedIDs(name string) []ent.Value {
+func (m *MentorshipMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *MentorshipSystemMutation) ClearedEdges() []string {
+func (m *MentorshipMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *MentorshipSystemMutation) EdgeCleared(name string) bool {
+func (m *MentorshipMutation) EdgeCleared(name string) bool {
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *MentorshipSystemMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown MentorshipSystem unique edge %s", name)
+func (m *MentorshipMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Mentorship unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *MentorshipSystemMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown MentorshipSystem edge %s", name)
+func (m *MentorshipMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Mentorship edge %s", name)
 }

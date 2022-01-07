@@ -9,9 +9,9 @@ import (
 	"github.com/juju/errors"
 )
 
-// MentorshipSystem ...
-type MentorshipSystem struct {
-	ID        types.MentorshipSystemID
+// Mentorship ...
+type Mentorship struct {
+	ID        types.MentorshipID
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
@@ -20,28 +20,28 @@ type MentorshipSystem struct {
 
 // GardenMentorship ...
 type GardenMentorship struct {
-	garden           *Garden
-	mentorshipSystem *MentorshipSystem
-	createdAt        time.Time
-	updatedAt        time.Time
-	deletedAt        time.Time
-	mentor           *Lily
-	mentee           *Lily
+	garden     *Garden
+	mentorship *Mentorship
+	createdAt  time.Time
+	updatedAt  time.Time
+	deletedAt  time.Time
+	mentor     *Lily
+	mentee     *Lily
 }
 
 // NewMentorship ...
-func NewMentorship(req *dto.Mentorship) (*MentorshipSystem, error) {
+func NewMentorship(req *dto.Mentorship) (*Mentorship, error) {
 	if err := validateMentorshipDTO(req); err != nil {
 		return nil, err
 	}
 
-	return &MentorshipSystem{
+	return &Mentorship{
 		Name: req.Name,
 	}, nil
 }
 
 // Update ...
-func (m *MentorshipSystem) Update(req *dto.Mentorship) error {
+func (m *Mentorship) Update(req *dto.Mentorship) error {
 	if err := validateMentorshipDTO(req); err != nil {
 		return err
 	}
@@ -49,6 +49,12 @@ func (m *MentorshipSystem) Update(req *dto.Mentorship) error {
 	m.Name = req.Name
 
 	return nil
+}
+
+// Delete ...
+func (m *Mentorship) Delete() {
+	now := time.Now().UTC()
+	m.DeletedAt = &now
 }
 
 func validateMentorshipDTO(req *dto.Mentorship) error {
@@ -61,7 +67,7 @@ func validateMentorshipDTO(req *dto.Mentorship) error {
 }
 
 // DTO ...
-func (m *MentorshipSystem) DTO() *dto.Mentorship {
+func (m *Mentorship) DTO() *dto.Mentorship {
 	return &dto.Mentorship{
 		ID:        m.ID,
 		CreatedAt: m.CreatedAt,

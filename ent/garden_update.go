@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 	"study-event-go/ent/garden"
-	"study-event-go/ent/mentorshipsystem"
+	"study-event-go/ent/mentorship"
 	"study-event-go/ent/predicate"
 	"study-event-go/types"
 
@@ -40,29 +40,29 @@ func (gu *GardenUpdate) SetLocation(s string) *GardenUpdate {
 	return gu
 }
 
-// SetMentorshipSystemID sets the "mentorship_system_id" field.
-func (gu *GardenUpdate) SetMentorshipSystemID(tsi types.MentorshipSystemID) *GardenUpdate {
-	gu.mutation.SetMentorshipSystemID(tsi)
+// SetMentorshipID sets the "mentorship_id" field.
+func (gu *GardenUpdate) SetMentorshipID(ti types.MentorshipID) *GardenUpdate {
+	gu.mutation.SetMentorshipID(ti)
 	return gu
 }
 
-// SetNillableMentorshipSystemID sets the "mentorship_system_id" field if the given value is not nil.
-func (gu *GardenUpdate) SetNillableMentorshipSystemID(tsi *types.MentorshipSystemID) *GardenUpdate {
-	if tsi != nil {
-		gu.SetMentorshipSystemID(*tsi)
+// SetNillableMentorshipID sets the "mentorship_id" field if the given value is not nil.
+func (gu *GardenUpdate) SetNillableMentorshipID(ti *types.MentorshipID) *GardenUpdate {
+	if ti != nil {
+		gu.SetMentorshipID(*ti)
 	}
 	return gu
 }
 
-// ClearMentorshipSystemID clears the value of the "mentorship_system_id" field.
-func (gu *GardenUpdate) ClearMentorshipSystemID() *GardenUpdate {
-	gu.mutation.ClearMentorshipSystemID()
+// ClearMentorshipID clears the value of the "mentorship_id" field.
+func (gu *GardenUpdate) ClearMentorshipID() *GardenUpdate {
+	gu.mutation.ClearMentorshipID()
 	return gu
 }
 
-// SetMentorshipSystem sets the "mentorship_system" edge to the MentorshipSystem entity.
-func (gu *GardenUpdate) SetMentorshipSystem(m *MentorshipSystem) *GardenUpdate {
-	return gu.SetMentorshipSystemID(m.ID)
+// SetMentorship sets the "mentorship" edge to the Mentorship entity.
+func (gu *GardenUpdate) SetMentorship(m *Mentorship) *GardenUpdate {
+	return gu.SetMentorshipID(m.ID)
 }
 
 // Mutation returns the GardenMutation object of the builder.
@@ -70,9 +70,9 @@ func (gu *GardenUpdate) Mutation() *GardenMutation {
 	return gu.mutation
 }
 
-// ClearMentorshipSystem clears the "mentorship_system" edge to the MentorshipSystem entity.
-func (gu *GardenUpdate) ClearMentorshipSystem() *GardenUpdate {
-	gu.mutation.ClearMentorshipSystem()
+// ClearMentorship clears the "mentorship" edge to the Mentorship entity.
+func (gu *GardenUpdate) ClearMentorship() *GardenUpdate {
+	gu.mutation.ClearMentorship()
 	return gu
 }
 
@@ -162,33 +162,33 @@ func (gu *GardenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: garden.FieldLocation,
 		})
 	}
-	if gu.mutation.MentorshipSystemCleared() {
+	if gu.mutation.MentorshipCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   garden.MentorshipSystemTable,
-			Columns: []string{garden.MentorshipSystemColumn},
+			Table:   garden.MentorshipTable,
+			Columns: []string{garden.MentorshipColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
-					Column: mentorshipsystem.FieldID,
+					Column: mentorship.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := gu.mutation.MentorshipSystemIDs(); len(nodes) > 0 {
+	if nodes := gu.mutation.MentorshipIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   garden.MentorshipSystemTable,
-			Columns: []string{garden.MentorshipSystemColumn},
+			Table:   garden.MentorshipTable,
+			Columns: []string{garden.MentorshipColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
-					Column: mentorshipsystem.FieldID,
+					Column: mentorship.FieldID,
 				},
 			},
 		}
@@ -228,29 +228,29 @@ func (guo *GardenUpdateOne) SetLocation(s string) *GardenUpdateOne {
 	return guo
 }
 
-// SetMentorshipSystemID sets the "mentorship_system_id" field.
-func (guo *GardenUpdateOne) SetMentorshipSystemID(tsi types.MentorshipSystemID) *GardenUpdateOne {
-	guo.mutation.SetMentorshipSystemID(tsi)
+// SetMentorshipID sets the "mentorship_id" field.
+func (guo *GardenUpdateOne) SetMentorshipID(ti types.MentorshipID) *GardenUpdateOne {
+	guo.mutation.SetMentorshipID(ti)
 	return guo
 }
 
-// SetNillableMentorshipSystemID sets the "mentorship_system_id" field if the given value is not nil.
-func (guo *GardenUpdateOne) SetNillableMentorshipSystemID(tsi *types.MentorshipSystemID) *GardenUpdateOne {
-	if tsi != nil {
-		guo.SetMentorshipSystemID(*tsi)
+// SetNillableMentorshipID sets the "mentorship_id" field if the given value is not nil.
+func (guo *GardenUpdateOne) SetNillableMentorshipID(ti *types.MentorshipID) *GardenUpdateOne {
+	if ti != nil {
+		guo.SetMentorshipID(*ti)
 	}
 	return guo
 }
 
-// ClearMentorshipSystemID clears the value of the "mentorship_system_id" field.
-func (guo *GardenUpdateOne) ClearMentorshipSystemID() *GardenUpdateOne {
-	guo.mutation.ClearMentorshipSystemID()
+// ClearMentorshipID clears the value of the "mentorship_id" field.
+func (guo *GardenUpdateOne) ClearMentorshipID() *GardenUpdateOne {
+	guo.mutation.ClearMentorshipID()
 	return guo
 }
 
-// SetMentorshipSystem sets the "mentorship_system" edge to the MentorshipSystem entity.
-func (guo *GardenUpdateOne) SetMentorshipSystem(m *MentorshipSystem) *GardenUpdateOne {
-	return guo.SetMentorshipSystemID(m.ID)
+// SetMentorship sets the "mentorship" edge to the Mentorship entity.
+func (guo *GardenUpdateOne) SetMentorship(m *Mentorship) *GardenUpdateOne {
+	return guo.SetMentorshipID(m.ID)
 }
 
 // Mutation returns the GardenMutation object of the builder.
@@ -258,9 +258,9 @@ func (guo *GardenUpdateOne) Mutation() *GardenMutation {
 	return guo.mutation
 }
 
-// ClearMentorshipSystem clears the "mentorship_system" edge to the MentorshipSystem entity.
-func (guo *GardenUpdateOne) ClearMentorshipSystem() *GardenUpdateOne {
-	guo.mutation.ClearMentorshipSystem()
+// ClearMentorship clears the "mentorship" edge to the Mentorship entity.
+func (guo *GardenUpdateOne) ClearMentorship() *GardenUpdateOne {
+	guo.mutation.ClearMentorship()
 	return guo
 }
 
@@ -374,33 +374,33 @@ func (guo *GardenUpdateOne) sqlSave(ctx context.Context) (_node *Garden, err err
 			Column: garden.FieldLocation,
 		})
 	}
-	if guo.mutation.MentorshipSystemCleared() {
+	if guo.mutation.MentorshipCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   garden.MentorshipSystemTable,
-			Columns: []string{garden.MentorshipSystemColumn},
+			Table:   garden.MentorshipTable,
+			Columns: []string{garden.MentorshipColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
-					Column: mentorshipsystem.FieldID,
+					Column: mentorship.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := guo.mutation.MentorshipSystemIDs(); len(nodes) > 0 {
+	if nodes := guo.mutation.MentorshipIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   garden.MentorshipSystemTable,
-			Columns: []string{garden.MentorshipSystemColumn},
+			Table:   garden.MentorshipTable,
+			Columns: []string{garden.MentorshipColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeUint64,
-					Column: mentorshipsystem.FieldID,
+					Column: mentorship.FieldID,
 				},
 			},
 		}

@@ -8,12 +8,12 @@ import (
 
 // Garden ...
 type Garden struct {
-	ID               types.GardenID
-	Name             string
-	Location         string
-	MentorshipSystem *MentorshipSystem
-	Legions          []*Legion
-	Lilies           []*Lily
+	ID         types.GardenID
+	Name       string
+	Location   string
+	Mentorship *Mentorship
+	Legions    []*Legion
+	Lilies     []*Lily
 }
 
 // NewTempleLegion ...

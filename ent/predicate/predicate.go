@@ -9,5 +9,5 @@ import (
 // Garden is the predicate function for garden builders.
 type Garden func(*sql.Selector)
 
-// MentorshipSystem is the predicate function for mentorshipsystem builders.
-type MentorshipSystem func(*sql.Selector)
+// Mentorship is the predicate function for mentorship builders.
+type Mentorship func(*sql.Selector)

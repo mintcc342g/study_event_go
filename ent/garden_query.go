@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"math"
 	"study-event-go/ent/garden"
-	"study-event-go/ent/mentorshipsystem"
+	"study-event-go/ent/mentorship"
 	"study-event-go/ent/predicate"
 	"study-event-go/types"
 
@@ -27,7 +27,7 @@ type GardenQuery struct {
 	fields     []string
 	predicates []predicate.Garden
 	// eager-loading edges.
-	withMentorshipSystem *MentorshipSystemQuery
+	withMentorship *MentorshipQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -64,9 +64,9 @@ func (gq *GardenQuery) Order(o ...OrderFunc) *GardenQuery {
 	return gq
 }
 
-// QueryMentorshipSystem chains the current query on the "mentorship_system" edge.
-func (gq *GardenQuery) QueryMentorshipSystem() *MentorshipSystemQuery {
-	query := &MentorshipSystemQuery{config: gq.config}
+// QueryMentorship chains the current query on the "mentorship" edge.
+func (gq *GardenQuery) QueryMentorship() *MentorshipQuery {
+	query := &MentorshipQuery{config: gq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := gq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -77,8 +77,8 @@ func (gq *GardenQuery) QueryMentorshipSystem() *MentorshipSystemQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(garden.Table, garden.FieldID, selector),
-			sqlgraph.To(mentorshipsystem.Table, mentorshipsystem.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, garden.MentorshipSystemTable, garden.MentorshipSystemColumn),
+			sqlgraph.To(mentorship.Table, mentorship.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, garden.MentorshipTable, garden.MentorshipColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(gq.driver.Dialect(), step)
 		return fromU, nil
@@ -262,26 +262,26 @@ func (gq *GardenQuery) Clone() *GardenQuery {
 		return nil
 	}
 	return &GardenQuery{
-		config:               gq.config,
-		limit:                gq.limit,
-		offset:               gq.offset,
-		order:                append([]OrderFunc{}, gq.order...),
-		predicates:           append([]predicate.Garden{}, gq.predicates...),
-		withMentorshipSystem: gq.withMentorshipSystem.Clone(),
+		config:         gq.config,
+		limit:          gq.limit,
+		offset:         gq.offset,
+		order:          append([]OrderFunc{}, gq.order...),
+		predicates:     append([]predicate.Garden{}, gq.predicates...),
+		withMentorship: gq.withMentorship.Clone(),
 		// clone intermediate query.
 		sql:  gq.sql.Clone(),
 		path: gq.path,
 	}
 }
 
-// WithMentorshipSystem tells the query-builder to eager-load the nodes that are connected to
-// the "mentorship_system" edge. The optional arguments are used to configure the query builder of the edge.
-func (gq *GardenQuery) WithMentorshipSystem(opts ...func(*MentorshipSystemQuery)) *GardenQuery {
-	query := &MentorshipSystemQuery{config: gq.config}
+// WithMentorship tells the query-builder to eager-load the nodes that are connected to
+// the "mentorship" edge. The optional arguments are used to configure the query builder of the edge.
+func (gq *GardenQuery) WithMentorship(opts ...func(*MentorshipQuery)) *GardenQuery {
+	query := &MentorshipQuery{config: gq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	gq.withMentorshipSystem = query
+	gq.withMentorship = query
 	return gq
 }
 
@@ -351,7 +351,7 @@ func (gq *GardenQuery) sqlAll(ctx context.Context) ([]*Garden, error) {
 		nodes       = []*Garden{}
 		_spec       = gq.querySpec()
 		loadedTypes = [1]bool{
-			gq.withMentorshipSystem != nil,
+			gq.withMentorship != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
@@ -374,20 +374,20 @@ func (gq *GardenQuery) sqlAll(ctx context.Context) ([]*Garden, error) {
 		return nodes, nil
 	}
 
-	if query := gq.withMentorshipSystem; query != nil {
-		ids := make([]types.MentorshipSystemID, 0, len(nodes))
-		nodeids := make(map[types.MentorshipSystemID][]*Garden)
+	if query := gq.withMentorship; query != nil {
+		ids := make([]types.MentorshipID, 0, len(nodes))
+		nodeids := make(map[types.MentorshipID][]*Garden)
 		for i := range nodes {
-			if nodes[i].MentorshipSystemID == nil {
+			if nodes[i].MentorshipID == nil {
 				continue
 			}
-			fk := *nodes[i].MentorshipSystemID
+			fk := *nodes[i].MentorshipID
 			if _, ok := nodeids[fk]; !ok {
 				ids = append(ids, fk)
 			}
 			nodeids[fk] = append(nodeids[fk], nodes[i])
 		}
-		query.Where(mentorshipsystem.IDIn(ids...))
+		query.Where(mentorship.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
@@ -395,10 +395,10 @@ func (gq *GardenQuery) sqlAll(ctx context.Context) ([]*Garden, error) {
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "mentorship_system_id" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "mentorship_id" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.MentorshipSystem = n
+				nodes[i].Edges.Mentorship = n
 			}
 		}
 	}

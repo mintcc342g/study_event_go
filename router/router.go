@@ -13,7 +13,7 @@ func AssaultLilyRoute(sys *echo.Group, ctrlContainer *container.ControllerContai
 	sys.GET("/mentorship/:id", ctrlContainer.Mentorship.Get)
 	sys.GET("/mentorship", ctrlContainer.Mentorship.List)
 	sys.PUT("/mentorship/:id", ctrlContainer.Mentorship.Update)
-	// sys.DELETE("/mentorship/:id", ctrlContainer.Mentorship.Delete)
+	sys.DELETE("/mentorship/:id", ctrlContainer.Mentorship.Delete)
 
 	// TODO
 	// sys.POST("/garden", ctrlContainer.Garden.New)

@@ -5,7 +5,7 @@ import (
 	"study-event-go/domain/entity"
 	"study-event-go/domain/interfaces"
 	"study-event-go/ent"
-	"study-event-go/ent/mentorshipsystem"
+	entMentorship "study-event-go/ent/mentorship"
 	"study-event-go/types"
 
 	"github.com/juju/errors"
@@ -24,22 +24,21 @@ func NewMentorshipRepository(conn *ent.Client) interfaces.MentorshipRepository {
 
 // TODO: logger
 
-func (m *mentorshipRepository) New(ctx context.Context, mentorship *entity.MentorshipSystem) (*entity.MentorshipSystem, error) {
+func (m *mentorshipRepository) New(ctx context.Context, mentorship *entity.Mentorship) (*entity.Mentorship, error) {
 
-	id, err := m.conn.MentorshipSystem.
+	id, err := m.conn.Mentorship.
 		Create().
 		SetName(mentorship.Name).
-		SetNillableDeletedAt(nil).
 		OnConflict().
 		UpdateUpdatedAt().
-		UpdateDeletedAt().
+		ClearDeletedAt().
 		ID(ctx)
 	if err != nil {
 		// logger
 		return nil, errors.New("internal server error")
 	}
 
-	entModel, err := m.conn.MentorshipSystem.Get(ctx, id)
+	entModel, err := m.conn.Mentorship.Get(ctx, id)
 	if err != nil {
 		// logger
 		return nil, errors.New("internal server error")
@@ -53,15 +52,15 @@ func (m *mentorshipRepository) New(ctx context.Context, mentorship *entity.Mento
 	return mentorship, nil
 }
 
-func (m *mentorshipRepository) Get(ctx context.Context, id types.MentorshipSystemID) (*entity.MentorshipSystem, error) {
+func (m *mentorshipRepository) Get(ctx context.Context, id types.MentorshipID) (*entity.Mentorship, error) {
 
-	entModel, err := m.conn.MentorshipSystem.Get(ctx, id)
+	entModel, err := m.conn.Mentorship.Get(ctx, id)
 	if err != nil {
 		// logger
 		return nil, errors.NotFoundf("id[%d]", id)
 	}
 
-	return &entity.MentorshipSystem{
+	return &entity.Mentorship{
 		ID:        entModel.ID,
 		CreatedAt: entModel.CreatedAt,
 		UpdatedAt: entModel.UpdatedAt,
@@ -70,11 +69,11 @@ func (m *mentorshipRepository) Get(ctx context.Context, id types.MentorshipSyste
 	}, nil
 }
 
-func (m *mentorshipRepository) GetByName(ctx context.Context, name string) (*entity.MentorshipSystem, error) {
+func (m *mentorshipRepository) GetByName(ctx context.Context, name string) (*entity.Mentorship, error) {
 
-	entModel, err := m.conn.MentorshipSystem.
+	entModel, err := m.conn.Mentorship.
 		Query().
-		Where(mentorshipsystem.Name(name)).
+		Where(entMentorship.Name(name)).
 		Only(ctx)
 	if err != nil {
 		// logger
@@ -84,7 +83,7 @@ func (m *mentorshipRepository) GetByName(ctx context.Context, name string) (*ent
 		return nil, errors.New("internal server error")
 	}
 
-	return &entity.MentorshipSystem{
+	return &entity.Mentorship{
 		ID:        entModel.ID,
 		CreatedAt: entModel.CreatedAt,
 		UpdatedAt: entModel.UpdatedAt,
@@ -93,9 +92,9 @@ func (m *mentorshipRepository) GetByName(ctx context.Context, name string) (*ent
 	}, nil
 }
 
-func (m *mentorshipRepository) List(ctx context.Context, offset uint32) ([]*entity.MentorshipSystem, error) {
+func (m *mentorshipRepository) List(ctx context.Context, offset uint32) ([]*entity.Mentorship, error) {
 
-	entModels, err := m.conn.MentorshipSystem.
+	entModels, err := m.conn.Mentorship.
 		Query().
 		Limit(10).
 		Offset(int(offset)).
@@ -105,9 +104,9 @@ func (m *mentorshipRepository) List(ctx context.Context, offset uint32) ([]*enti
 		return nil, errors.New("internal server error")
 	}
 
-	mentorships := make([]*entity.MentorshipSystem, len(entModels))
+	mentorships := make([]*entity.Mentorship, len(entModels))
 	for i, v := range entModels {
-		mentorships[i] = &entity.MentorshipSystem{
+		mentorships[i] = &entity.Mentorship{
 			ID:        v.ID,
 			CreatedAt: v.CreatedAt,
 			UpdatedAt: v.UpdatedAt,
@@ -119,11 +118,12 @@ func (m *mentorshipRepository) List(ctx context.Context, offset uint32) ([]*enti
 	return mentorships, nil
 }
 
-func (m *mentorshipRepository) Update(ctx context.Context, mentorship *entity.MentorshipSystem) (*entity.MentorshipSystem, error) {
+func (m *mentorshipRepository) Update(ctx context.Context, mentorship *entity.Mentorship) (*entity.Mentorship, error) {
 
-	entModel, err := m.conn.MentorshipSystem.
+	entModel, err := m.conn.Mentorship.
 		UpdateOneID(mentorship.ID).
 		SetName(mentorship.Name).
+		SetNillableDeletedAt(mentorship.DeletedAt).
 		Save(ctx)
 	if err != nil {
 		// logger
@@ -134,6 +134,7 @@ func (m *mentorshipRepository) Update(ctx context.Context, mentorship *entity.Me
 	mentorship.Name = entModel.Name
 	mentorship.CreatedAt = entModel.CreatedAt
 	mentorship.UpdatedAt = entModel.UpdatedAt
+	mentorship.DeletedAt = entModel.DeletedAt
 
 	return mentorship, nil
 }

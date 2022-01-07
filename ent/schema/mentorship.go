@@ -8,15 +8,15 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// MentorshipSystem holds the schema definition for the MentorshipSystem entity.
-type MentorshipSystem struct {
+// Mentorship holds the schema definition for the Mentorship entity.
+type Mentorship struct {
 	ent.Schema
 }
 
-// Fields of the MentorshipSystem.
-func (MentorshipSystem) Fields() []ent.Field {
+// Fields of the Mentorship.
+func (Mentorship) Fields() []ent.Field {
 	return []ent.Field{
-		field.Uint64("id").GoType(types.MentorshipSystemID(0)),
+		field.Uint64("id").GoType(types.MentorshipID(0)),
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 		field.Time("deleted_at").Nillable().Optional(),
@@ -24,7 +24,7 @@ func (MentorshipSystem) Fields() []ent.Field {
 	}
 }
 
-// Edges of the MentorshipSystem.
-func (MentorshipSystem) Edges() []ent.Edge {
+// Edges of the Mentorship.
+func (Mentorship) Edges() []ent.Edge {
 	return nil
 }

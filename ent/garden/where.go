@@ -107,11 +107,11 @@ func Location(v string) predicate.Garden {
 	})
 }
 
-// MentorshipSystemID applies equality check predicate on the "mentorship_system_id" field. It's identical to MentorshipSystemIDEQ.
-func MentorshipSystemID(v types.MentorshipSystemID) predicate.Garden {
+// MentorshipID applies equality check predicate on the "mentorship_id" field. It's identical to MentorshipIDEQ.
+func MentorshipID(v types.MentorshipID) predicate.Garden {
 	vc := uint64(v)
 	return predicate.Garden(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldMentorshipSystemID), vc))
+		s.Where(sql.EQ(s.C(FieldMentorshipID), vc))
 	})
 }
 
@@ -337,24 +337,24 @@ func LocationContainsFold(v string) predicate.Garden {
 	})
 }
 
-// MentorshipSystemIDEQ applies the EQ predicate on the "mentorship_system_id" field.
-func MentorshipSystemIDEQ(v types.MentorshipSystemID) predicate.Garden {
+// MentorshipIDEQ applies the EQ predicate on the "mentorship_id" field.
+func MentorshipIDEQ(v types.MentorshipID) predicate.Garden {
 	vc := uint64(v)
 	return predicate.Garden(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldMentorshipSystemID), vc))
+		s.Where(sql.EQ(s.C(FieldMentorshipID), vc))
 	})
 }
 
-// MentorshipSystemIDNEQ applies the NEQ predicate on the "mentorship_system_id" field.
-func MentorshipSystemIDNEQ(v types.MentorshipSystemID) predicate.Garden {
+// MentorshipIDNEQ applies the NEQ predicate on the "mentorship_id" field.
+func MentorshipIDNEQ(v types.MentorshipID) predicate.Garden {
 	vc := uint64(v)
 	return predicate.Garden(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldMentorshipSystemID), vc))
+		s.Where(sql.NEQ(s.C(FieldMentorshipID), vc))
 	})
 }
 
-// MentorshipSystemIDIn applies the In predicate on the "mentorship_system_id" field.
-func MentorshipSystemIDIn(vs ...types.MentorshipSystemID) predicate.Garden {
+// MentorshipIDIn applies the In predicate on the "mentorship_id" field.
+func MentorshipIDIn(vs ...types.MentorshipID) predicate.Garden {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = uint64(vs[i])
@@ -366,12 +366,12 @@ func MentorshipSystemIDIn(vs ...types.MentorshipSystemID) predicate.Garden {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldMentorshipSystemID), v...))
+		s.Where(sql.In(s.C(FieldMentorshipID), v...))
 	})
 }
 
-// MentorshipSystemIDNotIn applies the NotIn predicate on the "mentorship_system_id" field.
-func MentorshipSystemIDNotIn(vs ...types.MentorshipSystemID) predicate.Garden {
+// MentorshipIDNotIn applies the NotIn predicate on the "mentorship_id" field.
+func MentorshipIDNotIn(vs ...types.MentorshipID) predicate.Garden {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = uint64(vs[i])
@@ -383,43 +383,43 @@ func MentorshipSystemIDNotIn(vs ...types.MentorshipSystemID) predicate.Garden {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldMentorshipSystemID), v...))
+		s.Where(sql.NotIn(s.C(FieldMentorshipID), v...))
 	})
 }
 
-// MentorshipSystemIDIsNil applies the IsNil predicate on the "mentorship_system_id" field.
-func MentorshipSystemIDIsNil() predicate.Garden {
+// MentorshipIDIsNil applies the IsNil predicate on the "mentorship_id" field.
+func MentorshipIDIsNil() predicate.Garden {
 	return predicate.Garden(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldMentorshipSystemID)))
+		s.Where(sql.IsNull(s.C(FieldMentorshipID)))
 	})
 }
 
-// MentorshipSystemIDNotNil applies the NotNil predicate on the "mentorship_system_id" field.
-func MentorshipSystemIDNotNil() predicate.Garden {
+// MentorshipIDNotNil applies the NotNil predicate on the "mentorship_id" field.
+func MentorshipIDNotNil() predicate.Garden {
 	return predicate.Garden(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldMentorshipSystemID)))
+		s.Where(sql.NotNull(s.C(FieldMentorshipID)))
 	})
 }
 
-// HasMentorshipSystem applies the HasEdge predicate on the "mentorship_system" edge.
-func HasMentorshipSystem() predicate.Garden {
+// HasMentorship applies the HasEdge predicate on the "mentorship" edge.
+func HasMentorship() predicate.Garden {
 	return predicate.Garden(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(MentorshipSystemTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, MentorshipSystemTable, MentorshipSystemColumn),
+			sqlgraph.To(MentorshipTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, MentorshipTable, MentorshipColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasMentorshipSystemWith applies the HasEdge predicate on the "mentorship_system" edge with a given conditions (other predicates).
-func HasMentorshipSystemWith(preds ...predicate.MentorshipSystem) predicate.Garden {
+// HasMentorshipWith applies the HasEdge predicate on the "mentorship" edge with a given conditions (other predicates).
+func HasMentorshipWith(preds ...predicate.Mentorship) predicate.Garden {
 	return predicate.Garden(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(MentorshipSystemInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, MentorshipSystemTable, MentorshipSystemColumn),
+			sqlgraph.To(MentorshipInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, MentorshipTable, MentorshipColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

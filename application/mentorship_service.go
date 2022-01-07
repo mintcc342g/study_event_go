@@ -30,7 +30,7 @@ func NewMentorshipService(
 func (m *MentorshipService) New(ctx context.Context, mentorshipDTO *dto.Mentorship) (*dto.Mentorship, error) {
 
 	_, err := m.mentorshipRepo.GetByName(ctx, mentorshipDTO.Name)
-	if !errors.IsNotFound(err) {
+	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
 
@@ -47,7 +47,7 @@ func (m *MentorshipService) New(ctx context.Context, mentorshipDTO *dto.Mentorsh
 }
 
 // Get ...
-func (m *MentorshipService) Get(ctx context.Context, id types.MentorshipSystemID) (*dto.Mentorship, error) {
+func (m *MentorshipService) Get(ctx context.Context, id types.MentorshipID) (*dto.Mentorship, error) {
 
 	mentorship, err := m.mentorshipRepo.Get(ctx, id)
 	if err != nil {
@@ -97,6 +97,23 @@ func (m *MentorshipService) Update(ctx context.Context, mentorshipDTO *dto.Mento
 	if err = mentorship.Update(mentorshipDTO); err != nil {
 		return nil, err
 	}
+
+	if mentorship, err = m.mentorshipRepo.Update(ctx, mentorship); err != nil {
+		return nil, err
+	}
+
+	return mentorship.DTO(), nil
+}
+
+// SoftDelete ...
+func (m *MentorshipService) SoftDelete(ctx context.Context, id types.MentorshipID) (*dto.Mentorship, error) {
+
+	mentorship, err := m.mentorshipRepo.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	mentorship.Delete()
 
 	if mentorship, err = m.mentorshipRepo.Update(ctx, mentorship); err != nil {
 		return nil, err
