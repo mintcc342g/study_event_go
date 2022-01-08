@@ -19,7 +19,7 @@ var _ = Describe("Test Battle Domain", func() {
 		expectedError error
 	)
 
-	Describe("Alarm", func() {
+	Describe("Alarm Create", func() {
 		BeforeEach(func() {
 			alarmDTO = &dto.Alarm{
 				GardenID:     1,
