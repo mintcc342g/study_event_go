@@ -6,9 +6,9 @@ import (
 	"context"
 	"fmt"
 	"study-event-go/ent/garden"
-	"study-event-go/ent/mentorship"
 	"study-event-go/ent/predicate"
 	"study-event-go/types"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -28,6 +28,46 @@ func (gu *GardenUpdate) Where(ps ...predicate.Garden) *GardenUpdate {
 	return gu
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (gu *GardenUpdate) SetCreatedAt(t time.Time) *GardenUpdate {
+	gu.mutation.SetCreatedAt(t)
+	return gu
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (gu *GardenUpdate) SetNillableCreatedAt(t *time.Time) *GardenUpdate {
+	if t != nil {
+		gu.SetCreatedAt(*t)
+	}
+	return gu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (gu *GardenUpdate) SetUpdatedAt(t time.Time) *GardenUpdate {
+	gu.mutation.SetUpdatedAt(t)
+	return gu
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (gu *GardenUpdate) SetDeletedAt(t time.Time) *GardenUpdate {
+	gu.mutation.SetDeletedAt(t)
+	return gu
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (gu *GardenUpdate) SetNillableDeletedAt(t *time.Time) *GardenUpdate {
+	if t != nil {
+		gu.SetDeletedAt(*t)
+	}
+	return gu
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (gu *GardenUpdate) ClearDeletedAt() *GardenUpdate {
+	gu.mutation.ClearDeletedAt()
+	return gu
+}
+
 // SetName sets the "name" field.
 func (gu *GardenUpdate) SetName(s string) *GardenUpdate {
 	gu.mutation.SetName(s)
@@ -42,38 +82,20 @@ func (gu *GardenUpdate) SetLocation(s string) *GardenUpdate {
 
 // SetMentorshipID sets the "mentorship_id" field.
 func (gu *GardenUpdate) SetMentorshipID(ti types.MentorshipID) *GardenUpdate {
+	gu.mutation.ResetMentorshipID()
 	gu.mutation.SetMentorshipID(ti)
 	return gu
 }
 
-// SetNillableMentorshipID sets the "mentorship_id" field if the given value is not nil.
-func (gu *GardenUpdate) SetNillableMentorshipID(ti *types.MentorshipID) *GardenUpdate {
-	if ti != nil {
-		gu.SetMentorshipID(*ti)
-	}
+// AddMentorshipID adds ti to the "mentorship_id" field.
+func (gu *GardenUpdate) AddMentorshipID(ti types.MentorshipID) *GardenUpdate {
+	gu.mutation.AddMentorshipID(ti)
 	return gu
-}
-
-// ClearMentorshipID clears the value of the "mentorship_id" field.
-func (gu *GardenUpdate) ClearMentorshipID() *GardenUpdate {
-	gu.mutation.ClearMentorshipID()
-	return gu
-}
-
-// SetMentorship sets the "mentorship" edge to the Mentorship entity.
-func (gu *GardenUpdate) SetMentorship(m *Mentorship) *GardenUpdate {
-	return gu.SetMentorshipID(m.ID)
 }
 
 // Mutation returns the GardenMutation object of the builder.
 func (gu *GardenUpdate) Mutation() *GardenMutation {
 	return gu.mutation
-}
-
-// ClearMentorship clears the "mentorship" edge to the Mentorship entity.
-func (gu *GardenUpdate) ClearMentorship() *GardenUpdate {
-	gu.mutation.ClearMentorship()
-	return gu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -82,6 +104,7 @@ func (gu *GardenUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	gu.defaults()
 	if len(gu.hooks) == 0 {
 		affected, err = gu.sqlSave(ctx)
 	} else {
@@ -130,6 +153,14 @@ func (gu *GardenUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (gu *GardenUpdate) defaults() {
+	if _, ok := gu.mutation.UpdatedAt(); !ok {
+		v := garden.UpdateDefaultUpdatedAt()
+		gu.mutation.SetUpdatedAt(v)
+	}
+}
+
 func (gu *GardenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -148,6 +179,33 @@ func (gu *GardenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := gu.mutation.CreatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: garden.FieldCreatedAt,
+		})
+	}
+	if value, ok := gu.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: garden.FieldUpdatedAt,
+		})
+	}
+	if value, ok := gu.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: garden.FieldDeletedAt,
+		})
+	}
+	if gu.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: garden.FieldDeletedAt,
+		})
+	}
 	if value, ok := gu.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -162,40 +220,19 @@ func (gu *GardenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: garden.FieldLocation,
 		})
 	}
-	if gu.mutation.MentorshipCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   garden.MentorshipTable,
-			Columns: []string{garden.MentorshipColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: mentorship.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := gu.mutation.MentorshipID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: garden.FieldMentorshipID,
+		})
 	}
-	if nodes := gu.mutation.MentorshipIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   garden.MentorshipTable,
-			Columns: []string{garden.MentorshipColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: mentorship.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := gu.mutation.AddedMentorshipID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: garden.FieldMentorshipID,
+		})
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, gu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -216,6 +253,46 @@ type GardenUpdateOne struct {
 	mutation *GardenMutation
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (guo *GardenUpdateOne) SetCreatedAt(t time.Time) *GardenUpdateOne {
+	guo.mutation.SetCreatedAt(t)
+	return guo
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (guo *GardenUpdateOne) SetNillableCreatedAt(t *time.Time) *GardenUpdateOne {
+	if t != nil {
+		guo.SetCreatedAt(*t)
+	}
+	return guo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (guo *GardenUpdateOne) SetUpdatedAt(t time.Time) *GardenUpdateOne {
+	guo.mutation.SetUpdatedAt(t)
+	return guo
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (guo *GardenUpdateOne) SetDeletedAt(t time.Time) *GardenUpdateOne {
+	guo.mutation.SetDeletedAt(t)
+	return guo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (guo *GardenUpdateOne) SetNillableDeletedAt(t *time.Time) *GardenUpdateOne {
+	if t != nil {
+		guo.SetDeletedAt(*t)
+	}
+	return guo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (guo *GardenUpdateOne) ClearDeletedAt() *GardenUpdateOne {
+	guo.mutation.ClearDeletedAt()
+	return guo
+}
+
 // SetName sets the "name" field.
 func (guo *GardenUpdateOne) SetName(s string) *GardenUpdateOne {
 	guo.mutation.SetName(s)
@@ -230,38 +307,20 @@ func (guo *GardenUpdateOne) SetLocation(s string) *GardenUpdateOne {
 
 // SetMentorshipID sets the "mentorship_id" field.
 func (guo *GardenUpdateOne) SetMentorshipID(ti types.MentorshipID) *GardenUpdateOne {
+	guo.mutation.ResetMentorshipID()
 	guo.mutation.SetMentorshipID(ti)
 	return guo
 }
 
-// SetNillableMentorshipID sets the "mentorship_id" field if the given value is not nil.
-func (guo *GardenUpdateOne) SetNillableMentorshipID(ti *types.MentorshipID) *GardenUpdateOne {
-	if ti != nil {
-		guo.SetMentorshipID(*ti)
-	}
+// AddMentorshipID adds ti to the "mentorship_id" field.
+func (guo *GardenUpdateOne) AddMentorshipID(ti types.MentorshipID) *GardenUpdateOne {
+	guo.mutation.AddMentorshipID(ti)
 	return guo
-}
-
-// ClearMentorshipID clears the value of the "mentorship_id" field.
-func (guo *GardenUpdateOne) ClearMentorshipID() *GardenUpdateOne {
-	guo.mutation.ClearMentorshipID()
-	return guo
-}
-
-// SetMentorship sets the "mentorship" edge to the Mentorship entity.
-func (guo *GardenUpdateOne) SetMentorship(m *Mentorship) *GardenUpdateOne {
-	return guo.SetMentorshipID(m.ID)
 }
 
 // Mutation returns the GardenMutation object of the builder.
 func (guo *GardenUpdateOne) Mutation() *GardenMutation {
 	return guo.mutation
-}
-
-// ClearMentorship clears the "mentorship" edge to the Mentorship entity.
-func (guo *GardenUpdateOne) ClearMentorship() *GardenUpdateOne {
-	guo.mutation.ClearMentorship()
-	return guo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -277,6 +336,7 @@ func (guo *GardenUpdateOne) Save(ctx context.Context) (*Garden, error) {
 		err  error
 		node *Garden
 	)
+	guo.defaults()
 	if len(guo.hooks) == 0 {
 		node, err = guo.sqlSave(ctx)
 	} else {
@@ -325,6 +385,14 @@ func (guo *GardenUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (guo *GardenUpdateOne) defaults() {
+	if _, ok := guo.mutation.UpdatedAt(); !ok {
+		v := garden.UpdateDefaultUpdatedAt()
+		guo.mutation.SetUpdatedAt(v)
+	}
+}
+
 func (guo *GardenUpdateOne) sqlSave(ctx context.Context) (_node *Garden, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -360,6 +428,33 @@ func (guo *GardenUpdateOne) sqlSave(ctx context.Context) (_node *Garden, err err
 			}
 		}
 	}
+	if value, ok := guo.mutation.CreatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: garden.FieldCreatedAt,
+		})
+	}
+	if value, ok := guo.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: garden.FieldUpdatedAt,
+		})
+	}
+	if value, ok := guo.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: garden.FieldDeletedAt,
+		})
+	}
+	if guo.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: garden.FieldDeletedAt,
+		})
+	}
 	if value, ok := guo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -374,40 +469,19 @@ func (guo *GardenUpdateOne) sqlSave(ctx context.Context) (_node *Garden, err err
 			Column: garden.FieldLocation,
 		})
 	}
-	if guo.mutation.MentorshipCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   garden.MentorshipTable,
-			Columns: []string{garden.MentorshipColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: mentorship.FieldID,
-				},
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := guo.mutation.MentorshipID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: garden.FieldMentorshipID,
+		})
 	}
-	if nodes := guo.mutation.MentorshipIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   garden.MentorshipTable,
-			Columns: []string{garden.MentorshipColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: mentorship.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := guo.mutation.AddedMentorshipID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: garden.FieldMentorshipID,
+		})
 	}
 	_node = &Garden{config: guo.config}
 	_spec.Assign = _node.assignValues

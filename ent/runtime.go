@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"study-event-go/ent/garden"
 	"study-event-go/ent/mentorship"
 	"study-event-go/ent/schema"
 	"time"
@@ -12,6 +13,18 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	gardenFields := schema.Garden{}.Fields()
+	_ = gardenFields
+	// gardenDescCreatedAt is the schema descriptor for created_at field.
+	gardenDescCreatedAt := gardenFields[1].Descriptor()
+	// garden.DefaultCreatedAt holds the default value on creation for the created_at field.
+	garden.DefaultCreatedAt = gardenDescCreatedAt.Default.(func() time.Time)
+	// gardenDescUpdatedAt is the schema descriptor for updated_at field.
+	gardenDescUpdatedAt := gardenFields[2].Descriptor()
+	// garden.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	garden.DefaultUpdatedAt = gardenDescUpdatedAt.Default.(func() time.Time)
+	// garden.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	garden.UpdateDefaultUpdatedAt = gardenDescUpdatedAt.UpdateDefault.(func() time.Time)
 	mentorshipFields := schema.Mentorship{}.Fields()
 	_ = mentorshipFields
 	// mentorshipDescCreatedAt is the schema descriptor for created_at field.

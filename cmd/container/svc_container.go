@@ -6,16 +6,18 @@ import (
 
 // ServiceContainer ...
 type ServiceContainer struct {
-	ProtectionSvc *application.ProtectionService
 	EventSvc      *application.EventService
+	GardenSvc     *application.GardenService
 	MentorshipSvc *application.MentorshipService
+	ProtectionSvc *application.ProtectionService
 }
 
 func newServiceContainer(repo *RepositoryContainer) *ServiceContainer {
 	return &ServiceContainer{
-		ProtectionSvc: application.NewProtectionService(repo.LilyRepo, repo.GardenRepo, repo.EventRepo),
 		EventSvc:      application.NewEventService(repo.RedisRepo),
+		GardenSvc:     application.NewGardenService(repo.GardenRepo, repo.MentorshipRepo),
 		MentorshipSvc: application.NewMentorshipService(repo.MentorshipRepo),
+		ProtectionSvc: application.NewProtectionService(repo.LilyRepo, repo.GardenRepo, repo.EventRepo),
 	}
 }
 

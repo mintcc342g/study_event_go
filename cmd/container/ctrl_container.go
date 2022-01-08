@@ -6,14 +6,16 @@ import (
 
 // ControllerContainer ...
 type ControllerContainer struct {
-	Protection *controller.ProtectionController
+	Garden     *controller.GardenController
 	Mentorship *controller.MentorshipController
+	Protection *controller.ProtectionController
 }
 
 func newControllerContainer(svcContainer *ServiceContainer, repoContainer *RepositoryContainer) *ControllerContainer {
 	return &ControllerContainer{
-		Protection: controller.NewProtectionController(svcContainer.ProtectionSvc),
+		Garden:     controller.NewGardenController(svcContainer.GardenSvc),
 		Mentorship: controller.NewMentorshipController(svcContainer.MentorshipSvc),
+		Protection: controller.NewProtectionController(svcContainer.ProtectionSvc),
 	}
 }
 

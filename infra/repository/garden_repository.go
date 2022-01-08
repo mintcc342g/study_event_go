@@ -5,7 +5,10 @@ import (
 	"study-event-go/domain/entity"
 	"study-event-go/domain/interfaces"
 	"study-event-go/ent"
+	entGarden "study-event-go/ent/garden"
 	"study-event-go/types"
+
+	"github.com/juju/errors"
 )
 
 type gardenRepository struct {
@@ -19,9 +22,86 @@ func NewGardenRepository(conn *ent.Client) interfaces.GardenRepository {
 	}
 }
 
-func (g *gardenRepository) Garden(ctx context.Context, id types.GardenID) (*entity.Garden, error) {
+func (g *gardenRepository) New(ctx context.Context, garden *entity.Garden) (*entity.Garden, error) {
 
-	// TODO: RDB
+	id, err := g.conn.Garden.
+		Create().
+		SetName(garden.Name).
+		SetLocation(garden.Location).
+		SetMentorshipID(garden.MentorshipID).
+		OnConflict().
+		UpdateUpdatedAt().
+		ClearDeletedAt().
+		ID(ctx)
+	if err != nil {
+		// logger
+		return nil, errors.New("internal server error")
+	}
 
-	return nil, nil
+	entModel, err := g.conn.Garden.Get(ctx, id)
+	if err != nil {
+		// logger
+		return nil, errors.New("internal server error")
+	}
+
+	garden.ID = entModel.ID
+	garden.CreatedAt = entModel.CreatedAt
+	garden.UpdatedAt = entModel.UpdatedAt
+	garden.DeletedAt = entModel.DeletedAt
+	garden.Name = entModel.Name
+	garden.Location = entModel.Location
+	garden.MentorshipID = entModel.MentorshipID
+
+	return garden, nil
+}
+
+func (g *gardenRepository) Get(ctx context.Context, id types.GardenID) (*entity.Garden, error) {
+
+	entModel, err := g.conn.Garden.
+		Query().
+		Where(
+			entGarden.ID(id),
+			entGarden.DeletedAtIsNil()).
+		Only(ctx)
+	if err != nil {
+		// logger
+		return nil, errors.NotFoundf("id[%d]", id)
+	}
+
+	return &entity.Garden{
+		ID:           entModel.ID,
+		CreatedAt:    entModel.CreatedAt,
+		UpdatedAt:    entModel.UpdatedAt,
+		DeletedAt:    entModel.DeletedAt,
+		Name:         entModel.Name,
+		Location:     entModel.Location,
+		MentorshipID: entModel.MentorshipID,
+	}, nil
+}
+
+func (g *gardenRepository) GetByName(ctx context.Context, name string) (*entity.Garden, error) {
+
+	entModel, err := g.conn.Garden.
+		Query().
+		Where(
+			entGarden.Name(name),
+			entGarden.DeletedAtIsNil()).
+		Only(ctx)
+	if err != nil {
+		// logger
+		if ent.IsNotFound(err) { // TODO: converter (ent error -> error)
+			return nil, errors.NotFoundf("The name[%s]", name)
+		}
+		return nil, errors.New("internal server error")
+	}
+
+	return &entity.Garden{
+		ID:           entModel.ID,
+		CreatedAt:    entModel.CreatedAt,
+		UpdatedAt:    entModel.UpdatedAt,
+		DeletedAt:    entModel.DeletedAt,
+		Name:         entModel.Name,
+		Location:     entModel.Location,
+		MentorshipID: entModel.MentorshipID,
+	}, nil
 }

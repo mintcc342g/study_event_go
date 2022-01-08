@@ -34,7 +34,7 @@ func (p *ProtectionService) Alarm(ctx context.Context, alarmDTO *dto.Alarm) (err
 	// TODO: logger
 	// TODO: db
 
-	garden, err := p.gardenRepo.Garden(ctx, alarmDTO.GardenID)
+	garden, err := p.gardenRepo.Get(ctx, alarmDTO.GardenID)
 	if err != nil {
 		return err
 	}

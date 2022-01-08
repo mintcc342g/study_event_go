@@ -2,33 +2,37 @@
 
 package garden
 
+import (
+	"time"
+)
+
 const (
 	// Label holds the string label denoting the garden type in the database.
 	Label = "garden"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	FieldCreatedAt = "created_at"
+	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
+	FieldUpdatedAt = "updated_at"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldLocation holds the string denoting the location field in the database.
 	FieldLocation = "location"
 	// FieldMentorshipID holds the string denoting the mentorship_id field in the database.
 	FieldMentorshipID = "mentorship_id"
-	// EdgeMentorship holds the string denoting the mentorship edge name in mutations.
-	EdgeMentorship = "mentorship"
 	// Table holds the table name of the garden in the database.
 	Table = "gardens"
-	// MentorshipTable is the table that holds the mentorship relation/edge.
-	MentorshipTable = "gardens"
-	// MentorshipInverseTable is the table name for the Mentorship entity.
-	// It exists in this package in order to avoid circular dependency with the "mentorship" package.
-	MentorshipInverseTable = "mentorships"
-	// MentorshipColumn is the table column denoting the mentorship relation/edge.
-	MentorshipColumn = "mentorship_id"
 )
 
 // Columns holds all SQL columns for garden fields.
 var Columns = []string{
 	FieldID,
+	FieldCreatedAt,
+	FieldUpdatedAt,
+	FieldDeletedAt,
 	FieldName,
 	FieldLocation,
 	FieldMentorshipID,
@@ -43,3 +47,12 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	DefaultCreatedAt func() time.Time
+	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
+	DefaultUpdatedAt func() time.Time
+	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
+	UpdateDefaultUpdatedAt func() time.Time
+)

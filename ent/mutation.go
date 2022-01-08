@@ -31,17 +31,20 @@ const (
 // GardenMutation represents an operation that mutates the Garden nodes in the graph.
 type GardenMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *types.GardenID
-	name              *string
-	location          *string
-	clearedFields     map[string]struct{}
-	mentorship        *types.MentorshipID
-	clearedmentorship bool
-	done              bool
-	oldValue          func(context.Context) (*Garden, error)
-	predicates        []predicate.Garden
+	op               Op
+	typ              string
+	id               *types.GardenID
+	created_at       *time.Time
+	updated_at       *time.Time
+	deleted_at       *time.Time
+	name             *string
+	location         *string
+	mentorship_id    *types.MentorshipID
+	addmentorship_id *types.MentorshipID
+	clearedFields    map[string]struct{}
+	done             bool
+	oldValue         func(context.Context) (*Garden, error)
+	predicates       []predicate.Garden
 }
 
 var _ ent.Mutation = (*GardenMutation)(nil)
@@ -129,6 +132,127 @@ func (m *GardenMutation) ID() (id types.GardenID, exists bool) {
 	return *m.id, true
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (m *GardenMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *GardenMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Garden entity.
+// If the Garden object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GardenMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *GardenMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *GardenMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *GardenMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Garden entity.
+// If the Garden object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GardenMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *GardenMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *GardenMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *GardenMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Garden entity.
+// If the Garden object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GardenMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *GardenMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[garden.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *GardenMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[garden.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *GardenMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, garden.FieldDeletedAt)
+}
+
 // SetName sets the "name" field.
 func (m *GardenMutation) SetName(s string) {
 	m.name = &s
@@ -203,12 +327,13 @@ func (m *GardenMutation) ResetLocation() {
 
 // SetMentorshipID sets the "mentorship_id" field.
 func (m *GardenMutation) SetMentorshipID(ti types.MentorshipID) {
-	m.mentorship = &ti
+	m.mentorship_id = &ti
+	m.addmentorship_id = nil
 }
 
 // MentorshipID returns the value of the "mentorship_id" field in the mutation.
 func (m *GardenMutation) MentorshipID() (r types.MentorshipID, exists bool) {
-	v := m.mentorship
+	v := m.mentorship_id
 	if v == nil {
 		return
 	}
@@ -218,7 +343,7 @@ func (m *GardenMutation) MentorshipID() (r types.MentorshipID, exists bool) {
 // OldMentorshipID returns the old "mentorship_id" field's value of the Garden entity.
 // If the Garden object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GardenMutation) OldMentorshipID(ctx context.Context) (v *types.MentorshipID, err error) {
+func (m *GardenMutation) OldMentorshipID(ctx context.Context) (v types.MentorshipID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldMentorshipID is only allowed on UpdateOne operations")
 	}
@@ -232,48 +357,28 @@ func (m *GardenMutation) OldMentorshipID(ctx context.Context) (v *types.Mentorsh
 	return oldValue.MentorshipID, nil
 }
 
-// ClearMentorshipID clears the value of the "mentorship_id" field.
-func (m *GardenMutation) ClearMentorshipID() {
-	m.mentorship = nil
-	m.clearedFields[garden.FieldMentorshipID] = struct{}{}
+// AddMentorshipID adds ti to the "mentorship_id" field.
+func (m *GardenMutation) AddMentorshipID(ti types.MentorshipID) {
+	if m.addmentorship_id != nil {
+		*m.addmentorship_id += ti
+	} else {
+		m.addmentorship_id = &ti
+	}
 }
 
-// MentorshipIDCleared returns if the "mentorship_id" field was cleared in this mutation.
-func (m *GardenMutation) MentorshipIDCleared() bool {
-	_, ok := m.clearedFields[garden.FieldMentorshipID]
-	return ok
+// AddedMentorshipID returns the value that was added to the "mentorship_id" field in this mutation.
+func (m *GardenMutation) AddedMentorshipID() (r types.MentorshipID, exists bool) {
+	v := m.addmentorship_id
+	if v == nil {
+		return
+	}
+	return *v, true
 }
 
 // ResetMentorshipID resets all changes to the "mentorship_id" field.
 func (m *GardenMutation) ResetMentorshipID() {
-	m.mentorship = nil
-	delete(m.clearedFields, garden.FieldMentorshipID)
-}
-
-// ClearMentorship clears the "mentorship" edge to the Mentorship entity.
-func (m *GardenMutation) ClearMentorship() {
-	m.clearedmentorship = true
-}
-
-// MentorshipCleared reports if the "mentorship" edge to the Mentorship entity was cleared.
-func (m *GardenMutation) MentorshipCleared() bool {
-	return m.MentorshipIDCleared() || m.clearedmentorship
-}
-
-// MentorshipIDs returns the "mentorship" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// MentorshipID instead. It exists only for internal usage by the builders.
-func (m *GardenMutation) MentorshipIDs() (ids []types.MentorshipID) {
-	if id := m.mentorship; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetMentorship resets all changes to the "mentorship" edge.
-func (m *GardenMutation) ResetMentorship() {
-	m.mentorship = nil
-	m.clearedmentorship = false
+	m.mentorship_id = nil
+	m.addmentorship_id = nil
 }
 
 // Where appends a list predicates to the GardenMutation builder.
@@ -295,14 +400,23 @@ func (m *GardenMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GardenMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 6)
+	if m.created_at != nil {
+		fields = append(fields, garden.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, garden.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, garden.FieldDeletedAt)
+	}
 	if m.name != nil {
 		fields = append(fields, garden.FieldName)
 	}
 	if m.location != nil {
 		fields = append(fields, garden.FieldLocation)
 	}
-	if m.mentorship != nil {
+	if m.mentorship_id != nil {
 		fields = append(fields, garden.FieldMentorshipID)
 	}
 	return fields
@@ -313,6 +427,12 @@ func (m *GardenMutation) Fields() []string {
 // schema.
 func (m *GardenMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case garden.FieldCreatedAt:
+		return m.CreatedAt()
+	case garden.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case garden.FieldDeletedAt:
+		return m.DeletedAt()
 	case garden.FieldName:
 		return m.Name()
 	case garden.FieldLocation:
@@ -328,6 +448,12 @@ func (m *GardenMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *GardenMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case garden.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case garden.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case garden.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
 	case garden.FieldName:
 		return m.OldName(ctx)
 	case garden.FieldLocation:
@@ -343,6 +469,27 @@ func (m *GardenMutation) OldField(ctx context.Context, name string) (ent.Value, 
 // type.
 func (m *GardenMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case garden.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case garden.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case garden.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
 	case garden.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -372,6 +519,9 @@ func (m *GardenMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *GardenMutation) AddedFields() []string {
 	var fields []string
+	if m.addmentorship_id != nil {
+		fields = append(fields, garden.FieldMentorshipID)
+	}
 	return fields
 }
 
@@ -380,6 +530,8 @@ func (m *GardenMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *GardenMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case garden.FieldMentorshipID:
+		return m.AddedMentorshipID()
 	}
 	return nil, false
 }
@@ -389,6 +541,13 @@ func (m *GardenMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *GardenMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case garden.FieldMentorshipID:
+		v, ok := value.(types.MentorshipID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMentorshipID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Garden numeric field %s", name)
 }
@@ -397,8 +556,8 @@ func (m *GardenMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *GardenMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(garden.FieldMentorshipID) {
-		fields = append(fields, garden.FieldMentorshipID)
+	if m.FieldCleared(garden.FieldDeletedAt) {
+		fields = append(fields, garden.FieldDeletedAt)
 	}
 	return fields
 }
@@ -414,8 +573,8 @@ func (m *GardenMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *GardenMutation) ClearField(name string) error {
 	switch name {
-	case garden.FieldMentorshipID:
-		m.ClearMentorshipID()
+	case garden.FieldDeletedAt:
+		m.ClearDeletedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Garden nullable field %s", name)
@@ -425,6 +584,15 @@ func (m *GardenMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *GardenMutation) ResetField(name string) error {
 	switch name {
+	case garden.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case garden.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case garden.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
 	case garden.FieldName:
 		m.ResetName()
 		return nil
@@ -440,77 +608,49 @@ func (m *GardenMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *GardenMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.mentorship != nil {
-		edges = append(edges, garden.EdgeMentorship)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *GardenMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case garden.EdgeMentorship:
-		if id := m.mentorship; id != nil {
-			return []ent.Value{*id}
-		}
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *GardenMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *GardenMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *GardenMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedmentorship {
-		edges = append(edges, garden.EdgeMentorship)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *GardenMutation) EdgeCleared(name string) bool {
-	switch name {
-	case garden.EdgeMentorship:
-		return m.clearedmentorship
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *GardenMutation) ClearEdge(name string) error {
-	switch name {
-	case garden.EdgeMentorship:
-		m.ClearMentorship()
-		return nil
-	}
 	return fmt.Errorf("unknown Garden unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *GardenMutation) ResetEdge(name string) error {
-	switch name {
-	case garden.EdgeMentorship:
-		m.ResetMentorship()
-		return nil
-	}
 	return fmt.Errorf("unknown Garden edge %s", name)
 }
 

@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"math"
 	"study-event-go/ent/garden"
-	"study-event-go/ent/mentorship"
 	"study-event-go/ent/predicate"
 	"study-event-go/types"
 
@@ -26,8 +25,6 @@ type GardenQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.Garden
-	// eager-loading edges.
-	withMentorship *MentorshipQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -62,28 +59,6 @@ func (gq *GardenQuery) Unique(unique bool) *GardenQuery {
 func (gq *GardenQuery) Order(o ...OrderFunc) *GardenQuery {
 	gq.order = append(gq.order, o...)
 	return gq
-}
-
-// QueryMentorship chains the current query on the "mentorship" edge.
-func (gq *GardenQuery) QueryMentorship() *MentorshipQuery {
-	query := &MentorshipQuery{config: gq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := gq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := gq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(garden.Table, garden.FieldID, selector),
-			sqlgraph.To(mentorship.Table, mentorship.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, garden.MentorshipTable, garden.MentorshipColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(gq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Garden entity from the query.
@@ -262,27 +237,15 @@ func (gq *GardenQuery) Clone() *GardenQuery {
 		return nil
 	}
 	return &GardenQuery{
-		config:         gq.config,
-		limit:          gq.limit,
-		offset:         gq.offset,
-		order:          append([]OrderFunc{}, gq.order...),
-		predicates:     append([]predicate.Garden{}, gq.predicates...),
-		withMentorship: gq.withMentorship.Clone(),
+		config:     gq.config,
+		limit:      gq.limit,
+		offset:     gq.offset,
+		order:      append([]OrderFunc{}, gq.order...),
+		predicates: append([]predicate.Garden{}, gq.predicates...),
 		// clone intermediate query.
 		sql:  gq.sql.Clone(),
 		path: gq.path,
 	}
-}
-
-// WithMentorship tells the query-builder to eager-load the nodes that are connected to
-// the "mentorship" edge. The optional arguments are used to configure the query builder of the edge.
-func (gq *GardenQuery) WithMentorship(opts ...func(*MentorshipQuery)) *GardenQuery {
-	query := &MentorshipQuery{config: gq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	gq.withMentorship = query
-	return gq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -291,12 +254,12 @@ func (gq *GardenQuery) WithMentorship(opts ...func(*MentorshipQuery)) *GardenQue
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Garden.Query().
-//		GroupBy(garden.FieldName).
+//		GroupBy(garden.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -318,11 +281,11 @@ func (gq *GardenQuery) GroupBy(field string, fields ...string) *GardenGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		CreatedAt time.Time `json:"created_at,omitempty"`
 //	}
 //
 //	client.Garden.Query().
-//		Select(garden.FieldName).
+//		Select(garden.FieldCreatedAt).
 //		Scan(ctx, &v)
 //
 func (gq *GardenQuery) Select(fields ...string) *GardenSelect {
@@ -348,11 +311,8 @@ func (gq *GardenQuery) prepareQuery(ctx context.Context) error {
 
 func (gq *GardenQuery) sqlAll(ctx context.Context) ([]*Garden, error) {
 	var (
-		nodes       = []*Garden{}
-		_spec       = gq.querySpec()
-		loadedTypes = [1]bool{
-			gq.withMentorship != nil,
-		}
+		nodes = []*Garden{}
+		_spec = gq.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &Garden{config: gq.config}
@@ -364,7 +324,6 @@ func (gq *GardenQuery) sqlAll(ctx context.Context) ([]*Garden, error) {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, gq.driver, _spec); err != nil {
@@ -373,36 +332,6 @@ func (gq *GardenQuery) sqlAll(ctx context.Context) ([]*Garden, error) {
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-
-	if query := gq.withMentorship; query != nil {
-		ids := make([]types.MentorshipID, 0, len(nodes))
-		nodeids := make(map[types.MentorshipID][]*Garden)
-		for i := range nodes {
-			if nodes[i].MentorshipID == nil {
-				continue
-			}
-			fk := *nodes[i].MentorshipID
-			if _, ok := nodeids[fk]; !ok {
-				ids = append(ids, fk)
-			}
-			nodeids[fk] = append(nodeids[fk], nodes[i])
-		}
-		query.Where(mentorship.IDIn(ids...))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			nodes, ok := nodeids[n.ID]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "mentorship_id" returned %v`, n.ID)
-			}
-			for i := range nodes {
-				nodes[i].Edges.Mentorship = n
-			}
-		}
-	}
-
 	return nodes, nil
 }
 

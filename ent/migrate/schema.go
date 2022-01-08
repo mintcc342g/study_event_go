@@ -11,23 +11,18 @@ var (
 	// GardensColumns holds the columns for the "gardens" table.
 	GardensColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "location", Type: field.TypeString},
-		{Name: "mentorship_id", Type: field.TypeUint64, Nullable: true},
+		{Name: "mentorship_id", Type: field.TypeUint64},
 	}
 	// GardensTable holds the schema information for the "gardens" table.
 	GardensTable = &schema.Table{
 		Name:       "gardens",
 		Columns:    GardensColumns,
 		PrimaryKey: []*schema.Column{GardensColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "garden_mentorship",
-				Columns:    []*schema.Column{GardensColumns[3]},
-				RefColumns: []*schema.Column{MentorshipsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// MentorshipsColumns holds the columns for the "mentorships" table.
 	MentorshipsColumns = []*schema.Column{
@@ -51,5 +46,4 @@ var (
 )
 
 func init() {
-	GardensTable.ForeignKeys[0].RefTable = MentorshipsTable
 }

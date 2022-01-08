@@ -15,7 +15,6 @@ import (
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -213,22 +212,6 @@ func (c *GardenClient) GetX(ctx context.Context, id types.GardenID) *Garden {
 		panic(err)
 	}
 	return obj
-}
-
-// QueryMentorship queries the mentorship edge of a Garden.
-func (c *GardenClient) QueryMentorship(ga *Garden) *MentorshipQuery {
-	query := &MentorshipQuery{config: c.config}
-	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := ga.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(garden.Table, garden.FieldID, id),
-			sqlgraph.To(mentorship.Table, mentorship.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, garden.MentorshipTable, garden.MentorshipColumn),
-		)
-		fromV = sqlgraph.Neighbors(ga.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // Hooks returns the client hooks.

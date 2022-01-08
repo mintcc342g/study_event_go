@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 	"study-event-go/ent/garden"
-	"study-event-go/ent/mentorship"
 	"study-event-go/types"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -17,38 +17,18 @@ type Garden struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID types.GardenID `json:"id,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Location holds the value of the "location" field.
 	Location string `json:"location,omitempty"`
 	// MentorshipID holds the value of the "mentorship_id" field.
-	MentorshipID *types.MentorshipID `json:"mentorship_id,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the GardenQuery when eager-loading is set.
-	Edges GardenEdges `json:"edges"`
-}
-
-// GardenEdges holds the relations/edges for other nodes in the graph.
-type GardenEdges struct {
-	// Mentorship holds the value of the mentorship edge.
-	Mentorship *Mentorship `json:"mentorship,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-}
-
-// MentorshipOrErr returns the Mentorship value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e GardenEdges) MentorshipOrErr() (*Mentorship, error) {
-	if e.loadedTypes[0] {
-		if e.Mentorship == nil {
-			// The edge mentorship was loaded in eager-loading,
-			// but was not found.
-			return nil, &NotFoundError{label: mentorship.Label}
-		}
-		return e.Mentorship, nil
-	}
-	return nil, &NotLoadedError{edge: "mentorship"}
+	MentorshipID types.MentorshipID `json:"mentorship_id,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -60,6 +40,8 @@ func (*Garden) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case garden.FieldName, garden.FieldLocation:
 			values[i] = new(sql.NullString)
+		case garden.FieldCreatedAt, garden.FieldUpdatedAt, garden.FieldDeletedAt:
+			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Garden", columns[i])
 		}
@@ -81,6 +63,25 @@ func (ga *Garden) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ga.ID = types.GardenID(value.Int64)
+		case garden.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				ga.CreatedAt = value.Time
+			}
+		case garden.FieldUpdatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+			} else if value.Valid {
+				ga.UpdatedAt = value.Time
+			}
+		case garden.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+			} else if value.Valid {
+				ga.DeletedAt = new(time.Time)
+				*ga.DeletedAt = value.Time
+			}
 		case garden.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -97,17 +98,11 @@ func (ga *Garden) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field mentorship_id", values[i])
 			} else if value.Valid {
-				ga.MentorshipID = new(types.MentorshipID)
-				*ga.MentorshipID = types.MentorshipID(value.Int64)
+				ga.MentorshipID = types.MentorshipID(value.Int64)
 			}
 		}
 	}
 	return nil
-}
-
-// QueryMentorship queries the "mentorship" edge of the Garden entity.
-func (ga *Garden) QueryMentorship() *MentorshipQuery {
-	return (&GardenClient{config: ga.config}).QueryMentorship(ga)
 }
 
 // Update returns a builder for updating this Garden.
@@ -133,14 +128,20 @@ func (ga *Garden) String() string {
 	var builder strings.Builder
 	builder.WriteString("Garden(")
 	builder.WriteString(fmt.Sprintf("id=%v", ga.ID))
+	builder.WriteString(", created_at=")
+	builder.WriteString(ga.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", updated_at=")
+	builder.WriteString(ga.UpdatedAt.Format(time.ANSIC))
+	if v := ga.DeletedAt; v != nil {
+		builder.WriteString(", deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", name=")
 	builder.WriteString(ga.Name)
 	builder.WriteString(", location=")
 	builder.WriteString(ga.Location)
-	if v := ga.MentorshipID; v != nil {
-		builder.WriteString(", mentorship_id=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString(", mentorship_id=")
+	builder.WriteString(fmt.Sprintf("%v", ga.MentorshipID))
 	builder.WriteByte(')')
 	return builder.String()
 }

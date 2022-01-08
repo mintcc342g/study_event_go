@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"study-event-go/ent/garden"
-	"study-event-go/ent/mentorship"
 	"study-event-go/types"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -21,6 +21,48 @@ type GardenCreate struct {
 	mutation *GardenMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (gc *GardenCreate) SetCreatedAt(t time.Time) *GardenCreate {
+	gc.mutation.SetCreatedAt(t)
+	return gc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (gc *GardenCreate) SetNillableCreatedAt(t *time.Time) *GardenCreate {
+	if t != nil {
+		gc.SetCreatedAt(*t)
+	}
+	return gc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (gc *GardenCreate) SetUpdatedAt(t time.Time) *GardenCreate {
+	gc.mutation.SetUpdatedAt(t)
+	return gc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (gc *GardenCreate) SetNillableUpdatedAt(t *time.Time) *GardenCreate {
+	if t != nil {
+		gc.SetUpdatedAt(*t)
+	}
+	return gc
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (gc *GardenCreate) SetDeletedAt(t time.Time) *GardenCreate {
+	gc.mutation.SetDeletedAt(t)
+	return gc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (gc *GardenCreate) SetNillableDeletedAt(t *time.Time) *GardenCreate {
+	if t != nil {
+		gc.SetDeletedAt(*t)
+	}
+	return gc
 }
 
 // SetName sets the "name" field.
@@ -41,23 +83,10 @@ func (gc *GardenCreate) SetMentorshipID(ti types.MentorshipID) *GardenCreate {
 	return gc
 }
 
-// SetNillableMentorshipID sets the "mentorship_id" field if the given value is not nil.
-func (gc *GardenCreate) SetNillableMentorshipID(ti *types.MentorshipID) *GardenCreate {
-	if ti != nil {
-		gc.SetMentorshipID(*ti)
-	}
-	return gc
-}
-
 // SetID sets the "id" field.
 func (gc *GardenCreate) SetID(ti types.GardenID) *GardenCreate {
 	gc.mutation.SetID(ti)
 	return gc
-}
-
-// SetMentorship sets the "mentorship" edge to the Mentorship entity.
-func (gc *GardenCreate) SetMentorship(m *Mentorship) *GardenCreate {
-	return gc.SetMentorshipID(m.ID)
 }
 
 // Mutation returns the GardenMutation object of the builder.
@@ -71,6 +100,7 @@ func (gc *GardenCreate) Save(ctx context.Context) (*Garden, error) {
 		err  error
 		node *Garden
 	)
+	gc.defaults()
 	if len(gc.hooks) == 0 {
 		if err = gc.check(); err != nil {
 			return nil, err
@@ -128,13 +158,34 @@ func (gc *GardenCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (gc *GardenCreate) defaults() {
+	if _, ok := gc.mutation.CreatedAt(); !ok {
+		v := garden.DefaultCreatedAt()
+		gc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		v := garden.DefaultUpdatedAt()
+		gc.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (gc *GardenCreate) check() error {
+	if _, ok := gc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
+	}
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
+	}
 	if _, ok := gc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
 	}
 	if _, ok := gc.mutation.Location(); !ok {
 		return &ValidationError{Name: "location", err: errors.New(`ent: missing required field "location"`)}
+	}
+	if _, ok := gc.mutation.MentorshipID(); !ok {
+		return &ValidationError{Name: "mentorship_id", err: errors.New(`ent: missing required field "mentorship_id"`)}
 	}
 	return nil
 }
@@ -170,6 +221,30 @@ func (gc *GardenCreate) createSpec() (*Garden, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := gc.mutation.CreatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: garden.FieldCreatedAt,
+		})
+		_node.CreatedAt = value
+	}
+	if value, ok := gc.mutation.UpdatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: garden.FieldUpdatedAt,
+		})
+		_node.UpdatedAt = value
+	}
+	if value, ok := gc.mutation.DeletedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: garden.FieldDeletedAt,
+		})
+		_node.DeletedAt = &value
+	}
 	if value, ok := gc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -186,25 +261,13 @@ func (gc *GardenCreate) createSpec() (*Garden, *sqlgraph.CreateSpec) {
 		})
 		_node.Location = value
 	}
-	if nodes := gc.mutation.MentorshipIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   garden.MentorshipTable,
-			Columns: []string{garden.MentorshipColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: mentorship.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.MentorshipID = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := gc.mutation.MentorshipID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: garden.FieldMentorshipID,
+		})
+		_node.MentorshipID = value
 	}
 	return _node, _spec
 }
@@ -213,7 +276,7 @@ func (gc *GardenCreate) createSpec() (*Garden, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.Garden.Create().
-//		SetName(v).
+//		SetCreatedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -222,7 +285,7 @@ func (gc *GardenCreate) createSpec() (*Garden, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.GardenUpsert) {
-//			SetName(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -260,6 +323,48 @@ type (
 	}
 )
 
+// SetCreatedAt sets the "created_at" field.
+func (u *GardenUpsert) SetCreatedAt(v time.Time) *GardenUpsert {
+	u.Set(garden.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *GardenUpsert) UpdateCreatedAt() *GardenUpsert {
+	u.SetExcluded(garden.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *GardenUpsert) SetUpdatedAt(v time.Time) *GardenUpsert {
+	u.Set(garden.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *GardenUpsert) UpdateUpdatedAt() *GardenUpsert {
+	u.SetExcluded(garden.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *GardenUpsert) SetDeletedAt(v time.Time) *GardenUpsert {
+	u.Set(garden.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *GardenUpsert) UpdateDeletedAt() *GardenUpsert {
+	u.SetExcluded(garden.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *GardenUpsert) ClearDeletedAt() *GardenUpsert {
+	u.SetNull(garden.FieldDeletedAt)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *GardenUpsert) SetName(v string) *GardenUpsert {
 	u.Set(garden.FieldName, v)
@@ -293,12 +398,6 @@ func (u *GardenUpsert) SetMentorshipID(v types.MentorshipID) *GardenUpsert {
 // UpdateMentorshipID sets the "mentorship_id" field to the value that was provided on create.
 func (u *GardenUpsert) UpdateMentorshipID() *GardenUpsert {
 	u.SetExcluded(garden.FieldMentorshipID)
-	return u
-}
-
-// ClearMentorshipID clears the value of the "mentorship_id" field.
-func (u *GardenUpsert) ClearMentorshipID() *GardenUpsert {
-	u.SetNull(garden.FieldMentorshipID)
 	return u
 }
 
@@ -352,6 +451,55 @@ func (u *GardenUpsertOne) Update(set func(*GardenUpsert)) *GardenUpsertOne {
 	return u
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (u *GardenUpsertOne) SetCreatedAt(v time.Time) *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *GardenUpsertOne) UpdateCreatedAt() *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *GardenUpsertOne) SetUpdatedAt(v time.Time) *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *GardenUpsertOne) UpdateUpdatedAt() *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *GardenUpsertOne) SetDeletedAt(v time.Time) *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *GardenUpsertOne) UpdateDeletedAt() *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *GardenUpsertOne) ClearDeletedAt() *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *GardenUpsertOne) SetName(v string) *GardenUpsertOne {
 	return u.Update(func(s *GardenUpsert) {
@@ -391,13 +539,6 @@ func (u *GardenUpsertOne) SetMentorshipID(v types.MentorshipID) *GardenUpsertOne
 func (u *GardenUpsertOne) UpdateMentorshipID() *GardenUpsertOne {
 	return u.Update(func(s *GardenUpsert) {
 		s.UpdateMentorshipID()
-	})
-}
-
-// ClearMentorshipID clears the value of the "mentorship_id" field.
-func (u *GardenUpsertOne) ClearMentorshipID() *GardenUpsertOne {
-	return u.Update(func(s *GardenUpsert) {
-		s.ClearMentorshipID()
 	})
 }
 
@@ -449,6 +590,7 @@ func (gcb *GardenCreateBulk) Save(ctx context.Context) ([]*Garden, error) {
 	for i := range gcb.builders {
 		func(i int, root context.Context) {
 			builder := gcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*GardenMutation)
 				if !ok {
@@ -531,7 +673,7 @@ func (gcb *GardenCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.GardenUpsert) {
-//			SetName(v+v).
+//			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -615,6 +757,55 @@ func (u *GardenUpsertBulk) Update(set func(*GardenUpsert)) *GardenUpsertBulk {
 	return u
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (u *GardenUpsertBulk) SetCreatedAt(v time.Time) *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *GardenUpsertBulk) UpdateCreatedAt() *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *GardenUpsertBulk) SetUpdatedAt(v time.Time) *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *GardenUpsertBulk) UpdateUpdatedAt() *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *GardenUpsertBulk) SetDeletedAt(v time.Time) *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *GardenUpsertBulk) UpdateDeletedAt() *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *GardenUpsertBulk) ClearDeletedAt() *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *GardenUpsertBulk) SetName(v string) *GardenUpsertBulk {
 	return u.Update(func(s *GardenUpsert) {
@@ -654,13 +845,6 @@ func (u *GardenUpsertBulk) SetMentorshipID(v types.MentorshipID) *GardenUpsertBu
 func (u *GardenUpsertBulk) UpdateMentorshipID() *GardenUpsertBulk {
 	return u.Update(func(s *GardenUpsert) {
 		s.UpdateMentorshipID()
-	})
-}
-
-// ClearMentorshipID clears the value of the "mentorship_id" field.
-func (u *GardenUpsertBulk) ClearMentorshipID() *GardenUpsertBulk {
-	return u.Update(func(s *GardenUpsert) {
-		s.ClearMentorshipID()
 	})
 }
 

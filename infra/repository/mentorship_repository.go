@@ -78,7 +78,9 @@ func (m *mentorshipRepository) GetByName(ctx context.Context, name string) (*ent
 
 	entModel, err := m.conn.Mentorship.
 		Query().
-		Where(entMentorship.Name(name)).
+		Where(
+			entMentorship.Name(name),
+			entMentorship.DeletedAtIsNil()).
 		Only(ctx)
 	if err != nil {
 		// logger

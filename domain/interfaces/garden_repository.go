@@ -8,5 +8,7 @@ import (
 
 // GardenRepository ...
 type GardenRepository interface {
-	Garden(ctx context.Context, id types.GardenID) (*entity.Garden, error)
+	New(ctx context.Context, garden *entity.Garden) (*entity.Garden, error)
+	Get(ctx context.Context, id types.GardenID) (*entity.Garden, error)
+	GetByName(ctx context.Context, name string) (*entity.Garden, error)
 }
