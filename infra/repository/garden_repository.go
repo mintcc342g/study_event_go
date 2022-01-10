@@ -135,3 +135,28 @@ func (g *gardenRepository) List(ctx context.Context, offset uint32) ([]*entity.G
 
 	return gardens, nil
 }
+
+func (g *gardenRepository) Update(ctx context.Context, garden *entity.Garden) (*entity.Garden, error) {
+
+	entModel, err := g.conn.Garden.
+		UpdateOneID(garden.ID).
+		SetName(garden.Name).
+		SetLocation(garden.Location).
+		SetMentorshipID(garden.MentorshipID).
+		SetNillableDeletedAt(garden.DeletedAt).
+		Save(ctx)
+	if err != nil {
+		// logger
+		return nil, errors.New("internal server error")
+	}
+
+	garden.ID = entModel.ID
+	garden.CreatedAt = entModel.CreatedAt
+	garden.UpdatedAt = entModel.UpdatedAt
+	garden.DeletedAt = entModel.DeletedAt
+	garden.Name = entModel.Name
+	garden.Location = entModel.Location
+	garden.MentorshipID = entModel.MentorshipID
+
+	return garden, nil
+}

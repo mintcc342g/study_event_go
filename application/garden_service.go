@@ -37,10 +37,8 @@ func (g *GardenService) New(ctx context.Context, gardenDTO *dto.Garden) (*dto.Ga
 		return nil, err
 	}
 
-	if gardenDTO.MentorshipID != 0 {
-		if _, err = g.mentorshipRepo.Get(ctx, gardenDTO.MentorshipID); err != nil {
-			return nil, err
-		}
+	if _, err = g.mentorshipRepo.Get(ctx, gardenDTO.MentorshipID); err != nil {
+		return nil, err
 	}
 
 	garden, err := entity.NewGarden(gardenDTO)
@@ -90,4 +88,34 @@ func (g *GardenService) List(ctx context.Context, offset uint32) ([]*dto.Garden,
 	}
 
 	return results, nil
+}
+
+// Update ...
+func (g *GardenService) Update(ctx context.Context, gardenDTO *dto.Garden) (*dto.Garden, error) {
+
+	comparable, err := g.gardenRepo.GetByName(ctx, gardenDTO.Name)
+	if err != nil && !errors.IsNotFound(err) {
+		return nil, err
+	}
+
+	if gardenDTO.MentorshipID != 0 {
+		if _, err = g.mentorshipRepo.Get(ctx, gardenDTO.MentorshipID); err != nil {
+			return nil, err
+		}
+	}
+
+	garden, err := g.gardenRepo.Get(ctx, gardenDTO.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = garden.Update(gardenDTO, comparable); err != nil {
+		return nil, err
+	}
+
+	if garden, err = g.gardenRepo.Update(ctx, garden); err != nil {
+		return nil, err
+	}
+
+	return garden.DTO(), nil
 }

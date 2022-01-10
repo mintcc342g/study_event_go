@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strings"
 	"study-event-go/application"
 	"study-event-go/application/dto"
 	"study-event-go/types"
@@ -38,8 +39,8 @@ func (g *GardenController) New(c echo.Context) (err error) {
 	}
 
 	gardenDTO := &dto.Garden{
-		Name:         request.Name,
-		Location:     request.Location,
+		Name:         strings.TrimSpace(strings.ToLower(request.Name)),
+		Location:     strings.TrimSpace(strings.ToLower(request.Location)),
 		MentorshipID: request.MentorshipID,
 	}
 
@@ -99,4 +100,38 @@ func (g *GardenController) List(c echo.Context) (err error) {
 	}
 
 	return response(c, http.StatusOK, "List Gardens OK", gardenDTO)
+}
+
+// Update ...
+func (g *GardenController) Update(c echo.Context) (err error) {
+	// TODO: change logger
+
+	ctx := c.Request().Context()
+
+	var request struct {
+		ID           types.GardenID     `param:"id"`
+		Name         string             `json:"name"`
+		Location     string             `json:"location"`
+		MentorshipID types.MentorshipID `json:"mentorship_id"`
+	}
+	if err = c.Bind(&request); err != nil {
+		c.Logger().Error("GardenController Bind", "err", err)
+		return response(c, http.StatusBadRequest, "invalid request", nil)
+	}
+
+	gardenDTO := &dto.Garden{
+		ID:           request.ID,
+		Name:         strings.TrimSpace(strings.ToLower(request.Name)),
+		Location:     strings.TrimSpace(strings.ToLower(request.Location)),
+		MentorshipID: request.MentorshipID,
+	}
+
+	gardenDTO, err = g.gardenSvc.Update(ctx, gardenDTO)
+	if err != nil {
+		c.Logger().Error("GardenController Update", "err", err)
+		// TODO: error handle
+		return response(c, http.StatusInternalServerError, "internal server error", err.Error())
+	}
+
+	return response(c, http.StatusOK, "Update Garden OK", gardenDTO)
 }

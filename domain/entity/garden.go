@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"strings"
 	"study-event-go/application/dto"
 	"study-event-go/types"
 	"time"
@@ -23,30 +22,24 @@ type Garden struct {
 }
 
 // NewGarden ...
-func NewGarden(req *dto.Garden) (*Garden, error) {
-	if err := validateGardenDTO(req); err != nil {
-		return nil, err
+func NewGarden(gardenDTO *dto.Garden) (*Garden, error) {
+	if gardenDTO.Name == "" {
+		return nil, errors.BadRequestf("invalid name")
+	}
+
+	if gardenDTO.Location == "" {
+		return nil, errors.BadRequestf("invalid location")
+	}
+
+	if gardenDTO.MentorshipID == 0 {
+		return nil, errors.BadRequestf("invalid mentorship ID")
 	}
 
 	return &Garden{
-		Name:         req.Name,
-		Location:     req.Location,
-		MentorshipID: req.MentorshipID,
+		Name:         gardenDTO.Name,
+		Location:     gardenDTO.Location,
+		MentorshipID: gardenDTO.MentorshipID,
 	}, nil
-}
-
-func validateGardenDTO(req *dto.Garden) error {
-	req.Name = strings.TrimSpace(strings.ToLower(req.Name))
-	if req.Name == "" {
-		return errors.BadRequestf("invalid name")
-	}
-
-	req.Location = strings.TrimSpace(strings.ToLower(req.Location))
-	if req.Location == "" {
-		return errors.BadRequestf("invalid location")
-	}
-
-	return nil
 }
 
 // NewTempleLegion ...
@@ -77,6 +70,36 @@ func (g *Garden) EqualID(id uint64) bool {
 // IsLudovico ...
 func (g *Garden) IsLudovico() bool {
 	return g.Name == types.LudovicoMissionSchool
+}
+
+// isDuplicatedName ...
+func (g *Garden) isDuplicatedName(comparable *Garden) error {
+	if comparable != nil && g.ID != comparable.ID && g.Name == comparable.Name {
+		return errors.AlreadyExistsf("The name [%s]", comparable.Name)
+	}
+
+	return nil
+}
+
+// Update ...
+func (g *Garden) Update(req *dto.Garden, comparable *Garden) (err error) {
+	if err = g.isDuplicatedName(comparable); err != nil {
+		return
+	}
+
+	if req.Name != "" {
+		g.Name = req.Name
+	}
+
+	if req.Location != "" {
+		g.Location = req.Location
+	}
+
+	if req.MentorshipID != 0 {
+		g.MentorshipID = req.MentorshipID
+	}
+
+	return
 }
 
 // DTO ...
