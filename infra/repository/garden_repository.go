@@ -30,6 +30,8 @@ func (g *gardenRepository) New(ctx context.Context, garden *entity.Garden) (*ent
 		SetLocation(garden.Location).
 		SetMentorshipID(garden.MentorshipID).
 		OnConflict().
+		UpdateLocation().
+		UpdateMentorshipID().
 		UpdateUpdatedAt().
 		ClearDeletedAt().
 		ID(ctx)

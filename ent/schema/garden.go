@@ -20,7 +20,7 @@ func (Garden) Fields() []ent.Field {
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 		field.Time("deleted_at").Nillable().Optional(),
-		field.String("name"),
+		field.String("name").Unique().NotEmpty(),
 		field.String("location"),
 		field.Uint64("mentorship_id").
 			GoType(types.MentorshipID(0)),

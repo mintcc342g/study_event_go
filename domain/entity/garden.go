@@ -98,6 +98,12 @@ func (g *Garden) Update(req *dto.Garden, comparable *Garden) (err error) {
 	return
 }
 
+// Delete ...
+func (g *Garden) Delete() {
+	now := time.Now().UTC()
+	g.DeletedAt = &now
+}
+
 // DTO ...
 func (g *Garden) DTO() *dto.Garden {
 	return &dto.Garden{

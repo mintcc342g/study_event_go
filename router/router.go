@@ -22,7 +22,7 @@ func AssaultLilyRoute(sys *echo.Group, ctrlContainer *container.ControllerContai
 	sys.GET("/garden/:id", ctrlContainer.Garden.Get)
 	sys.GET("/garden", ctrlContainer.Garden.List)
 	sys.PUT("/garden/:id", ctrlContainer.Garden.Update)
-	// sys.DELETE("/garden/:id", ctrlContainer.Garden.Delete)
+	sys.DELETE("/garden/:id", ctrlContainer.Garden.Delete)
 
 	// TODO
 	// sys.POST("/lily", ctrlContainer.Lily.New)

@@ -106,12 +106,18 @@ func (gu *GardenUpdate) Save(ctx context.Context) (int, error) {
 	)
 	gu.defaults()
 	if len(gu.hooks) == 0 {
+		if err = gu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = gu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*GardenMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = gu.check(); err != nil {
+				return 0, err
 			}
 			gu.mutation = mutation
 			affected, err = gu.sqlSave(ctx)
@@ -159,6 +165,16 @@ func (gu *GardenUpdate) defaults() {
 		v := garden.UpdateDefaultUpdatedAt()
 		gu.mutation.SetUpdatedAt(v)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (gu *GardenUpdate) check() error {
+	if v, ok := gu.mutation.Name(); ok {
+		if err := garden.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
+		}
+	}
+	return nil
 }
 
 func (gu *GardenUpdate) sqlSave(ctx context.Context) (n int, err error) {
@@ -338,12 +354,18 @@ func (guo *GardenUpdateOne) Save(ctx context.Context) (*Garden, error) {
 	)
 	guo.defaults()
 	if len(guo.hooks) == 0 {
+		if err = guo.check(); err != nil {
+			return nil, err
+		}
 		node, err = guo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*GardenMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = guo.check(); err != nil {
+				return nil, err
 			}
 			guo.mutation = mutation
 			node, err = guo.sqlSave(ctx)
@@ -391,6 +413,16 @@ func (guo *GardenUpdateOne) defaults() {
 		v := garden.UpdateDefaultUpdatedAt()
 		guo.mutation.SetUpdatedAt(v)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (guo *GardenUpdateOne) check() error {
+	if v, ok := guo.mutation.Name(); ok {
+		if err := garden.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
+		}
+	}
+	return nil
 }
 
 func (guo *GardenUpdateOne) sqlSave(ctx context.Context) (_node *Garden, err error) {

@@ -25,6 +25,10 @@ func init() {
 	garden.DefaultUpdatedAt = gardenDescUpdatedAt.Default.(func() time.Time)
 	// garden.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	garden.UpdateDefaultUpdatedAt = gardenDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// gardenDescName is the schema descriptor for name field.
+	gardenDescName := gardenFields[4].Descriptor()
+	// garden.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	garden.NameValidator = gardenDescName.Validators[0].(func(string) error)
 	mentorshipFields := schema.Mentorship{}.Fields()
 	_ = mentorshipFields
 	// mentorshipDescCreatedAt is the schema descriptor for created_at field.

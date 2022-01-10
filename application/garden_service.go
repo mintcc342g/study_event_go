@@ -119,3 +119,20 @@ func (g *GardenService) Update(ctx context.Context, gardenDTO *dto.Garden) (*dto
 
 	return garden.DTO(), nil
 }
+
+// SoftDelete ...
+func (g *GardenService) SoftDelete(ctx context.Context, id types.GardenID) (*dto.Garden, error) {
+
+	garden, err := g.gardenRepo.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	garden.Delete()
+
+	if garden, err = g.gardenRepo.Update(ctx, garden); err != nil {
+		return nil, err
+	}
+
+	return garden.DTO(), nil
+}

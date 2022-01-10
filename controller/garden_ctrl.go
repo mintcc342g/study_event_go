@@ -135,3 +135,27 @@ func (g *GardenController) Update(c echo.Context) (err error) {
 
 	return response(c, http.StatusOK, "Update Garden OK", gardenDTO)
 }
+
+// Delete ...
+func (g *GardenController) Delete(c echo.Context) (err error) {
+	// TODO: change logger
+
+	ctx := c.Request().Context()
+
+	var request struct {
+		ID types.GardenID `param:"id"`
+	}
+	if err = c.Bind(&request); err != nil {
+		c.Logger().Error("GardenController Bind", "err", err)
+		return response(c, http.StatusBadRequest, "invalid request", nil)
+	}
+
+	gardenDTO, err := g.gardenSvc.SoftDelete(ctx, request.ID)
+	if err != nil {
+		c.Logger().Error("GardenController Delete", "err", err)
+		// TODO: error handle
+		return response(c, http.StatusInternalServerError, "internal server error", err.Error())
+	}
+
+	return response(c, http.StatusOK, "Delete Garden OK", gardenDTO)
+}
