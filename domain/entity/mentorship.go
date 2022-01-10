@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"strings"
 	"study-event-go/application/dto"
 	"study-event-go/types"
 	"time"
@@ -18,52 +17,43 @@ type Mentorship struct {
 	Name      string
 }
 
-// GardenMentorship ...
-type GardenMentorship struct {
-	garden     *Garden
-	mentorship *Mentorship
-	createdAt  time.Time
-	updatedAt  time.Time
-	deletedAt  time.Time
-	mentor     *Lily
-	mentee     *Lily
-}
-
 // NewMentorship ...
-func NewMentorship(req *dto.Mentorship) (*Mentorship, error) {
-	if err := validateMentorshipDTO(req); err != nil {
-		return nil, err
+func NewMentorship(mentorshipDTO *dto.Mentorship) (*Mentorship, error) {
+	if mentorshipDTO.Name == "" {
+		return nil, errors.BadRequestf("invalid name")
 	}
 
 	return &Mentorship{
-		Name: req.Name,
+		Name: mentorshipDTO.Name,
 	}, nil
 }
 
-// Update ...
-func (m *Mentorship) Update(req *dto.Mentorship) error {
-	if err := validateMentorshipDTO(req); err != nil {
-		return err
+// isDuplicatedName ...
+func (m *Mentorship) isDuplicatedName(comparable *Mentorship) error {
+	if comparable != nil && m.ID != comparable.ID && m.Name == comparable.Name {
+		return errors.AlreadyExistsf("The name [%s]", comparable.Name)
 	}
 
-	m.Name = req.Name
-
 	return nil
+}
+
+// Update ...
+func (m *Mentorship) Update(mentorshipDTO *dto.Mentorship, comparable *Mentorship) (err error) {
+	if err = m.isDuplicatedName(comparable); err != nil {
+		return
+	}
+
+	if mentorshipDTO.Name != "" {
+		m.Name = mentorshipDTO.Name
+	}
+
+	return
 }
 
 // Delete ...
 func (m *Mentorship) Delete() {
 	now := time.Now().UTC()
 	m.DeletedAt = &now
-}
-
-func validateMentorshipDTO(req *dto.Mentorship) error {
-	req.Name = strings.TrimSpace(strings.ToLower(req.Name))
-	if req.Name == "" {
-		return errors.BadRequestf("invalid name")
-	}
-
-	return nil
 }
 
 // DTO ...
@@ -75,4 +65,15 @@ func (m *Mentorship) DTO() *dto.Mentorship {
 		DeletedAt: m.DeletedAt,
 		Name:      m.Name,
 	}
+}
+
+// GardenMentorship ...
+type GardenMentorship struct {
+	garden     *Garden
+	mentorship *Mentorship
+	createdAt  time.Time
+	updatedAt  time.Time
+	deletedAt  time.Time
+	mentor     *Lily
+	mentee     *Lily
 }

@@ -14,6 +14,7 @@ var _ = Describe("Test Mentorship Domain", func() {
 	var (
 		mentorshipDTO *dto.Mentorship
 		mentorship    *entity.Mentorship
+		comparable    *entity.Mentorship
 
 		expectedError error
 	)
@@ -21,7 +22,7 @@ var _ = Describe("Test Mentorship Domain", func() {
 	Describe("Mentorship Create", func() {
 		BeforeEach(func() {
 			mentorshipDTO = &dto.Mentorship{
-				Name: " testName  ",
+				Name: "testname",
 			}
 
 			mentorship = &entity.Mentorship{
@@ -39,7 +40,7 @@ var _ = Describe("Test Mentorship Domain", func() {
 
 		Context("fail to create a new mentorship by invalid name", func() {
 			BeforeEach(func() {
-				mentorshipDTO.Name = "   "
+				mentorshipDTO.Name = ""
 				expectedError = errors.BadRequestf("invalid name")
 			})
 
@@ -54,29 +55,35 @@ var _ = Describe("Test Mentorship Domain", func() {
 	Describe("Mentorship Update", func() {
 		BeforeEach(func() {
 			mentorshipDTO = &dto.Mentorship{
-				Name: " updatedName  ",
+				Name: "updatedname",
 			}
 
 			mentorship = &entity.Mentorship{
+				ID:   1,
+				Name: "updatedname",
+			}
+
+			comparable = &entity.Mentorship{
+				ID:   1,
 				Name: "updatedname",
 			}
 		})
 
 		Context("pass to update a mentorship", func() {
 			It("should not error", func() {
-				err := mentorship.Update(mentorshipDTO)
+				err := mentorship.Update(mentorshipDTO, comparable)
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
 
-		Context("fail to update a mentorship by invalid name", func() {
+		Context("fail to update a mentorship by duplicated name", func() {
 			BeforeEach(func() {
-				mentorshipDTO.Name = "   "
-				expectedError = errors.BadRequestf("invalid name")
+				comparable.ID = 2
+				expectedError = errors.AlreadyExistsf("The name [%s]", comparable.Name)
 			})
 
 			It("should be error", func() {
-				err := mentorship.Update(mentorshipDTO)
+				err := mentorship.Update(mentorshipDTO, comparable)
 				Expect(err.Error()).To(Equal(expectedError.Error()))
 			})
 		})

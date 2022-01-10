@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strings"
 	"study-event-go/application"
 	"study-event-go/application/dto"
 	"study-event-go/types"
@@ -36,7 +37,7 @@ func (m *MentorshipController) New(c echo.Context) (err error) {
 	}
 
 	mentorshipDTO := &dto.Mentorship{
-		Name: request.Name,
+		Name: strings.TrimSpace(strings.ToLower(request.Name)),
 	}
 
 	mentorshipDTO, err = m.mentorshipSvc.New(ctx, mentorshipDTO)
@@ -114,7 +115,7 @@ func (m *MentorshipController) Update(c echo.Context) (err error) {
 
 	mentorshipDTO := &dto.Mentorship{
 		ID:   request.ID,
-		Name: request.Name,
+		Name: strings.TrimSpace(strings.ToLower(request.Name)),
 	}
 
 	mentorshipDTO, err = m.mentorshipSvc.Update(ctx, mentorshipDTO)

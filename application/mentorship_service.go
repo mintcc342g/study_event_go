@@ -84,7 +84,7 @@ func (m *MentorshipService) List(ctx context.Context, offset uint32) ([]*dto.Men
 // Update ...
 func (m *MentorshipService) Update(ctx context.Context, mentorshipDTO *dto.Mentorship) (*dto.Mentorship, error) {
 
-	_, err := m.mentorshipRepo.GetByName(ctx, mentorshipDTO.Name)
+	comparable, err := m.mentorshipRepo.GetByName(ctx, mentorshipDTO.Name)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (m *MentorshipService) Update(ctx context.Context, mentorshipDTO *dto.Mento
 		return nil, err
 	}
 
-	if err = mentorship.Update(mentorshipDTO); err != nil {
+	if err = mentorship.Update(mentorshipDTO, comparable); err != nil {
 		return nil, err
 	}
 
