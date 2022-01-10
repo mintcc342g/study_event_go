@@ -41,7 +41,7 @@ func NewGarden(gardenDTO *dto.Garden) (*Garden, error) {
 // NewTempleLegion ...
 func (g *Garden) NewTempleLegion(lilies []*Lily) (*Legion, error) {
 
-	if !g.IsLudovico() {
+	if !g.IsLudovic() {
 		return nil, errors.BadRequestf("invalid garden")
 	}
 
@@ -63,9 +63,9 @@ func (g *Garden) EqualID(id uint64) bool {
 	return g.ID == types.GardenID(id)
 }
 
-// IsLudovico ...
-func (g *Garden) IsLudovico() bool {
-	return g.Name == types.LudovicoMissionSchool
+// IsLudovic ...
+func (g *Garden) IsLudovic() bool {
+	return g.Name == types.LudovicMissionSchool
 }
 
 // isDuplicatedName ...

@@ -2,7 +2,7 @@ package types
 
 // Gardens ...
 const (
-	LudovicoMissionSchool = "Ludovico"
+	LudovicMissionSchool = "Ludovic"
 )
 
 // TempleLegionNumbers ...
