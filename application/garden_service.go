@@ -5,6 +5,7 @@ import (
 	"study-event-go/application/dto"
 	"study-event-go/domain/entity"
 	"study-event-go/domain/interfaces"
+	"study-event-go/types"
 
 	"github.com/juju/errors"
 )
@@ -52,4 +53,41 @@ func (g *GardenService) New(ctx context.Context, gardenDTO *dto.Garden) (*dto.Ga
 	}
 
 	return garden.DTO(), nil
+}
+
+// Get ...
+func (g *GardenService) Get(ctx context.Context, id types.GardenID) (*dto.Garden, error) {
+
+	garden, err := g.gardenRepo.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return garden.DTO(), nil
+}
+
+// List ...
+func (g *GardenService) List(ctx context.Context, offset uint32) ([]*dto.Garden, error) {
+
+	// TODO: cursor pagination
+
+	gardens, err := g.gardenRepo.List(ctx, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	results := make([]*dto.Garden, len(gardens))
+	for i, v := range gardens {
+		results[i] = &dto.Garden{
+			ID:           v.ID,
+			CreatedAt:    v.CreatedAt,
+			UpdatedAt:    v.UpdatedAt,
+			DeletedAt:    v.DeletedAt,
+			Name:         v.Name,
+			Location:     v.Location,
+			MentorshipID: v.MentorshipID,
+		}
+	}
+
+	return results, nil
 }

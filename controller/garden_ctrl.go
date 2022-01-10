@@ -52,3 +52,51 @@ func (g *GardenController) New(c echo.Context) (err error) {
 
 	return response(c, http.StatusOK, "New Garden OK", gardenDTO)
 }
+
+// Get ...
+func (g *GardenController) Get(c echo.Context) (err error) {
+	// TODO: change logger
+
+	ctx := c.Request().Context()
+
+	var request struct {
+		ID types.GardenID `param:"id"`
+	}
+	if err = c.Bind(&request); err != nil {
+		c.Logger().Error("GardenController Bind", "err", err)
+		return response(c, http.StatusBadRequest, "invalid request", nil)
+	}
+
+	gardenDTO, err := g.gardenSvc.Get(ctx, request.ID)
+	if err != nil {
+		c.Logger().Error("GardenController Get", "err", err)
+		// TODO: error handle
+		return response(c, http.StatusInternalServerError, "internal server error", err.Error())
+	}
+
+	return response(c, http.StatusOK, "Get Garden OK", gardenDTO)
+}
+
+// List ...
+func (g *GardenController) List(c echo.Context) (err error) {
+	// TODO: change logger
+
+	ctx := c.Request().Context()
+
+	var request struct {
+		Offset uint32 `query:"offset"`
+	}
+	if err = c.Bind(&request); err != nil {
+		c.Logger().Error("GardenController Bind", "err", err)
+		return response(c, http.StatusBadRequest, "invalid request", nil)
+	}
+
+	gardenDTO, err := g.gardenSvc.List(ctx, request.Offset)
+	if err != nil {
+		c.Logger().Error("GardenController List", "err", err)
+		// TODO: error handle
+		return response(c, http.StatusInternalServerError, "internal server error", err.Error())
+	}
+
+	return response(c, http.StatusOK, "List Gardens OK", gardenDTO)
+}
