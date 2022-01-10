@@ -11,7 +11,10 @@ import (
 	"study-event-go/types"
 
 	"study-event-go/ent/garden"
+	"study-event-go/ent/lily"
+	"study-event-go/ent/lilyskill"
 	"study-event-go/ent/mentorship"
+	"study-event-go/ent/skill"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -24,8 +27,14 @@ type Client struct {
 	Schema *migrate.Schema
 	// Garden is the client for interacting with the Garden builders.
 	Garden *GardenClient
+	// Lily is the client for interacting with the Lily builders.
+	Lily *LilyClient
+	// LilySkill is the client for interacting with the LilySkill builders.
+	LilySkill *LilySkillClient
 	// Mentorship is the client for interacting with the Mentorship builders.
 	Mentorship *MentorshipClient
+	// Skill is the client for interacting with the Skill builders.
+	Skill *SkillClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -40,7 +49,10 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Garden = NewGardenClient(c.config)
+	c.Lily = NewLilyClient(c.config)
+	c.LilySkill = NewLilySkillClient(c.config)
 	c.Mentorship = NewMentorshipClient(c.config)
+	c.Skill = NewSkillClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -75,7 +87,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:        ctx,
 		config:     cfg,
 		Garden:     NewGardenClient(cfg),
+		Lily:       NewLilyClient(cfg),
+		LilySkill:  NewLilySkillClient(cfg),
 		Mentorship: NewMentorshipClient(cfg),
+		Skill:      NewSkillClient(cfg),
 	}, nil
 }
 
@@ -95,7 +110,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		config:     cfg,
 		Garden:     NewGardenClient(cfg),
+		Lily:       NewLilyClient(cfg),
+		LilySkill:  NewLilySkillClient(cfg),
 		Mentorship: NewMentorshipClient(cfg),
+		Skill:      NewSkillClient(cfg),
 	}, nil
 }
 
@@ -126,7 +144,10 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Garden.Use(hooks...)
+	c.Lily.Use(hooks...)
+	c.LilySkill.Use(hooks...)
 	c.Mentorship.Use(hooks...)
+	c.Skill.Use(hooks...)
 }
 
 // GardenClient is a client for the Garden schema.
@@ -219,6 +240,186 @@ func (c *GardenClient) Hooks() []Hook {
 	return c.hooks.Garden
 }
 
+// LilyClient is a client for the Lily schema.
+type LilyClient struct {
+	config
+}
+
+// NewLilyClient returns a client for the Lily from the given config.
+func NewLilyClient(c config) *LilyClient {
+	return &LilyClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `lily.Hooks(f(g(h())))`.
+func (c *LilyClient) Use(hooks ...Hook) {
+	c.hooks.Lily = append(c.hooks.Lily, hooks...)
+}
+
+// Create returns a create builder for Lily.
+func (c *LilyClient) Create() *LilyCreate {
+	mutation := newLilyMutation(c.config, OpCreate)
+	return &LilyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Lily entities.
+func (c *LilyClient) CreateBulk(builders ...*LilyCreate) *LilyCreateBulk {
+	return &LilyCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Lily.
+func (c *LilyClient) Update() *LilyUpdate {
+	mutation := newLilyMutation(c.config, OpUpdate)
+	return &LilyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *LilyClient) UpdateOne(l *Lily) *LilyUpdateOne {
+	mutation := newLilyMutation(c.config, OpUpdateOne, withLily(l))
+	return &LilyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *LilyClient) UpdateOneID(id types.LilyID) *LilyUpdateOne {
+	mutation := newLilyMutation(c.config, OpUpdateOne, withLilyID(id))
+	return &LilyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Lily.
+func (c *LilyClient) Delete() *LilyDelete {
+	mutation := newLilyMutation(c.config, OpDelete)
+	return &LilyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *LilyClient) DeleteOne(l *Lily) *LilyDeleteOne {
+	return c.DeleteOneID(l.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *LilyClient) DeleteOneID(id types.LilyID) *LilyDeleteOne {
+	builder := c.Delete().Where(lily.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &LilyDeleteOne{builder}
+}
+
+// Query returns a query builder for Lily.
+func (c *LilyClient) Query() *LilyQuery {
+	return &LilyQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Lily entity by its id.
+func (c *LilyClient) Get(ctx context.Context, id types.LilyID) (*Lily, error) {
+	return c.Query().Where(lily.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *LilyClient) GetX(ctx context.Context, id types.LilyID) *Lily {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *LilyClient) Hooks() []Hook {
+	return c.hooks.Lily
+}
+
+// LilySkillClient is a client for the LilySkill schema.
+type LilySkillClient struct {
+	config
+}
+
+// NewLilySkillClient returns a client for the LilySkill from the given config.
+func NewLilySkillClient(c config) *LilySkillClient {
+	return &LilySkillClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `lilyskill.Hooks(f(g(h())))`.
+func (c *LilySkillClient) Use(hooks ...Hook) {
+	c.hooks.LilySkill = append(c.hooks.LilySkill, hooks...)
+}
+
+// Create returns a create builder for LilySkill.
+func (c *LilySkillClient) Create() *LilySkillCreate {
+	mutation := newLilySkillMutation(c.config, OpCreate)
+	return &LilySkillCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of LilySkill entities.
+func (c *LilySkillClient) CreateBulk(builders ...*LilySkillCreate) *LilySkillCreateBulk {
+	return &LilySkillCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for LilySkill.
+func (c *LilySkillClient) Update() *LilySkillUpdate {
+	mutation := newLilySkillMutation(c.config, OpUpdate)
+	return &LilySkillUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *LilySkillClient) UpdateOne(ls *LilySkill) *LilySkillUpdateOne {
+	mutation := newLilySkillMutation(c.config, OpUpdateOne, withLilySkill(ls))
+	return &LilySkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *LilySkillClient) UpdateOneID(id int) *LilySkillUpdateOne {
+	mutation := newLilySkillMutation(c.config, OpUpdateOne, withLilySkillID(id))
+	return &LilySkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for LilySkill.
+func (c *LilySkillClient) Delete() *LilySkillDelete {
+	mutation := newLilySkillMutation(c.config, OpDelete)
+	return &LilySkillDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *LilySkillClient) DeleteOne(ls *LilySkill) *LilySkillDeleteOne {
+	return c.DeleteOneID(ls.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *LilySkillClient) DeleteOneID(id int) *LilySkillDeleteOne {
+	builder := c.Delete().Where(lilyskill.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &LilySkillDeleteOne{builder}
+}
+
+// Query returns a query builder for LilySkill.
+func (c *LilySkillClient) Query() *LilySkillQuery {
+	return &LilySkillQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a LilySkill entity by its id.
+func (c *LilySkillClient) Get(ctx context.Context, id int) (*LilySkill, error) {
+	return c.Query().Where(lilyskill.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *LilySkillClient) GetX(ctx context.Context, id int) *LilySkill {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *LilySkillClient) Hooks() []Hook {
+	return c.hooks.LilySkill
+}
+
 // MentorshipClient is a client for the Mentorship schema.
 type MentorshipClient struct {
 	config
@@ -307,4 +508,94 @@ func (c *MentorshipClient) GetX(ctx context.Context, id types.MentorshipID) *Men
 // Hooks returns the client hooks.
 func (c *MentorshipClient) Hooks() []Hook {
 	return c.hooks.Mentorship
+}
+
+// SkillClient is a client for the Skill schema.
+type SkillClient struct {
+	config
+}
+
+// NewSkillClient returns a client for the Skill from the given config.
+func NewSkillClient(c config) *SkillClient {
+	return &SkillClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `skill.Hooks(f(g(h())))`.
+func (c *SkillClient) Use(hooks ...Hook) {
+	c.hooks.Skill = append(c.hooks.Skill, hooks...)
+}
+
+// Create returns a create builder for Skill.
+func (c *SkillClient) Create() *SkillCreate {
+	mutation := newSkillMutation(c.config, OpCreate)
+	return &SkillCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Skill entities.
+func (c *SkillClient) CreateBulk(builders ...*SkillCreate) *SkillCreateBulk {
+	return &SkillCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Skill.
+func (c *SkillClient) Update() *SkillUpdate {
+	mutation := newSkillMutation(c.config, OpUpdate)
+	return &SkillUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SkillClient) UpdateOne(s *Skill) *SkillUpdateOne {
+	mutation := newSkillMutation(c.config, OpUpdateOne, withSkill(s))
+	return &SkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SkillClient) UpdateOneID(id types.SkillID) *SkillUpdateOne {
+	mutation := newSkillMutation(c.config, OpUpdateOne, withSkillID(id))
+	return &SkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Skill.
+func (c *SkillClient) Delete() *SkillDelete {
+	mutation := newSkillMutation(c.config, OpDelete)
+	return &SkillDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *SkillClient) DeleteOne(s *Skill) *SkillDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *SkillClient) DeleteOneID(id types.SkillID) *SkillDeleteOne {
+	builder := c.Delete().Where(skill.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SkillDeleteOne{builder}
+}
+
+// Query returns a query builder for Skill.
+func (c *SkillClient) Query() *SkillQuery {
+	return &SkillQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Skill entity by its id.
+func (c *SkillClient) Get(ctx context.Context, id types.SkillID) (*Skill, error) {
+	return c.Query().Where(skill.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SkillClient) GetX(ctx context.Context, id types.SkillID) *Skill {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *SkillClient) Hooks() []Hook {
+	return c.hooks.Skill
 }

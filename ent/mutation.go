@@ -6,8 +6,11 @@ import (
 	"context"
 	"fmt"
 	"study-event-go/ent/garden"
+	"study-event-go/ent/lily"
+	"study-event-go/ent/lilyskill"
 	"study-event-go/ent/mentorship"
 	"study-event-go/ent/predicate"
+	"study-event-go/ent/skill"
 	"study-event-go/types"
 	"sync"
 	"time"
@@ -25,7 +28,10 @@ const (
 
 	// Node types.
 	TypeGarden     = "Garden"
+	TypeLily       = "Lily"
+	TypeLilySkill  = "LilySkill"
 	TypeMentorship = "Mentorship"
+	TypeSkill      = "Skill"
 )
 
 // GardenMutation represents an operation that mutates the Garden nodes in the graph.
@@ -654,6 +660,1644 @@ func (m *GardenMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Garden edge %s", name)
 }
 
+// LilyMutation represents an operation that mutates the Lily nodes in the graph.
+type LilyMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *types.LilyID
+	created_at         *time.Time
+	updated_at         *time.Time
+	deleted_at         *time.Time
+	deletion_reason    *types.DeletionReason
+	adddeletion_reason *types.DeletionReason
+	first_name         *string
+	middle_name        *string
+	last_name          *string
+	rank               *uint32
+	addrank            *uint32
+	main_charm_id      *types.CharmID
+	addmain_charm_id   *types.CharmID
+	sub_charm_id       *types.CharmID
+	addsub_charm_id    *types.CharmID
+	garden_id          *types.GardenID
+	addgarden_id       *types.GardenID
+	legion_id          *types.LegionID
+	addlegion_id       *types.LegionID
+	clearedFields      map[string]struct{}
+	done               bool
+	oldValue           func(context.Context) (*Lily, error)
+	predicates         []predicate.Lily
+}
+
+var _ ent.Mutation = (*LilyMutation)(nil)
+
+// lilyOption allows management of the mutation configuration using functional options.
+type lilyOption func(*LilyMutation)
+
+// newLilyMutation creates new mutation for the Lily entity.
+func newLilyMutation(c config, op Op, opts ...lilyOption) *LilyMutation {
+	m := &LilyMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeLily,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withLilyID sets the ID field of the mutation.
+func withLilyID(id types.LilyID) lilyOption {
+	return func(m *LilyMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Lily
+		)
+		m.oldValue = func(ctx context.Context) (*Lily, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Lily.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withLily sets the old Lily of the mutation.
+func withLily(node *Lily) lilyOption {
+	return func(m *LilyMutation) {
+		m.oldValue = func(context.Context) (*Lily, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m LilyMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m LilyMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Lily entities.
+func (m *LilyMutation) SetID(id types.LilyID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *LilyMutation) ID() (id types.LilyID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *LilyMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *LilyMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *LilyMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *LilyMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *LilyMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *LilyMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *LilyMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *LilyMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *LilyMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[lily.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *LilyMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[lily.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *LilyMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, lily.FieldDeletedAt)
+}
+
+// SetDeletionReason sets the "deletion_reason" field.
+func (m *LilyMutation) SetDeletionReason(tr types.DeletionReason) {
+	m.deletion_reason = &tr
+	m.adddeletion_reason = nil
+}
+
+// DeletionReason returns the value of the "deletion_reason" field in the mutation.
+func (m *LilyMutation) DeletionReason() (r types.DeletionReason, exists bool) {
+	v := m.deletion_reason
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletionReason returns the old "deletion_reason" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldDeletionReason(ctx context.Context) (v types.DeletionReason, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDeletionReason is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDeletionReason requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletionReason: %w", err)
+	}
+	return oldValue.DeletionReason, nil
+}
+
+// AddDeletionReason adds tr to the "deletion_reason" field.
+func (m *LilyMutation) AddDeletionReason(tr types.DeletionReason) {
+	if m.adddeletion_reason != nil {
+		*m.adddeletion_reason += tr
+	} else {
+		m.adddeletion_reason = &tr
+	}
+}
+
+// AddedDeletionReason returns the value that was added to the "deletion_reason" field in this mutation.
+func (m *LilyMutation) AddedDeletionReason() (r types.DeletionReason, exists bool) {
+	v := m.adddeletion_reason
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeletionReason resets all changes to the "deletion_reason" field.
+func (m *LilyMutation) ResetDeletionReason() {
+	m.deletion_reason = nil
+	m.adddeletion_reason = nil
+}
+
+// SetFirstName sets the "first_name" field.
+func (m *LilyMutation) SetFirstName(s string) {
+	m.first_name = &s
+}
+
+// FirstName returns the value of the "first_name" field in the mutation.
+func (m *LilyMutation) FirstName() (r string, exists bool) {
+	v := m.first_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFirstName returns the old "first_name" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldFirstName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldFirstName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldFirstName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFirstName: %w", err)
+	}
+	return oldValue.FirstName, nil
+}
+
+// ResetFirstName resets all changes to the "first_name" field.
+func (m *LilyMutation) ResetFirstName() {
+	m.first_name = nil
+}
+
+// SetMiddleName sets the "middle_name" field.
+func (m *LilyMutation) SetMiddleName(s string) {
+	m.middle_name = &s
+}
+
+// MiddleName returns the value of the "middle_name" field in the mutation.
+func (m *LilyMutation) MiddleName() (r string, exists bool) {
+	v := m.middle_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMiddleName returns the old "middle_name" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldMiddleName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldMiddleName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldMiddleName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMiddleName: %w", err)
+	}
+	return oldValue.MiddleName, nil
+}
+
+// ResetMiddleName resets all changes to the "middle_name" field.
+func (m *LilyMutation) ResetMiddleName() {
+	m.middle_name = nil
+}
+
+// SetLastName sets the "last_name" field.
+func (m *LilyMutation) SetLastName(s string) {
+	m.last_name = &s
+}
+
+// LastName returns the value of the "last_name" field in the mutation.
+func (m *LilyMutation) LastName() (r string, exists bool) {
+	v := m.last_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastName returns the old "last_name" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldLastName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldLastName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldLastName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastName: %w", err)
+	}
+	return oldValue.LastName, nil
+}
+
+// ResetLastName resets all changes to the "last_name" field.
+func (m *LilyMutation) ResetLastName() {
+	m.last_name = nil
+}
+
+// SetRank sets the "rank" field.
+func (m *LilyMutation) SetRank(u uint32) {
+	m.rank = &u
+	m.addrank = nil
+}
+
+// Rank returns the value of the "rank" field in the mutation.
+func (m *LilyMutation) Rank() (r uint32, exists bool) {
+	v := m.rank
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRank returns the old "rank" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldRank(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldRank is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldRank requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRank: %w", err)
+	}
+	return oldValue.Rank, nil
+}
+
+// AddRank adds u to the "rank" field.
+func (m *LilyMutation) AddRank(u uint32) {
+	if m.addrank != nil {
+		*m.addrank += u
+	} else {
+		m.addrank = &u
+	}
+}
+
+// AddedRank returns the value that was added to the "rank" field in this mutation.
+func (m *LilyMutation) AddedRank() (r uint32, exists bool) {
+	v := m.addrank
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRank resets all changes to the "rank" field.
+func (m *LilyMutation) ResetRank() {
+	m.rank = nil
+	m.addrank = nil
+}
+
+// SetMainCharmID sets the "main_charm_id" field.
+func (m *LilyMutation) SetMainCharmID(ti types.CharmID) {
+	m.main_charm_id = &ti
+	m.addmain_charm_id = nil
+}
+
+// MainCharmID returns the value of the "main_charm_id" field in the mutation.
+func (m *LilyMutation) MainCharmID() (r types.CharmID, exists bool) {
+	v := m.main_charm_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMainCharmID returns the old "main_charm_id" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldMainCharmID(ctx context.Context) (v types.CharmID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldMainCharmID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldMainCharmID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMainCharmID: %w", err)
+	}
+	return oldValue.MainCharmID, nil
+}
+
+// AddMainCharmID adds ti to the "main_charm_id" field.
+func (m *LilyMutation) AddMainCharmID(ti types.CharmID) {
+	if m.addmain_charm_id != nil {
+		*m.addmain_charm_id += ti
+	} else {
+		m.addmain_charm_id = &ti
+	}
+}
+
+// AddedMainCharmID returns the value that was added to the "main_charm_id" field in this mutation.
+func (m *LilyMutation) AddedMainCharmID() (r types.CharmID, exists bool) {
+	v := m.addmain_charm_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetMainCharmID resets all changes to the "main_charm_id" field.
+func (m *LilyMutation) ResetMainCharmID() {
+	m.main_charm_id = nil
+	m.addmain_charm_id = nil
+}
+
+// SetSubCharmID sets the "sub_charm_id" field.
+func (m *LilyMutation) SetSubCharmID(ti types.CharmID) {
+	m.sub_charm_id = &ti
+	m.addsub_charm_id = nil
+}
+
+// SubCharmID returns the value of the "sub_charm_id" field in the mutation.
+func (m *LilyMutation) SubCharmID() (r types.CharmID, exists bool) {
+	v := m.sub_charm_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubCharmID returns the old "sub_charm_id" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldSubCharmID(ctx context.Context) (v types.CharmID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldSubCharmID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldSubCharmID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubCharmID: %w", err)
+	}
+	return oldValue.SubCharmID, nil
+}
+
+// AddSubCharmID adds ti to the "sub_charm_id" field.
+func (m *LilyMutation) AddSubCharmID(ti types.CharmID) {
+	if m.addsub_charm_id != nil {
+		*m.addsub_charm_id += ti
+	} else {
+		m.addsub_charm_id = &ti
+	}
+}
+
+// AddedSubCharmID returns the value that was added to the "sub_charm_id" field in this mutation.
+func (m *LilyMutation) AddedSubCharmID() (r types.CharmID, exists bool) {
+	v := m.addsub_charm_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSubCharmID resets all changes to the "sub_charm_id" field.
+func (m *LilyMutation) ResetSubCharmID() {
+	m.sub_charm_id = nil
+	m.addsub_charm_id = nil
+}
+
+// SetGardenID sets the "garden_id" field.
+func (m *LilyMutation) SetGardenID(ti types.GardenID) {
+	m.garden_id = &ti
+	m.addgarden_id = nil
+}
+
+// GardenID returns the value of the "garden_id" field in the mutation.
+func (m *LilyMutation) GardenID() (r types.GardenID, exists bool) {
+	v := m.garden_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGardenID returns the old "garden_id" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldGardenID(ctx context.Context) (v types.GardenID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldGardenID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldGardenID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGardenID: %w", err)
+	}
+	return oldValue.GardenID, nil
+}
+
+// AddGardenID adds ti to the "garden_id" field.
+func (m *LilyMutation) AddGardenID(ti types.GardenID) {
+	if m.addgarden_id != nil {
+		*m.addgarden_id += ti
+	} else {
+		m.addgarden_id = &ti
+	}
+}
+
+// AddedGardenID returns the value that was added to the "garden_id" field in this mutation.
+func (m *LilyMutation) AddedGardenID() (r types.GardenID, exists bool) {
+	v := m.addgarden_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetGardenID resets all changes to the "garden_id" field.
+func (m *LilyMutation) ResetGardenID() {
+	m.garden_id = nil
+	m.addgarden_id = nil
+}
+
+// SetLegionID sets the "legion_id" field.
+func (m *LilyMutation) SetLegionID(ti types.LegionID) {
+	m.legion_id = &ti
+	m.addlegion_id = nil
+}
+
+// LegionID returns the value of the "legion_id" field in the mutation.
+func (m *LilyMutation) LegionID() (r types.LegionID, exists bool) {
+	v := m.legion_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLegionID returns the old "legion_id" field's value of the Lily entity.
+// If the Lily object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilyMutation) OldLegionID(ctx context.Context) (v types.LegionID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldLegionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldLegionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLegionID: %w", err)
+	}
+	return oldValue.LegionID, nil
+}
+
+// AddLegionID adds ti to the "legion_id" field.
+func (m *LilyMutation) AddLegionID(ti types.LegionID) {
+	if m.addlegion_id != nil {
+		*m.addlegion_id += ti
+	} else {
+		m.addlegion_id = &ti
+	}
+}
+
+// AddedLegionID returns the value that was added to the "legion_id" field in this mutation.
+func (m *LilyMutation) AddedLegionID() (r types.LegionID, exists bool) {
+	v := m.addlegion_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLegionID resets all changes to the "legion_id" field.
+func (m *LilyMutation) ResetLegionID() {
+	m.legion_id = nil
+	m.addlegion_id = nil
+}
+
+// Where appends a list predicates to the LilyMutation builder.
+func (m *LilyMutation) Where(ps ...predicate.Lily) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *LilyMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Lily).
+func (m *LilyMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *LilyMutation) Fields() []string {
+	fields := make([]string, 0, 12)
+	if m.created_at != nil {
+		fields = append(fields, lily.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, lily.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, lily.FieldDeletedAt)
+	}
+	if m.deletion_reason != nil {
+		fields = append(fields, lily.FieldDeletionReason)
+	}
+	if m.first_name != nil {
+		fields = append(fields, lily.FieldFirstName)
+	}
+	if m.middle_name != nil {
+		fields = append(fields, lily.FieldMiddleName)
+	}
+	if m.last_name != nil {
+		fields = append(fields, lily.FieldLastName)
+	}
+	if m.rank != nil {
+		fields = append(fields, lily.FieldRank)
+	}
+	if m.main_charm_id != nil {
+		fields = append(fields, lily.FieldMainCharmID)
+	}
+	if m.sub_charm_id != nil {
+		fields = append(fields, lily.FieldSubCharmID)
+	}
+	if m.garden_id != nil {
+		fields = append(fields, lily.FieldGardenID)
+	}
+	if m.legion_id != nil {
+		fields = append(fields, lily.FieldLegionID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *LilyMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case lily.FieldCreatedAt:
+		return m.CreatedAt()
+	case lily.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case lily.FieldDeletedAt:
+		return m.DeletedAt()
+	case lily.FieldDeletionReason:
+		return m.DeletionReason()
+	case lily.FieldFirstName:
+		return m.FirstName()
+	case lily.FieldMiddleName:
+		return m.MiddleName()
+	case lily.FieldLastName:
+		return m.LastName()
+	case lily.FieldRank:
+		return m.Rank()
+	case lily.FieldMainCharmID:
+		return m.MainCharmID()
+	case lily.FieldSubCharmID:
+		return m.SubCharmID()
+	case lily.FieldGardenID:
+		return m.GardenID()
+	case lily.FieldLegionID:
+		return m.LegionID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *LilyMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case lily.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case lily.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case lily.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case lily.FieldDeletionReason:
+		return m.OldDeletionReason(ctx)
+	case lily.FieldFirstName:
+		return m.OldFirstName(ctx)
+	case lily.FieldMiddleName:
+		return m.OldMiddleName(ctx)
+	case lily.FieldLastName:
+		return m.OldLastName(ctx)
+	case lily.FieldRank:
+		return m.OldRank(ctx)
+	case lily.FieldMainCharmID:
+		return m.OldMainCharmID(ctx)
+	case lily.FieldSubCharmID:
+		return m.OldSubCharmID(ctx)
+	case lily.FieldGardenID:
+		return m.OldGardenID(ctx)
+	case lily.FieldLegionID:
+		return m.OldLegionID(ctx)
+	}
+	return nil, fmt.Errorf("unknown Lily field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *LilyMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case lily.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case lily.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case lily.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case lily.FieldDeletionReason:
+		v, ok := value.(types.DeletionReason)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletionReason(v)
+		return nil
+	case lily.FieldFirstName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFirstName(v)
+		return nil
+	case lily.FieldMiddleName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMiddleName(v)
+		return nil
+	case lily.FieldLastName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastName(v)
+		return nil
+	case lily.FieldRank:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRank(v)
+		return nil
+	case lily.FieldMainCharmID:
+		v, ok := value.(types.CharmID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMainCharmID(v)
+		return nil
+	case lily.FieldSubCharmID:
+		v, ok := value.(types.CharmID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubCharmID(v)
+		return nil
+	case lily.FieldGardenID:
+		v, ok := value.(types.GardenID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGardenID(v)
+		return nil
+	case lily.FieldLegionID:
+		v, ok := value.(types.LegionID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLegionID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Lily field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *LilyMutation) AddedFields() []string {
+	var fields []string
+	if m.adddeletion_reason != nil {
+		fields = append(fields, lily.FieldDeletionReason)
+	}
+	if m.addrank != nil {
+		fields = append(fields, lily.FieldRank)
+	}
+	if m.addmain_charm_id != nil {
+		fields = append(fields, lily.FieldMainCharmID)
+	}
+	if m.addsub_charm_id != nil {
+		fields = append(fields, lily.FieldSubCharmID)
+	}
+	if m.addgarden_id != nil {
+		fields = append(fields, lily.FieldGardenID)
+	}
+	if m.addlegion_id != nil {
+		fields = append(fields, lily.FieldLegionID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *LilyMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case lily.FieldDeletionReason:
+		return m.AddedDeletionReason()
+	case lily.FieldRank:
+		return m.AddedRank()
+	case lily.FieldMainCharmID:
+		return m.AddedMainCharmID()
+	case lily.FieldSubCharmID:
+		return m.AddedSubCharmID()
+	case lily.FieldGardenID:
+		return m.AddedGardenID()
+	case lily.FieldLegionID:
+		return m.AddedLegionID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *LilyMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case lily.FieldDeletionReason:
+		v, ok := value.(types.DeletionReason)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeletionReason(v)
+		return nil
+	case lily.FieldRank:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRank(v)
+		return nil
+	case lily.FieldMainCharmID:
+		v, ok := value.(types.CharmID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMainCharmID(v)
+		return nil
+	case lily.FieldSubCharmID:
+		v, ok := value.(types.CharmID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSubCharmID(v)
+		return nil
+	case lily.FieldGardenID:
+		v, ok := value.(types.GardenID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddGardenID(v)
+		return nil
+	case lily.FieldLegionID:
+		v, ok := value.(types.LegionID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLegionID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Lily numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *LilyMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(lily.FieldDeletedAt) {
+		fields = append(fields, lily.FieldDeletedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *LilyMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *LilyMutation) ClearField(name string) error {
+	switch name {
+	case lily.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Lily nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *LilyMutation) ResetField(name string) error {
+	switch name {
+	case lily.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case lily.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case lily.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case lily.FieldDeletionReason:
+		m.ResetDeletionReason()
+		return nil
+	case lily.FieldFirstName:
+		m.ResetFirstName()
+		return nil
+	case lily.FieldMiddleName:
+		m.ResetMiddleName()
+		return nil
+	case lily.FieldLastName:
+		m.ResetLastName()
+		return nil
+	case lily.FieldRank:
+		m.ResetRank()
+		return nil
+	case lily.FieldMainCharmID:
+		m.ResetMainCharmID()
+		return nil
+	case lily.FieldSubCharmID:
+		m.ResetSubCharmID()
+		return nil
+	case lily.FieldGardenID:
+		m.ResetGardenID()
+		return nil
+	case lily.FieldLegionID:
+		m.ResetLegionID()
+		return nil
+	}
+	return fmt.Errorf("unknown Lily field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *LilyMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *LilyMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *LilyMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *LilyMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *LilyMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *LilyMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *LilyMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Lily unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *LilyMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Lily edge %s", name)
+}
+
+// LilySkillMutation represents an operation that mutates the LilySkill nodes in the graph.
+type LilySkillMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	lily_id       *types.LilyID
+	addlily_id    *types.LilyID
+	skill_id      *types.SkillID
+	addskill_id   *types.SkillID
+	created_at    *time.Time
+	updated_at    *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*LilySkill, error)
+	predicates    []predicate.LilySkill
+}
+
+var _ ent.Mutation = (*LilySkillMutation)(nil)
+
+// lilyskillOption allows management of the mutation configuration using functional options.
+type lilyskillOption func(*LilySkillMutation)
+
+// newLilySkillMutation creates new mutation for the LilySkill entity.
+func newLilySkillMutation(c config, op Op, opts ...lilyskillOption) *LilySkillMutation {
+	m := &LilySkillMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeLilySkill,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withLilySkillID sets the ID field of the mutation.
+func withLilySkillID(id int) lilyskillOption {
+	return func(m *LilySkillMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *LilySkill
+		)
+		m.oldValue = func(ctx context.Context) (*LilySkill, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().LilySkill.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withLilySkill sets the old LilySkill of the mutation.
+func withLilySkill(node *LilySkill) lilyskillOption {
+	return func(m *LilySkillMutation) {
+		m.oldValue = func(context.Context) (*LilySkill, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m LilySkillMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m LilySkillMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *LilySkillMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetLilyID sets the "lily_id" field.
+func (m *LilySkillMutation) SetLilyID(ti types.LilyID) {
+	m.lily_id = &ti
+	m.addlily_id = nil
+}
+
+// LilyID returns the value of the "lily_id" field in the mutation.
+func (m *LilySkillMutation) LilyID() (r types.LilyID, exists bool) {
+	v := m.lily_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLilyID returns the old "lily_id" field's value of the LilySkill entity.
+// If the LilySkill object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilySkillMutation) OldLilyID(ctx context.Context) (v types.LilyID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldLilyID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldLilyID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLilyID: %w", err)
+	}
+	return oldValue.LilyID, nil
+}
+
+// AddLilyID adds ti to the "lily_id" field.
+func (m *LilySkillMutation) AddLilyID(ti types.LilyID) {
+	if m.addlily_id != nil {
+		*m.addlily_id += ti
+	} else {
+		m.addlily_id = &ti
+	}
+}
+
+// AddedLilyID returns the value that was added to the "lily_id" field in this mutation.
+func (m *LilySkillMutation) AddedLilyID() (r types.LilyID, exists bool) {
+	v := m.addlily_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLilyID resets all changes to the "lily_id" field.
+func (m *LilySkillMutation) ResetLilyID() {
+	m.lily_id = nil
+	m.addlily_id = nil
+}
+
+// SetSkillID sets the "skill_id" field.
+func (m *LilySkillMutation) SetSkillID(ti types.SkillID) {
+	m.skill_id = &ti
+	m.addskill_id = nil
+}
+
+// SkillID returns the value of the "skill_id" field in the mutation.
+func (m *LilySkillMutation) SkillID() (r types.SkillID, exists bool) {
+	v := m.skill_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSkillID returns the old "skill_id" field's value of the LilySkill entity.
+// If the LilySkill object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilySkillMutation) OldSkillID(ctx context.Context) (v types.SkillID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldSkillID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldSkillID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSkillID: %w", err)
+	}
+	return oldValue.SkillID, nil
+}
+
+// AddSkillID adds ti to the "skill_id" field.
+func (m *LilySkillMutation) AddSkillID(ti types.SkillID) {
+	if m.addskill_id != nil {
+		*m.addskill_id += ti
+	} else {
+		m.addskill_id = &ti
+	}
+}
+
+// AddedSkillID returns the value that was added to the "skill_id" field in this mutation.
+func (m *LilySkillMutation) AddedSkillID() (r types.SkillID, exists bool) {
+	v := m.addskill_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSkillID resets all changes to the "skill_id" field.
+func (m *LilySkillMutation) ResetSkillID() {
+	m.skill_id = nil
+	m.addskill_id = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *LilySkillMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *LilySkillMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the LilySkill entity.
+// If the LilySkill object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilySkillMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *LilySkillMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *LilySkillMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *LilySkillMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the LilySkill entity.
+// If the LilySkill object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LilySkillMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *LilySkillMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// Where appends a list predicates to the LilySkillMutation builder.
+func (m *LilySkillMutation) Where(ps ...predicate.LilySkill) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *LilySkillMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (LilySkill).
+func (m *LilySkillMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *LilySkillMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.lily_id != nil {
+		fields = append(fields, lilyskill.FieldLilyID)
+	}
+	if m.skill_id != nil {
+		fields = append(fields, lilyskill.FieldSkillID)
+	}
+	if m.created_at != nil {
+		fields = append(fields, lilyskill.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, lilyskill.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *LilySkillMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case lilyskill.FieldLilyID:
+		return m.LilyID()
+	case lilyskill.FieldSkillID:
+		return m.SkillID()
+	case lilyskill.FieldCreatedAt:
+		return m.CreatedAt()
+	case lilyskill.FieldUpdatedAt:
+		return m.UpdatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *LilySkillMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case lilyskill.FieldLilyID:
+		return m.OldLilyID(ctx)
+	case lilyskill.FieldSkillID:
+		return m.OldSkillID(ctx)
+	case lilyskill.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case lilyskill.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown LilySkill field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *LilySkillMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case lilyskill.FieldLilyID:
+		v, ok := value.(types.LilyID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLilyID(v)
+		return nil
+	case lilyskill.FieldSkillID:
+		v, ok := value.(types.SkillID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSkillID(v)
+		return nil
+	case lilyskill.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case lilyskill.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown LilySkill field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *LilySkillMutation) AddedFields() []string {
+	var fields []string
+	if m.addlily_id != nil {
+		fields = append(fields, lilyskill.FieldLilyID)
+	}
+	if m.addskill_id != nil {
+		fields = append(fields, lilyskill.FieldSkillID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *LilySkillMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case lilyskill.FieldLilyID:
+		return m.AddedLilyID()
+	case lilyskill.FieldSkillID:
+		return m.AddedSkillID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *LilySkillMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case lilyskill.FieldLilyID:
+		v, ok := value.(types.LilyID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLilyID(v)
+		return nil
+	case lilyskill.FieldSkillID:
+		v, ok := value.(types.SkillID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSkillID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown LilySkill numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *LilySkillMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *LilySkillMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *LilySkillMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown LilySkill nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *LilySkillMutation) ResetField(name string) error {
+	switch name {
+	case lilyskill.FieldLilyID:
+		m.ResetLilyID()
+		return nil
+	case lilyskill.FieldSkillID:
+		m.ResetSkillID()
+		return nil
+	case lilyskill.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case lilyskill.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown LilySkill field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *LilySkillMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *LilySkillMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *LilySkillMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *LilySkillMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *LilySkillMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *LilySkillMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *LilySkillMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown LilySkill unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *LilySkillMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown LilySkill edge %s", name)
+}
+
 // MentorshipMutation represents an operation that mutates the Mentorship nodes in the graph.
 type MentorshipMutation struct {
 	config
@@ -1134,4 +2778,576 @@ func (m *MentorshipMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *MentorshipMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Mentorship edge %s", name)
+}
+
+// SkillMutation represents an operation that mutates the Skill nodes in the graph.
+type SkillMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *types.SkillID
+	created_at    *time.Time
+	updated_at    *time.Time
+	deleted_at    *time.Time
+	name          *string
+	_type         *types.SkillType
+	add_type      *types.SkillType
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Skill, error)
+	predicates    []predicate.Skill
+}
+
+var _ ent.Mutation = (*SkillMutation)(nil)
+
+// skillOption allows management of the mutation configuration using functional options.
+type skillOption func(*SkillMutation)
+
+// newSkillMutation creates new mutation for the Skill entity.
+func newSkillMutation(c config, op Op, opts ...skillOption) *SkillMutation {
+	m := &SkillMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSkill,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSkillID sets the ID field of the mutation.
+func withSkillID(id types.SkillID) skillOption {
+	return func(m *SkillMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Skill
+		)
+		m.oldValue = func(ctx context.Context) (*Skill, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Skill.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSkill sets the old Skill of the mutation.
+func withSkill(node *Skill) skillOption {
+	return func(m *SkillMutation) {
+		m.oldValue = func(context.Context) (*Skill, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SkillMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SkillMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Skill entities.
+func (m *SkillMutation) SetID(id types.SkillID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SkillMutation) ID() (id types.SkillID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *SkillMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *SkillMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Skill entity.
+// If the Skill object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SkillMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *SkillMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *SkillMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *SkillMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Skill entity.
+// If the Skill object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SkillMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *SkillMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *SkillMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *SkillMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Skill entity.
+// If the Skill object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SkillMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *SkillMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[skill.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *SkillMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[skill.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *SkillMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, skill.FieldDeletedAt)
+}
+
+// SetName sets the "name" field.
+func (m *SkillMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *SkillMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Skill entity.
+// If the Skill object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SkillMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *SkillMutation) ResetName() {
+	m.name = nil
+}
+
+// SetType sets the "type" field.
+func (m *SkillMutation) SetType(tt types.SkillType) {
+	m._type = &tt
+	m.add_type = nil
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *SkillMutation) GetType() (r types.SkillType, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the Skill entity.
+// If the Skill object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SkillMutation) OldType(ctx context.Context) (v types.SkillType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// AddType adds tt to the "type" field.
+func (m *SkillMutation) AddType(tt types.SkillType) {
+	if m.add_type != nil {
+		*m.add_type += tt
+	} else {
+		m.add_type = &tt
+	}
+}
+
+// AddedType returns the value that was added to the "type" field in this mutation.
+func (m *SkillMutation) AddedType() (r types.SkillType, exists bool) {
+	v := m.add_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *SkillMutation) ResetType() {
+	m._type = nil
+	m.add_type = nil
+}
+
+// Where appends a list predicates to the SkillMutation builder.
+func (m *SkillMutation) Where(ps ...predicate.Skill) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *SkillMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Skill).
+func (m *SkillMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SkillMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, skill.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, skill.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, skill.FieldDeletedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, skill.FieldName)
+	}
+	if m._type != nil {
+		fields = append(fields, skill.FieldType)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SkillMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case skill.FieldCreatedAt:
+		return m.CreatedAt()
+	case skill.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case skill.FieldDeletedAt:
+		return m.DeletedAt()
+	case skill.FieldName:
+		return m.Name()
+	case skill.FieldType:
+		return m.GetType()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SkillMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case skill.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case skill.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case skill.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case skill.FieldName:
+		return m.OldName(ctx)
+	case skill.FieldType:
+		return m.OldType(ctx)
+	}
+	return nil, fmt.Errorf("unknown Skill field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SkillMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case skill.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case skill.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case skill.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case skill.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case skill.FieldType:
+		v, ok := value.(types.SkillType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Skill field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SkillMutation) AddedFields() []string {
+	var fields []string
+	if m.add_type != nil {
+		fields = append(fields, skill.FieldType)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SkillMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case skill.FieldType:
+		return m.AddedType()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SkillMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case skill.FieldType:
+		v, ok := value.(types.SkillType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddType(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Skill numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SkillMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(skill.FieldDeletedAt) {
+		fields = append(fields, skill.FieldDeletedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SkillMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SkillMutation) ClearField(name string) error {
+	switch name {
+	case skill.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Skill nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SkillMutation) ResetField(name string) error {
+	switch name {
+	case skill.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case skill.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case skill.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case skill.FieldName:
+		m.ResetName()
+		return nil
+	case skill.FieldType:
+		m.ResetType()
+		return nil
+	}
+	return fmt.Errorf("unknown Skill field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SkillMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SkillMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SkillMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SkillMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SkillMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SkillMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SkillMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Skill unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SkillMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Skill edge %s", name)
 }

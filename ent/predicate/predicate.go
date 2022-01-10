@@ -9,5 +9,14 @@ import (
 // Garden is the predicate function for garden builders.
 type Garden func(*sql.Selector)
 
+// Lily is the predicate function for lily builders.
+type Lily func(*sql.Selector)
+
+// LilySkill is the predicate function for lilyskill builders.
+type LilySkill func(*sql.Selector)
+
 // Mentorship is the predicate function for mentorship builders.
 type Mentorship func(*sql.Selector)
+
+// Skill is the predicate function for skill builders.
+type Skill func(*sql.Selector)

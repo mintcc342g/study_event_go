@@ -3,30 +3,36 @@ package entity
 import (
 	"study-event-go/domain/vo"
 	"study-event-go/types"
+	"time"
 )
 
 // Lily ...
 type Lily struct {
-	id        types.LilyID
-	name      *vo.Name
-	rareSkill *Skill
-	subSkill  *Skill
-	mainCharm *Charm
-	subCharm  *Charm
-	gardenID  types.GardenID
-	rank      uint32
-	legionID  types.LegionID
+	ID             types.LilyID
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      *time.Time
+	DeletionReason types.DeletionReason
+	Name           *vo.Name
+	Rank           uint32
+	MainCharm      *Charm
+	SubCharm       *Charm
+	GardenID       types.GardenID
+	LegionID       types.LegionID
+	Skills         []*Skill
 }
 
 // IsFirstPlace ...
 func (l *Lily) IsFirstPlace() bool {
-	return l.rank == types.FirstPlace
+	return l.Rank == types.FirstPlace
 }
 
-// Skill ...
-type Skill struct {
-	id   types.SkillID
-	name string
+// LilySkill ...
+type LilySkill struct {
+	LilyID    types.LilyID
+	SkillID   types.SkillID
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // Charm ...

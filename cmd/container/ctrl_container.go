@@ -9,6 +9,7 @@ type ControllerContainer struct {
 	Garden     *controller.GardenController
 	Mentorship *controller.MentorshipController
 	Protection *controller.ProtectionController
+	Skill      *controller.SkillController
 }
 
 func newControllerContainer(svcContainer *ServiceContainer, repoContainer *RepositoryContainer) *ControllerContainer {
@@ -16,6 +17,7 @@ func newControllerContainer(svcContainer *ServiceContainer, repoContainer *Repos
 		Garden:     controller.NewGardenController(svcContainer.GardenSvc),
 		Mentorship: controller.NewMentorshipController(svcContainer.MentorshipSvc),
 		Protection: controller.NewProtectionController(svcContainer.ProtectionSvc),
+		Skill:      controller.NewSkillController(svcContainer.SkillSvc),
 	}
 }
 

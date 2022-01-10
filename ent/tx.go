@@ -14,8 +14,14 @@ type Tx struct {
 	config
 	// Garden is the client for interacting with the Garden builders.
 	Garden *GardenClient
+	// Lily is the client for interacting with the Lily builders.
+	Lily *LilyClient
+	// LilySkill is the client for interacting with the LilySkill builders.
+	LilySkill *LilySkillClient
 	// Mentorship is the client for interacting with the Mentorship builders.
 	Mentorship *MentorshipClient
+	// Skill is the client for interacting with the Skill builders.
+	Skill *SkillClient
 
 	// lazily loaded.
 	client     *Client
@@ -152,7 +158,10 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Garden = NewGardenClient(tx.config)
+	tx.Lily = NewLilyClient(tx.config)
+	tx.LilySkill = NewLilySkillClient(tx.config)
 	tx.Mentorship = NewMentorshipClient(tx.config)
+	tx.Skill = NewSkillClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

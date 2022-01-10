@@ -51,7 +51,7 @@ func (g *Garden) NewTempleLegion(lilies []*Lily) (*Legion, error) {
 
 	for _, lily := range lilies {
 		if lily.IsFirstPlace() {
-			legion.LeaderID = lily.id
+			legion.LeaderID = lily.ID
 		}
 	}
 

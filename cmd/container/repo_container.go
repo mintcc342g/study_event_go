@@ -13,20 +13,22 @@ import (
 
 // RepositoryContainer ...
 type RepositoryContainer struct {
-	RedisRepo      interfaces.RedisRepository
-	LilyRepo       interfaces.LilyRepository
-	GardenRepo     interfaces.GardenRepository
 	EventRepo      interfaces.EventRepository
+	GardenRepo     interfaces.GardenRepository
+	LilyRepo       interfaces.LilyRepository
 	MentorshipRepo interfaces.MentorshipRepository
+	RedisRepo      interfaces.RedisRepository
+	SkillRepo      interfaces.SkillRepository
 }
 
 func newRepositoryContainer(db *ent.Client, redis redis.Cmdable, machineryServer *machinery.Server) *RepositoryContainer {
 	return &RepositoryContainer{
-		RedisRepo:      repository.NewRedisRepository(redis),
-		LilyRepo:       repository.NewLilyRepository(db),
-		GardenRepo:     repository.NewGardenRepository(db),
 		EventRepo:      repository.NewMachineryRepository(machineryServer),
+		GardenRepo:     repository.NewGardenRepository(db),
+		LilyRepo:       repository.NewLilyRepository(db),
 		MentorshipRepo: repository.NewMentorshipRepository(db),
+		RedisRepo:      repository.NewRedisRepository(redis),
+		SkillRepo:      repository.NewSkillRepository(db),
 	}
 }
 

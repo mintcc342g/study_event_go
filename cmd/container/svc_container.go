@@ -10,6 +10,7 @@ type ServiceContainer struct {
 	GardenSvc     *application.GardenService
 	MentorshipSvc *application.MentorshipService
 	ProtectionSvc *application.ProtectionService
+	SkillSvc      *application.SkillService
 }
 
 func newServiceContainer(repo *RepositoryContainer) *ServiceContainer {
@@ -18,6 +19,7 @@ func newServiceContainer(repo *RepositoryContainer) *ServiceContainer {
 		GardenSvc:     application.NewGardenService(repo.GardenRepo, repo.MentorshipRepo),
 		MentorshipSvc: application.NewMentorshipService(repo.MentorshipRepo),
 		ProtectionSvc: application.NewProtectionService(repo.LilyRepo, repo.GardenRepo, repo.EventRepo),
+		SkillSvc:      application.NewSkillService(repo.SkillRepo),
 	}
 }
 

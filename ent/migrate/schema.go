@@ -24,6 +24,42 @@ var (
 		Columns:    GardensColumns,
 		PrimaryKey: []*schema.Column{GardensColumns[0]},
 	}
+	// LiliesColumns holds the columns for the "lilies" table.
+	LiliesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "deletion_reason", Type: field.TypeUint32, Default: 0},
+		{Name: "first_name", Type: field.TypeString},
+		{Name: "middle_name", Type: field.TypeString},
+		{Name: "last_name", Type: field.TypeString},
+		{Name: "rank", Type: field.TypeUint32, Default: 0},
+		{Name: "main_charm_id", Type: field.TypeUint64, Default: 0},
+		{Name: "sub_charm_id", Type: field.TypeUint64, Default: 0},
+		{Name: "garden_id", Type: field.TypeUint64, Default: 0},
+		{Name: "legion_id", Type: field.TypeUint64, Default: 0},
+	}
+	// LiliesTable holds the schema information for the "lilies" table.
+	LiliesTable = &schema.Table{
+		Name:       "lilies",
+		Columns:    LiliesColumns,
+		PrimaryKey: []*schema.Column{LiliesColumns[0]},
+	}
+	// LilySkillsColumns holds the columns for the "lily_skills" table.
+	LilySkillsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "lily_id", Type: field.TypeUint64},
+		{Name: "skill_id", Type: field.TypeUint64},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// LilySkillsTable holds the schema information for the "lily_skills" table.
+	LilySkillsTable = &schema.Table{
+		Name:       "lily_skills",
+		Columns:    LilySkillsColumns,
+		PrimaryKey: []*schema.Column{LilySkillsColumns[0]},
+	}
 	// MentorshipsColumns holds the columns for the "mentorships" table.
 	MentorshipsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
@@ -38,10 +74,28 @@ var (
 		Columns:    MentorshipsColumns,
 		PrimaryKey: []*schema.Column{MentorshipsColumns[0]},
 	}
+	// SkillsColumns holds the columns for the "skills" table.
+	SkillsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "type", Type: field.TypeUint32, Default: 0},
+	}
+	// SkillsTable holds the schema information for the "skills" table.
+	SkillsTable = &schema.Table{
+		Name:       "skills",
+		Columns:    SkillsColumns,
+		PrimaryKey: []*schema.Column{SkillsColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		GardensTable,
+		LiliesTable,
+		LilySkillsTable,
 		MentorshipsTable,
+		SkillsTable,
 	}
 )
 

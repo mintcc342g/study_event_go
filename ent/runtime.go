@@ -4,8 +4,12 @@ package ent
 
 import (
 	"study-event-go/ent/garden"
+	"study-event-go/ent/lily"
+	"study-event-go/ent/lilyskill"
 	"study-event-go/ent/mentorship"
 	"study-event-go/ent/schema"
+	"study-event-go/ent/skill"
+	"study-event-go/types"
 	"time"
 )
 
@@ -29,6 +33,62 @@ func init() {
 	gardenDescName := gardenFields[4].Descriptor()
 	// garden.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	garden.NameValidator = gardenDescName.Validators[0].(func(string) error)
+	lilyFields := schema.Lily{}.Fields()
+	_ = lilyFields
+	// lilyDescCreatedAt is the schema descriptor for created_at field.
+	lilyDescCreatedAt := lilyFields[1].Descriptor()
+	// lily.DefaultCreatedAt holds the default value on creation for the created_at field.
+	lily.DefaultCreatedAt = lilyDescCreatedAt.Default.(func() time.Time)
+	// lilyDescUpdatedAt is the schema descriptor for updated_at field.
+	lilyDescUpdatedAt := lilyFields[2].Descriptor()
+	// lily.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	lily.DefaultUpdatedAt = lilyDescUpdatedAt.Default.(func() time.Time)
+	// lily.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	lily.UpdateDefaultUpdatedAt = lilyDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// lilyDescDeletionReason is the schema descriptor for deletion_reason field.
+	lilyDescDeletionReason := lilyFields[4].Descriptor()
+	// lily.DefaultDeletionReason holds the default value on creation for the deletion_reason field.
+	lily.DefaultDeletionReason = types.DeletionReason(lilyDescDeletionReason.Default.(uint32))
+	// lilyDescFirstName is the schema descriptor for first_name field.
+	lilyDescFirstName := lilyFields[5].Descriptor()
+	// lily.FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
+	lily.FirstNameValidator = lilyDescFirstName.Validators[0].(func(string) error)
+	// lilyDescLastName is the schema descriptor for last_name field.
+	lilyDescLastName := lilyFields[7].Descriptor()
+	// lily.LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
+	lily.LastNameValidator = lilyDescLastName.Validators[0].(func(string) error)
+	// lilyDescRank is the schema descriptor for rank field.
+	lilyDescRank := lilyFields[8].Descriptor()
+	// lily.DefaultRank holds the default value on creation for the rank field.
+	lily.DefaultRank = lilyDescRank.Default.(uint32)
+	// lilyDescMainCharmID is the schema descriptor for main_charm_id field.
+	lilyDescMainCharmID := lilyFields[9].Descriptor()
+	// lily.DefaultMainCharmID holds the default value on creation for the main_charm_id field.
+	lily.DefaultMainCharmID = types.CharmID(lilyDescMainCharmID.Default.(uint64))
+	// lilyDescSubCharmID is the schema descriptor for sub_charm_id field.
+	lilyDescSubCharmID := lilyFields[10].Descriptor()
+	// lily.DefaultSubCharmID holds the default value on creation for the sub_charm_id field.
+	lily.DefaultSubCharmID = types.CharmID(lilyDescSubCharmID.Default.(uint64))
+	// lilyDescGardenID is the schema descriptor for garden_id field.
+	lilyDescGardenID := lilyFields[11].Descriptor()
+	// lily.DefaultGardenID holds the default value on creation for the garden_id field.
+	lily.DefaultGardenID = types.GardenID(lilyDescGardenID.Default.(uint64))
+	// lilyDescLegionID is the schema descriptor for legion_id field.
+	lilyDescLegionID := lilyFields[12].Descriptor()
+	// lily.DefaultLegionID holds the default value on creation for the legion_id field.
+	lily.DefaultLegionID = types.LegionID(lilyDescLegionID.Default.(uint64))
+	lilyskillFields := schema.LilySkill{}.Fields()
+	_ = lilyskillFields
+	// lilyskillDescCreatedAt is the schema descriptor for created_at field.
+	lilyskillDescCreatedAt := lilyskillFields[2].Descriptor()
+	// lilyskill.DefaultCreatedAt holds the default value on creation for the created_at field.
+	lilyskill.DefaultCreatedAt = lilyskillDescCreatedAt.Default.(func() time.Time)
+	// lilyskillDescUpdatedAt is the schema descriptor for updated_at field.
+	lilyskillDescUpdatedAt := lilyskillFields[3].Descriptor()
+	// lilyskill.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	lilyskill.DefaultUpdatedAt = lilyskillDescUpdatedAt.Default.(func() time.Time)
+	// lilyskill.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	lilyskill.UpdateDefaultUpdatedAt = lilyskillDescUpdatedAt.UpdateDefault.(func() time.Time)
 	mentorshipFields := schema.Mentorship{}.Fields()
 	_ = mentorshipFields
 	// mentorshipDescCreatedAt is the schema descriptor for created_at field.
@@ -45,4 +105,24 @@ func init() {
 	mentorshipDescName := mentorshipFields[4].Descriptor()
 	// mentorship.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	mentorship.NameValidator = mentorshipDescName.Validators[0].(func(string) error)
+	skillFields := schema.Skill{}.Fields()
+	_ = skillFields
+	// skillDescCreatedAt is the schema descriptor for created_at field.
+	skillDescCreatedAt := skillFields[1].Descriptor()
+	// skill.DefaultCreatedAt holds the default value on creation for the created_at field.
+	skill.DefaultCreatedAt = skillDescCreatedAt.Default.(func() time.Time)
+	// skillDescUpdatedAt is the schema descriptor for updated_at field.
+	skillDescUpdatedAt := skillFields[2].Descriptor()
+	// skill.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	skill.DefaultUpdatedAt = skillDescUpdatedAt.Default.(func() time.Time)
+	// skill.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	skill.UpdateDefaultUpdatedAt = skillDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// skillDescName is the schema descriptor for name field.
+	skillDescName := skillFields[4].Descriptor()
+	// skill.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	skill.NameValidator = skillDescName.Validators[0].(func(string) error)
+	// skillDescType is the schema descriptor for type field.
+	skillDescType := skillFields[5].Descriptor()
+	// skill.DefaultType holds the default value on creation for the type field.
+	skill.DefaultType = types.SkillType(skillDescType.Default.(uint32))
 }

@@ -6,7 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"study-event-go/ent/garden"
+	"study-event-go/ent/lily"
+	"study-event-go/ent/lilyskill"
 	"study-event-go/ent/mentorship"
+	"study-event-go/ent/skill"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -31,7 +34,10 @@ type OrderFunc func(*sql.Selector)
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		garden.Table:     garden.ValidColumn,
+		lily.Table:       lily.ValidColumn,
+		lilyskill.Table:  lilyskill.ValidColumn,
 		mentorship.Table: mentorship.ValidColumn,
+		skill.Table:      skill.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

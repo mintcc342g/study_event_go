@@ -21,6 +21,32 @@ func (f GardenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return f(ctx, mv)
 }
 
+// The LilyFunc type is an adapter to allow the use of ordinary
+// function as Lily mutator.
+type LilyFunc func(context.Context, *ent.LilyMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f LilyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.LilyMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LilyMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The LilySkillFunc type is an adapter to allow the use of ordinary
+// function as LilySkill mutator.
+type LilySkillFunc func(context.Context, *ent.LilySkillMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f LilySkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.LilySkillMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LilySkillMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The MentorshipFunc type is an adapter to allow the use of ordinary
 // function as Mentorship mutator.
 type MentorshipFunc func(context.Context, *ent.MentorshipMutation) (ent.Value, error)
@@ -30,6 +56,19 @@ func (f MentorshipFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	mv, ok := m.(*ent.MentorshipMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MentorshipMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The SkillFunc type is an adapter to allow the use of ordinary
+// function as Skill mutator.
+type SkillFunc func(context.Context, *ent.SkillMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.SkillMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SkillMutation", m)
 	}
 	return f(ctx, mv)
 }
