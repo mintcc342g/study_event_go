@@ -31,10 +31,6 @@ func NewGarden(gardenDTO *dto.Garden) (*Garden, error) {
 		return nil, errors.BadRequestf("invalid location")
 	}
 
-	if gardenDTO.MentorshipID == 0 {
-		return nil, errors.BadRequestf("invalid mentorship ID")
-	}
-
 	return &Garden{
 		Name:         gardenDTO.Name,
 		Location:     gardenDTO.Location,
