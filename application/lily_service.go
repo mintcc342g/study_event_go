@@ -5,23 +5,24 @@ import (
 	"study-event-go/application/dto"
 	"study-event-go/domain/entity"
 	"study-event-go/domain/interfaces"
+	"study-event-go/types"
 )
 
 // LilyService ...
 type LilyService struct {
-	// charmRepo  interfaces.CharmRepository
+	charmRepo  interfaces.CharmRepository
 	gardenRepo interfaces.GardenRepository
 	lilyRepo   interfaces.LilyRepository
 }
 
 // NewLilyService ...
 func NewLilyService(
-	// charmRepo interfaces.CharmRepository,
+	charmRepo interfaces.CharmRepository,
 	gardenRepo interfaces.GardenRepository,
 	lilyRepo interfaces.LilyRepository,
 ) *LilyService {
 	return &LilyService{
-		// charmRepo:  charmRepo,
+		charmRepo:  charmRepo,
 		gardenRepo: gardenRepo,
 		lilyRepo:   lilyRepo,
 	}
@@ -34,7 +35,7 @@ func (l *LilyService) New(ctx context.Context, lilyDTO *dto.Lily) (*dto.Lily, er
 
 	// TODO: requestor check with ctx
 
-	_, err := l.gardenRepo.Get(ctx, lilyDTO.GardenID)
+	_, err := l.gardenRepo.Garden(ctx, lilyDTO.GardenID)
 	if err != nil {
 		return nil, err
 	}
@@ -49,4 +50,42 @@ func (l *LilyService) New(ctx context.Context, lilyDTO *dto.Lily) (*dto.Lily, er
 	}
 
 	return lily.DTO(), nil
+}
+
+// NewCharms ...
+func (l *LilyService) NewCharms(ctx context.Context, lilyID types.LilyID, charmModelIDs []types.CharmModelID) (results []*dto.Charm, err error) {
+
+	// TODO: requestor check with ctx
+	lily, err := l.lilyRepo.Lily(ctx, lilyID)
+	if err != nil {
+		return
+	}
+
+	charmModels, err := l.charmRepo.ModelsByIDs(ctx, charmModelIDs)
+	if err != nil {
+		return
+	}
+
+	if err = lily.NewCharms(charmModelIDs, charmModels...); err != nil {
+		return
+	}
+
+	charms, err := l.charmRepo.RegistCharms(ctx, lily.Charms...)
+	if err != nil {
+		return
+	}
+
+	for _, v := range charms {
+		results = append(results, &dto.Charm{
+			ID:        v.ID,
+			CreatedAt: v.CreatedAt,
+			UpdatedAt: v.UpdatedAt,
+			DeletedAt: v.DeletedAt,
+			Name:      v.Name,
+			ModelID:   v.ModelID,
+			OwnerID:   v.OwnerID,
+		})
+	}
+
+	return
 }

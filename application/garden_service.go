@@ -32,12 +32,12 @@ func NewGardenService(
 // New ...
 func (g *GardenService) New(ctx context.Context, gardenDTO *dto.Garden) (*dto.Garden, error) {
 
-	_, err := g.gardenRepo.GetByName(ctx, gardenDTO.Name)
+	_, err := g.gardenRepo.GardenByName(ctx, gardenDTO.Name)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
 
-	if _, err = g.mentorshipRepo.Get(ctx, gardenDTO.MentorshipID); err != nil {
+	if _, err = g.mentorshipRepo.Mentorship(ctx, gardenDTO.MentorshipID); err != nil {
 		return nil, err
 	}
 
@@ -56,7 +56,7 @@ func (g *GardenService) New(ctx context.Context, gardenDTO *dto.Garden) (*dto.Ga
 // Get ...
 func (g *GardenService) Get(ctx context.Context, id types.GardenID) (*dto.Garden, error) {
 
-	garden, err := g.gardenRepo.Get(ctx, id)
+	garden, err := g.gardenRepo.Garden(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (g *GardenService) List(ctx context.Context, offset uint32) ([]*dto.Garden,
 
 	// TODO: cursor pagination
 
-	gardens, err := g.gardenRepo.List(ctx, offset)
+	gardens, err := g.gardenRepo.Gardens(ctx, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -93,18 +93,18 @@ func (g *GardenService) List(ctx context.Context, offset uint32) ([]*dto.Garden,
 // Update ...
 func (g *GardenService) Update(ctx context.Context, gardenDTO *dto.Garden) (*dto.Garden, error) {
 
-	comparable, err := g.gardenRepo.GetByName(ctx, gardenDTO.Name)
+	comparable, err := g.gardenRepo.GardenByName(ctx, gardenDTO.Name)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
 
 	if gardenDTO.MentorshipID != 0 {
-		if _, err = g.mentorshipRepo.Get(ctx, gardenDTO.MentorshipID); err != nil {
+		if _, err = g.mentorshipRepo.Mentorship(ctx, gardenDTO.MentorshipID); err != nil {
 			return nil, err
 		}
 	}
 
-	garden, err := g.gardenRepo.Get(ctx, gardenDTO.ID)
+	garden, err := g.gardenRepo.Garden(ctx, gardenDTO.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (g *GardenService) Update(ctx context.Context, gardenDTO *dto.Garden) (*dto
 // SoftDelete ...
 func (g *GardenService) SoftDelete(ctx context.Context, id types.GardenID) (*dto.Garden, error) {
 
-	garden, err := g.gardenRepo.Get(ctx, id)
+	garden, err := g.gardenRepo.Garden(ctx, id)
 	if err != nil {
 		return nil, err
 	}

@@ -9,6 +9,7 @@ import (
 	"math"
 	"study-event-go/ent/charm"
 	"study-event-go/ent/predicate"
+	"study-event-go/types"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -84,8 +85,8 @@ func (cq *CharmQuery) FirstX(ctx context.Context) *Charm {
 
 // FirstID returns the first Charm ID from the query.
 // Returns a *NotFoundError when no Charm ID was found.
-func (cq *CharmQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *CharmQuery) FirstID(ctx context.Context) (id types.CharmID, err error) {
+	var ids []types.CharmID
 	if ids, err = cq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -97,7 +98,7 @@ func (cq *CharmQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *CharmQuery) FirstIDX(ctx context.Context) int {
+func (cq *CharmQuery) FirstIDX(ctx context.Context) types.CharmID {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -135,8 +136,8 @@ func (cq *CharmQuery) OnlyX(ctx context.Context) *Charm {
 // OnlyID is like Only, but returns the only Charm ID in the query.
 // Returns a *NotSingularError when exactly one Charm ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *CharmQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *CharmQuery) OnlyID(ctx context.Context) (id types.CharmID, err error) {
+	var ids []types.CharmID
 	if ids, err = cq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -152,7 +153,7 @@ func (cq *CharmQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *CharmQuery) OnlyIDX(ctx context.Context) int {
+func (cq *CharmQuery) OnlyIDX(ctx context.Context) types.CharmID {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,8 +179,8 @@ func (cq *CharmQuery) AllX(ctx context.Context) []*Charm {
 }
 
 // IDs executes the query and returns a list of Charm IDs.
-func (cq *CharmQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (cq *CharmQuery) IDs(ctx context.Context) ([]types.CharmID, error) {
+	var ids []types.CharmID
 	if err := cq.Select(charm.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -187,7 +188,7 @@ func (cq *CharmQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *CharmQuery) IDsX(ctx context.Context) []int {
+func (cq *CharmQuery) IDsX(ctx context.Context) []types.CharmID {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -249,6 +250,19 @@ func (cq *CharmQuery) Clone() *CharmQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		CreatedAt time.Time `json:"created_at,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Charm.Query().
+//		GroupBy(charm.FieldCreatedAt).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
+//
 func (cq *CharmQuery) GroupBy(field string, fields ...string) *CharmGroupBy {
 	group := &CharmGroupBy{config: cq.config}
 	group.fields = append([]string{field}, fields...)
@@ -263,6 +277,17 @@ func (cq *CharmQuery) GroupBy(field string, fields ...string) *CharmGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		CreatedAt time.Time `json:"created_at,omitempty"`
+//	}
+//
+//	client.Charm.Query().
+//		Select(charm.FieldCreatedAt).
+//		Scan(ctx, &v)
+//
 func (cq *CharmQuery) Select(fields ...string) *CharmSelect {
 	cq.fields = append(cq.fields, fields...)
 	return &CharmSelect{CharmQuery: cq}
@@ -329,7 +354,7 @@ func (cq *CharmQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   charm.Table,
 			Columns: charm.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: charm.FieldID,
 			},
 		},

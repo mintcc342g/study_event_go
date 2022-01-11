@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"study-event-go/ent/charm"
+	"study-event-go/ent/charmcreator"
 	"study-event-go/ent/charmmodel"
 	"study-event-go/ent/garden"
 	"study-event-go/ent/lily"
@@ -35,13 +36,14 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		charm.Table:      charm.ValidColumn,
-		charmmodel.Table: charmmodel.ValidColumn,
-		garden.Table:     garden.ValidColumn,
-		lily.Table:       lily.ValidColumn,
-		lilyskill.Table:  lilyskill.ValidColumn,
-		mentorship.Table: mentorship.ValidColumn,
-		skill.Table:      skill.ValidColumn,
+		charm.Table:        charm.ValidColumn,
+		charmcreator.Table: charmcreator.ValidColumn,
+		charmmodel.Table:   charmmodel.ValidColumn,
+		garden.Table:       garden.ValidColumn,
+		lily.Table:         lily.ValidColumn,
+		lilyskill.Table:    lilyskill.ValidColumn,
+		mentorship.Table:   mentorship.ValidColumn,
+		skill.Table:        skill.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

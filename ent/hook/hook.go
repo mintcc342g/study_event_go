@@ -21,6 +21,19 @@ func (f CharmFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return f(ctx, mv)
 }
 
+// The CharmCreatorFunc type is an adapter to allow the use of ordinary
+// function as CharmCreator mutator.
+type CharmCreatorFunc func(context.Context, *ent.CharmCreatorMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CharmCreatorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CharmCreatorMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CharmCreatorMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The CharmModelFunc type is an adapter to allow the use of ordinary
 // function as CharmModel mutator.
 type CharmModelFunc func(context.Context, *ent.CharmModelMutation) (ent.Value, error)

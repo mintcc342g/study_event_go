@@ -11,6 +11,7 @@ import (
 	"study-event-go/types"
 
 	"study-event-go/ent/charm"
+	"study-event-go/ent/charmcreator"
 	"study-event-go/ent/charmmodel"
 	"study-event-go/ent/garden"
 	"study-event-go/ent/lily"
@@ -29,6 +30,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Charm is the client for interacting with the Charm builders.
 	Charm *CharmClient
+	// CharmCreator is the client for interacting with the CharmCreator builders.
+	CharmCreator *CharmCreatorClient
 	// CharmModel is the client for interacting with the CharmModel builders.
 	CharmModel *CharmModelClient
 	// Garden is the client for interacting with the Garden builders.
@@ -55,6 +58,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Charm = NewCharmClient(c.config)
+	c.CharmCreator = NewCharmCreatorClient(c.config)
 	c.CharmModel = NewCharmModelClient(c.config)
 	c.Garden = NewGardenClient(c.config)
 	c.Lily = NewLilyClient(c.config)
@@ -92,15 +96,16 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		Charm:      NewCharmClient(cfg),
-		CharmModel: NewCharmModelClient(cfg),
-		Garden:     NewGardenClient(cfg),
-		Lily:       NewLilyClient(cfg),
-		LilySkill:  NewLilySkillClient(cfg),
-		Mentorship: NewMentorshipClient(cfg),
-		Skill:      NewSkillClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		Charm:        NewCharmClient(cfg),
+		CharmCreator: NewCharmCreatorClient(cfg),
+		CharmModel:   NewCharmModelClient(cfg),
+		Garden:       NewGardenClient(cfg),
+		Lily:         NewLilyClient(cfg),
+		LilySkill:    NewLilySkillClient(cfg),
+		Mentorship:   NewMentorshipClient(cfg),
+		Skill:        NewSkillClient(cfg),
 	}, nil
 }
 
@@ -118,14 +123,15 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:     cfg,
-		Charm:      NewCharmClient(cfg),
-		CharmModel: NewCharmModelClient(cfg),
-		Garden:     NewGardenClient(cfg),
-		Lily:       NewLilyClient(cfg),
-		LilySkill:  NewLilySkillClient(cfg),
-		Mentorship: NewMentorshipClient(cfg),
-		Skill:      NewSkillClient(cfg),
+		config:       cfg,
+		Charm:        NewCharmClient(cfg),
+		CharmCreator: NewCharmCreatorClient(cfg),
+		CharmModel:   NewCharmModelClient(cfg),
+		Garden:       NewGardenClient(cfg),
+		Lily:         NewLilyClient(cfg),
+		LilySkill:    NewLilySkillClient(cfg),
+		Mentorship:   NewMentorshipClient(cfg),
+		Skill:        NewSkillClient(cfg),
 	}, nil
 }
 
@@ -156,6 +162,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Charm.Use(hooks...)
+	c.CharmCreator.Use(hooks...)
 	c.CharmModel.Use(hooks...)
 	c.Garden.Use(hooks...)
 	c.Lily.Use(hooks...)
@@ -204,7 +211,7 @@ func (c *CharmClient) UpdateOne(ch *Charm) *CharmUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CharmClient) UpdateOneID(id int) *CharmUpdateOne {
+func (c *CharmClient) UpdateOneID(id types.CharmID) *CharmUpdateOne {
 	mutation := newCharmMutation(c.config, OpUpdateOne, withCharmID(id))
 	return &CharmUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -221,7 +228,7 @@ func (c *CharmClient) DeleteOne(ch *Charm) *CharmDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *CharmClient) DeleteOneID(id int) *CharmDeleteOne {
+func (c *CharmClient) DeleteOneID(id types.CharmID) *CharmDeleteOne {
 	builder := c.Delete().Where(charm.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -236,12 +243,12 @@ func (c *CharmClient) Query() *CharmQuery {
 }
 
 // Get returns a Charm entity by its id.
-func (c *CharmClient) Get(ctx context.Context, id int) (*Charm, error) {
+func (c *CharmClient) Get(ctx context.Context, id types.CharmID) (*Charm, error) {
 	return c.Query().Where(charm.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CharmClient) GetX(ctx context.Context, id int) *Charm {
+func (c *CharmClient) GetX(ctx context.Context, id types.CharmID) *Charm {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -252,6 +259,96 @@ func (c *CharmClient) GetX(ctx context.Context, id int) *Charm {
 // Hooks returns the client hooks.
 func (c *CharmClient) Hooks() []Hook {
 	return c.hooks.Charm
+}
+
+// CharmCreatorClient is a client for the CharmCreator schema.
+type CharmCreatorClient struct {
+	config
+}
+
+// NewCharmCreatorClient returns a client for the CharmCreator from the given config.
+func NewCharmCreatorClient(c config) *CharmCreatorClient {
+	return &CharmCreatorClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `charmcreator.Hooks(f(g(h())))`.
+func (c *CharmCreatorClient) Use(hooks ...Hook) {
+	c.hooks.CharmCreator = append(c.hooks.CharmCreator, hooks...)
+}
+
+// Create returns a create builder for CharmCreator.
+func (c *CharmCreatorClient) Create() *CharmCreatorCreate {
+	mutation := newCharmCreatorMutation(c.config, OpCreate)
+	return &CharmCreatorCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CharmCreator entities.
+func (c *CharmCreatorClient) CreateBulk(builders ...*CharmCreatorCreate) *CharmCreatorCreateBulk {
+	return &CharmCreatorCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CharmCreator.
+func (c *CharmCreatorClient) Update() *CharmCreatorUpdate {
+	mutation := newCharmCreatorMutation(c.config, OpUpdate)
+	return &CharmCreatorUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CharmCreatorClient) UpdateOne(cc *CharmCreator) *CharmCreatorUpdateOne {
+	mutation := newCharmCreatorMutation(c.config, OpUpdateOne, withCharmCreator(cc))
+	return &CharmCreatorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CharmCreatorClient) UpdateOneID(id types.CharmCreatorID) *CharmCreatorUpdateOne {
+	mutation := newCharmCreatorMutation(c.config, OpUpdateOne, withCharmCreatorID(id))
+	return &CharmCreatorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CharmCreator.
+func (c *CharmCreatorClient) Delete() *CharmCreatorDelete {
+	mutation := newCharmCreatorMutation(c.config, OpDelete)
+	return &CharmCreatorDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *CharmCreatorClient) DeleteOne(cc *CharmCreator) *CharmCreatorDeleteOne {
+	return c.DeleteOneID(cc.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *CharmCreatorClient) DeleteOneID(id types.CharmCreatorID) *CharmCreatorDeleteOne {
+	builder := c.Delete().Where(charmcreator.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CharmCreatorDeleteOne{builder}
+}
+
+// Query returns a query builder for CharmCreator.
+func (c *CharmCreatorClient) Query() *CharmCreatorQuery {
+	return &CharmCreatorQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CharmCreator entity by its id.
+func (c *CharmCreatorClient) Get(ctx context.Context, id types.CharmCreatorID) (*CharmCreator, error) {
+	return c.Query().Where(charmcreator.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CharmCreatorClient) GetX(ctx context.Context, id types.CharmCreatorID) *CharmCreator {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *CharmCreatorClient) Hooks() []Hook {
+	return c.hooks.CharmCreator
 }
 
 // CharmModelClient is a client for the CharmModel schema.
@@ -294,7 +391,7 @@ func (c *CharmModelClient) UpdateOne(cm *CharmModel) *CharmModelUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CharmModelClient) UpdateOneID(id int) *CharmModelUpdateOne {
+func (c *CharmModelClient) UpdateOneID(id types.CharmModelID) *CharmModelUpdateOne {
 	mutation := newCharmModelMutation(c.config, OpUpdateOne, withCharmModelID(id))
 	return &CharmModelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -311,7 +408,7 @@ func (c *CharmModelClient) DeleteOne(cm *CharmModel) *CharmModelDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *CharmModelClient) DeleteOneID(id int) *CharmModelDeleteOne {
+func (c *CharmModelClient) DeleteOneID(id types.CharmModelID) *CharmModelDeleteOne {
 	builder := c.Delete().Where(charmmodel.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -326,12 +423,12 @@ func (c *CharmModelClient) Query() *CharmModelQuery {
 }
 
 // Get returns a CharmModel entity by its id.
-func (c *CharmModelClient) Get(ctx context.Context, id int) (*CharmModel, error) {
+func (c *CharmModelClient) Get(ctx context.Context, id types.CharmModelID) (*CharmModel, error) {
 	return c.Query().Where(charmmodel.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CharmModelClient) GetX(ctx context.Context, id int) *CharmModel {
+func (c *CharmModelClient) GetX(ctx context.Context, id types.CharmModelID) *CharmModel {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

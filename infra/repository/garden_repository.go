@@ -57,7 +57,7 @@ func (g *gardenRepository) New(ctx context.Context, garden *entity.Garden) (*ent
 	return garden, nil
 }
 
-func (g *gardenRepository) Get(ctx context.Context, id types.GardenID) (*entity.Garden, error) {
+func (g *gardenRepository) Garden(ctx context.Context, id types.GardenID) (*entity.Garden, error) {
 
 	entModel, err := g.conn.Garden.
 		Query().
@@ -81,7 +81,7 @@ func (g *gardenRepository) Get(ctx context.Context, id types.GardenID) (*entity.
 	}, nil
 }
 
-func (g *gardenRepository) GetByName(ctx context.Context, name string) (*entity.Garden, error) {
+func (g *gardenRepository) GardenByName(ctx context.Context, name string) (*entity.Garden, error) {
 
 	entModel, err := g.conn.Garden.
 		Query().
@@ -108,7 +108,7 @@ func (g *gardenRepository) GetByName(ctx context.Context, name string) (*entity.
 	}, nil
 }
 
-func (g *gardenRepository) List(ctx context.Context, offset uint32) ([]*entity.Garden, error) {
+func (g *gardenRepository) Gardens(ctx context.Context, offset uint32) ([]*entity.Garden, error) {
 
 	entModels, err := g.conn.Garden.
 		Query().

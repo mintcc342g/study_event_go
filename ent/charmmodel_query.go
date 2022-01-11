@@ -9,6 +9,7 @@ import (
 	"math"
 	"study-event-go/ent/charmmodel"
 	"study-event-go/ent/predicate"
+	"study-event-go/types"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -84,8 +85,8 @@ func (cmq *CharmModelQuery) FirstX(ctx context.Context) *CharmModel {
 
 // FirstID returns the first CharmModel ID from the query.
 // Returns a *NotFoundError when no CharmModel ID was found.
-func (cmq *CharmModelQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cmq *CharmModelQuery) FirstID(ctx context.Context) (id types.CharmModelID, err error) {
+	var ids []types.CharmModelID
 	if ids, err = cmq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -97,7 +98,7 @@ func (cmq *CharmModelQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cmq *CharmModelQuery) FirstIDX(ctx context.Context) int {
+func (cmq *CharmModelQuery) FirstIDX(ctx context.Context) types.CharmModelID {
 	id, err := cmq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -135,8 +136,8 @@ func (cmq *CharmModelQuery) OnlyX(ctx context.Context) *CharmModel {
 // OnlyID is like Only, but returns the only CharmModel ID in the query.
 // Returns a *NotSingularError when exactly one CharmModel ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (cmq *CharmModelQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cmq *CharmModelQuery) OnlyID(ctx context.Context) (id types.CharmModelID, err error) {
+	var ids []types.CharmModelID
 	if ids, err = cmq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -152,7 +153,7 @@ func (cmq *CharmModelQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cmq *CharmModelQuery) OnlyIDX(ctx context.Context) int {
+func (cmq *CharmModelQuery) OnlyIDX(ctx context.Context) types.CharmModelID {
 	id, err := cmq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,8 +179,8 @@ func (cmq *CharmModelQuery) AllX(ctx context.Context) []*CharmModel {
 }
 
 // IDs executes the query and returns a list of CharmModel IDs.
-func (cmq *CharmModelQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (cmq *CharmModelQuery) IDs(ctx context.Context) ([]types.CharmModelID, error) {
+	var ids []types.CharmModelID
 	if err := cmq.Select(charmmodel.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -187,7 +188,7 @@ func (cmq *CharmModelQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cmq *CharmModelQuery) IDsX(ctx context.Context) []int {
+func (cmq *CharmModelQuery) IDsX(ctx context.Context) []types.CharmModelID {
 	ids, err := cmq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -249,6 +250,19 @@ func (cmq *CharmModelQuery) Clone() *CharmModelQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		CreatedAt time.Time `json:"created_at,omitempty"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.CharmModel.Query().
+//		GroupBy(charmmodel.FieldCreatedAt).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
+//
 func (cmq *CharmModelQuery) GroupBy(field string, fields ...string) *CharmModelGroupBy {
 	group := &CharmModelGroupBy{config: cmq.config}
 	group.fields = append([]string{field}, fields...)
@@ -263,6 +277,17 @@ func (cmq *CharmModelQuery) GroupBy(field string, fields ...string) *CharmModelG
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		CreatedAt time.Time `json:"created_at,omitempty"`
+//	}
+//
+//	client.CharmModel.Query().
+//		Select(charmmodel.FieldCreatedAt).
+//		Scan(ctx, &v)
+//
 func (cmq *CharmModelQuery) Select(fields ...string) *CharmModelSelect {
 	cmq.fields = append(cmq.fields, fields...)
 	return &CharmModelSelect{CharmModelQuery: cmq}
@@ -329,7 +354,7 @@ func (cmq *CharmModelQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   charmmodel.Table,
 			Columns: charmmodel.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: charmmodel.FieldID,
 			},
 		},

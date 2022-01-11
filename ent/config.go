@@ -24,13 +24,14 @@ type config struct {
 
 // hooks per client, for fast access.
 type hooks struct {
-	Charm      []ent.Hook
-	CharmModel []ent.Hook
-	Garden     []ent.Hook
-	Lily       []ent.Hook
-	LilySkill  []ent.Hook
-	Mentorship []ent.Hook
-	Skill      []ent.Hook
+	Charm        []ent.Hook
+	CharmCreator []ent.Hook
+	CharmModel   []ent.Hook
+	Garden       []ent.Hook
+	Lily         []ent.Hook
+	LilySkill    []ent.Hook
+	Mentorship   []ent.Hook
+	Skill        []ent.Hook
 }
 
 // Options applies the options on the config object.

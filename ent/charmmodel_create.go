@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"study-event-go/ent/charmmodel"
+	"study-event-go/types"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -21,6 +23,66 @@ type CharmModelCreate struct {
 	conflict []sql.ConflictOption
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (cmc *CharmModelCreate) SetCreatedAt(t time.Time) *CharmModelCreate {
+	cmc.mutation.SetCreatedAt(t)
+	return cmc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (cmc *CharmModelCreate) SetNillableCreatedAt(t *time.Time) *CharmModelCreate {
+	if t != nil {
+		cmc.SetCreatedAt(*t)
+	}
+	return cmc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cmc *CharmModelCreate) SetUpdatedAt(t time.Time) *CharmModelCreate {
+	cmc.mutation.SetUpdatedAt(t)
+	return cmc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (cmc *CharmModelCreate) SetNillableUpdatedAt(t *time.Time) *CharmModelCreate {
+	if t != nil {
+		cmc.SetUpdatedAt(*t)
+	}
+	return cmc
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (cmc *CharmModelCreate) SetDeletedAt(t time.Time) *CharmModelCreate {
+	cmc.mutation.SetDeletedAt(t)
+	return cmc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (cmc *CharmModelCreate) SetNillableDeletedAt(t *time.Time) *CharmModelCreate {
+	if t != nil {
+		cmc.SetDeletedAt(*t)
+	}
+	return cmc
+}
+
+// SetName sets the "name" field.
+func (cmc *CharmModelCreate) SetName(s string) *CharmModelCreate {
+	cmc.mutation.SetName(s)
+	return cmc
+}
+
+// SetCreatorID sets the "creator_id" field.
+func (cmc *CharmModelCreate) SetCreatorID(tci types.CharmCreatorID) *CharmModelCreate {
+	cmc.mutation.SetCreatorID(tci)
+	return cmc
+}
+
+// SetID sets the "id" field.
+func (cmc *CharmModelCreate) SetID(tmi types.CharmModelID) *CharmModelCreate {
+	cmc.mutation.SetID(tmi)
+	return cmc
+}
+
 // Mutation returns the CharmModelMutation object of the builder.
 func (cmc *CharmModelCreate) Mutation() *CharmModelMutation {
 	return cmc.mutation
@@ -32,6 +94,7 @@ func (cmc *CharmModelCreate) Save(ctx context.Context) (*CharmModel, error) {
 		err  error
 		node *CharmModel
 	)
+	cmc.defaults()
 	if len(cmc.hooks) == 0 {
 		if err = cmc.check(); err != nil {
 			return nil, err
@@ -89,8 +152,37 @@ func (cmc *CharmModelCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cmc *CharmModelCreate) defaults() {
+	if _, ok := cmc.mutation.CreatedAt(); !ok {
+		v := charmmodel.DefaultCreatedAt()
+		cmc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := cmc.mutation.UpdatedAt(); !ok {
+		v := charmmodel.DefaultUpdatedAt()
+		cmc.mutation.SetUpdatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cmc *CharmModelCreate) check() error {
+	if _, ok := cmc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
+	}
+	if _, ok := cmc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
+	}
+	if _, ok := cmc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
+	}
+	if v, ok := cmc.mutation.Name(); ok {
+		if err := charmmodel.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "name": %w`, err)}
+		}
+	}
+	if _, ok := cmc.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`ent: missing required field "creator_id"`)}
+	}
 	return nil
 }
 
@@ -102,8 +194,10 @@ func (cmc *CharmModelCreate) sqlSave(ctx context.Context) (*CharmModel, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = types.CharmModelID(id)
+	}
 	return _node, nil
 }
 
@@ -113,12 +207,56 @@ func (cmc *CharmModelCreate) createSpec() (*CharmModel, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: charmmodel.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: charmmodel.FieldID,
 			},
 		}
 	)
 	_spec.OnConflict = cmc.conflict
+	if id, ok := cmc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
+	if value, ok := cmc.mutation.CreatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: charmmodel.FieldCreatedAt,
+		})
+		_node.CreatedAt = value
+	}
+	if value, ok := cmc.mutation.UpdatedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: charmmodel.FieldUpdatedAt,
+		})
+		_node.UpdatedAt = value
+	}
+	if value, ok := cmc.mutation.DeletedAt(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: charmmodel.FieldDeletedAt,
+		})
+		_node.DeletedAt = &value
+	}
+	if value, ok := cmc.mutation.Name(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: charmmodel.FieldName,
+		})
+		_node.Name = value
+	}
+	if value, ok := cmc.mutation.CreatorID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charmmodel.FieldCreatorID,
+		})
+		_node.CreatorID = value
+	}
 	return _node, _spec
 }
 
@@ -126,11 +264,17 @@ func (cmc *CharmModelCreate) createSpec() (*CharmModel, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.CharmModel.Create().
+//		SetCreatedAt(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.CharmModelUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
 //		Exec(ctx)
 //
 func (cmc *CharmModelCreate) OnConflict(opts ...sql.ConflictOption) *CharmModelUpsertOne {
@@ -167,17 +311,91 @@ type (
 	}
 )
 
-// UpdateNewValues updates the fields using the new values that were set on create.
+// SetCreatedAt sets the "created_at" field.
+func (u *CharmModelUpsert) SetCreatedAt(v time.Time) *CharmModelUpsert {
+	u.Set(charmmodel.FieldCreatedAt, v)
+	return u
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CharmModelUpsert) UpdateCreatedAt() *CharmModelUpsert {
+	u.SetExcluded(charmmodel.FieldCreatedAt)
+	return u
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CharmModelUpsert) SetUpdatedAt(v time.Time) *CharmModelUpsert {
+	u.Set(charmmodel.FieldUpdatedAt, v)
+	return u
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CharmModelUpsert) UpdateUpdatedAt() *CharmModelUpsert {
+	u.SetExcluded(charmmodel.FieldUpdatedAt)
+	return u
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *CharmModelUpsert) SetDeletedAt(v time.Time) *CharmModelUpsert {
+	u.Set(charmmodel.FieldDeletedAt, v)
+	return u
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *CharmModelUpsert) UpdateDeletedAt() *CharmModelUpsert {
+	u.SetExcluded(charmmodel.FieldDeletedAt)
+	return u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *CharmModelUpsert) ClearDeletedAt() *CharmModelUpsert {
+	u.SetNull(charmmodel.FieldDeletedAt)
+	return u
+}
+
+// SetName sets the "name" field.
+func (u *CharmModelUpsert) SetName(v string) *CharmModelUpsert {
+	u.Set(charmmodel.FieldName, v)
+	return u
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *CharmModelUpsert) UpdateName() *CharmModelUpsert {
+	u.SetExcluded(charmmodel.FieldName)
+	return u
+}
+
+// SetCreatorID sets the "creator_id" field.
+func (u *CharmModelUpsert) SetCreatorID(v types.CharmCreatorID) *CharmModelUpsert {
+	u.Set(charmmodel.FieldCreatorID, v)
+	return u
+}
+
+// UpdateCreatorID sets the "creator_id" field to the value that was provided on create.
+func (u *CharmModelUpsert) UpdateCreatorID() *CharmModelUpsert {
+	u.SetExcluded(charmmodel.FieldCreatorID)
+	return u
+}
+
+// UpdateNewValues updates the fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
 //	client.CharmModel.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(charmmodel.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 //
 func (u *CharmModelUpsertOne) UpdateNewValues() *CharmModelUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(charmmodel.FieldID)
+		}
+	}))
 	return u
 }
 
@@ -209,6 +427,83 @@ func (u *CharmModelUpsertOne) Update(set func(*CharmModelUpsert)) *CharmModelUps
 	return u
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (u *CharmModelUpsertOne) SetCreatedAt(v time.Time) *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CharmModelUpsertOne) UpdateCreatedAt() *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CharmModelUpsertOne) SetUpdatedAt(v time.Time) *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CharmModelUpsertOne) UpdateUpdatedAt() *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *CharmModelUpsertOne) SetDeletedAt(v time.Time) *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *CharmModelUpsertOne) UpdateDeletedAt() *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *CharmModelUpsertOne) ClearDeletedAt() *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *CharmModelUpsertOne) SetName(v string) *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *CharmModelUpsertOne) UpdateName() *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetCreatorID sets the "creator_id" field.
+func (u *CharmModelUpsertOne) SetCreatorID(v types.CharmCreatorID) *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetCreatorID(v)
+	})
+}
+
+// UpdateCreatorID sets the "creator_id" field to the value that was provided on create.
+func (u *CharmModelUpsertOne) UpdateCreatorID() *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateCreatorID()
+	})
+}
+
 // Exec executes the query.
 func (u *CharmModelUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -225,7 +520,7 @@ func (u *CharmModelUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CharmModelUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *CharmModelUpsertOne) ID(ctx context.Context) (id types.CharmModelID, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -234,7 +529,7 @@ func (u *CharmModelUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CharmModelUpsertOne) IDX(ctx context.Context) int {
+func (u *CharmModelUpsertOne) IDX(ctx context.Context) types.CharmModelID {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -257,6 +552,7 @@ func (cmcb *CharmModelCreateBulk) Save(ctx context.Context) ([]*CharmModel, erro
 	for i := range cmcb.builders {
 		func(i int, root context.Context) {
 			builder := cmcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CharmModelMutation)
 				if !ok {
@@ -285,9 +581,9 @@ func (cmcb *CharmModelCreateBulk) Save(ctx context.Context) ([]*CharmModel, erro
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = types.CharmModelID(id)
 				}
 				return nodes[i], nil
 			})
@@ -336,6 +632,11 @@ func (cmcb *CharmModelCreateBulk) ExecX(ctx context.Context) {
 //			// the was proposed for insertion.
 //			sql.ResolveWithNewValues(),
 //		).
+//		// Override some of the fields with custom
+//		// update values.
+//		Update(func(u *ent.CharmModelUpsert) {
+//			SetCreatedAt(v+v).
+//		}).
 //		Exec(ctx)
 //
 func (cmcb *CharmModelCreateBulk) OnConflict(opts ...sql.ConflictOption) *CharmModelUpsertBulk {
@@ -371,11 +672,22 @@ type CharmModelUpsertBulk struct {
 //	client.CharmModel.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(charmmodel.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 //
 func (u *CharmModelUpsertBulk) UpdateNewValues() *CharmModelUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(charmmodel.FieldID)
+				return
+			}
+		}
+	}))
 	return u
 }
 
@@ -405,6 +717,83 @@ func (u *CharmModelUpsertBulk) Update(set func(*CharmModelUpsert)) *CharmModelUp
 		set(&CharmModelUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (u *CharmModelUpsertBulk) SetCreatedAt(v time.Time) *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetCreatedAt(v)
+	})
+}
+
+// UpdateCreatedAt sets the "created_at" field to the value that was provided on create.
+func (u *CharmModelUpsertBulk) UpdateCreatedAt() *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateCreatedAt()
+	})
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (u *CharmModelUpsertBulk) SetUpdatedAt(v time.Time) *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetUpdatedAt(v)
+	})
+}
+
+// UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
+func (u *CharmModelUpsertBulk) UpdateUpdatedAt() *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateUpdatedAt()
+	})
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (u *CharmModelUpsertBulk) SetDeletedAt(v time.Time) *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetDeletedAt(v)
+	})
+}
+
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *CharmModelUpsertBulk) UpdateDeletedAt() *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateDeletedAt()
+	})
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *CharmModelUpsertBulk) ClearDeletedAt() *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.ClearDeletedAt()
+	})
+}
+
+// SetName sets the "name" field.
+func (u *CharmModelUpsertBulk) SetName(v string) *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetName(v)
+	})
+}
+
+// UpdateName sets the "name" field to the value that was provided on create.
+func (u *CharmModelUpsertBulk) UpdateName() *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateName()
+	})
+}
+
+// SetCreatorID sets the "creator_id" field.
+func (u *CharmModelUpsertBulk) SetCreatorID(v types.CharmCreatorID) *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetCreatorID(v)
+	})
+}
+
+// UpdateCreatorID sets the "creator_id" field to the value that was provided on create.
+func (u *CharmModelUpsertBulk) UpdateCreatorID() *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateCreatorID()
+	})
 }
 
 // Exec executes the query.

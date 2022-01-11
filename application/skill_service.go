@@ -28,7 +28,7 @@ func NewSkillService(
 // New ...
 func (g *SkillService) New(ctx context.Context, skillDTO *dto.Skill) (*dto.Skill, error) {
 
-	_, err := g.skillRepo.GetByName(ctx, skillDTO.Name)
+	_, err := g.skillRepo.SkillByName(ctx, skillDTO.Name)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}

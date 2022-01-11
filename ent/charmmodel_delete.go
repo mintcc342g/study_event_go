@@ -72,7 +72,7 @@ func (cmd *CharmModelDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: charmmodel.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: charmmodel.FieldID,
 			},
 		},

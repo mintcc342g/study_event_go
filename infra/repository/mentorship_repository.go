@@ -52,7 +52,7 @@ func (m *mentorshipRepository) New(ctx context.Context, mentorship *entity.Mento
 	return mentorship, nil
 }
 
-func (m *mentorshipRepository) Get(ctx context.Context, id types.MentorshipID) (*entity.Mentorship, error) {
+func (m *mentorshipRepository) Mentorship(ctx context.Context, id types.MentorshipID) (*entity.Mentorship, error) {
 
 	entModel, err := m.conn.Mentorship.
 		Query().
@@ -74,7 +74,7 @@ func (m *mentorshipRepository) Get(ctx context.Context, id types.MentorshipID) (
 	}, nil
 }
 
-func (m *mentorshipRepository) GetByName(ctx context.Context, name string) (*entity.Mentorship, error) {
+func (m *mentorshipRepository) MentorshipByName(ctx context.Context, name string) (*entity.Mentorship, error) {
 
 	entModel, err := m.conn.Mentorship.
 		Query().
@@ -99,7 +99,7 @@ func (m *mentorshipRepository) GetByName(ctx context.Context, name string) (*ent
 	}, nil
 }
 
-func (m *mentorshipRepository) List(ctx context.Context, offset uint32) ([]*entity.Mentorship, error) {
+func (m *mentorshipRepository) Mentorships(ctx context.Context, offset uint32) ([]*entity.Mentorship, error) {
 
 	entModels, err := m.conn.Mentorship.
 		Query().

@@ -9,6 +9,9 @@ import (
 // Charm is the predicate function for charm builders.
 type Charm func(*sql.Selector)
 
+// CharmCreator is the predicate function for charmcreator builders.
+type CharmCreator func(*sql.Selector)
+
 // CharmModel is the predicate function for charmmodel builders.
 type CharmModel func(*sql.Selector)
 

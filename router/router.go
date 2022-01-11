@@ -36,10 +36,14 @@ func AssaultLilyRoute(sys *echo.Group, ctrlContainer *container.ControllerContai
 	// sys.GET("/lilies", ctrlContainer.Lily.List)
 	// sys.GET("/lilies/:id", ctrlContainer.Lily.Get)
 	// sys.PUT("/lilies/:id", ctrlContainer.Lily.Update)
-	// sys.PUT("/lilies/:id/charms", ctrlContainer.Lily.UpdateCharms)
-	// sys.PUT("/lilies/:id/skills", ctrlContainer.Lily.UpdateSkills)
-	// sys.PUT("/lilies/:lily_id/legions/:id", ctrlContainer.Lily.ApplyLegion)
 	// sys.DELETE("/lilies/:id", ctrlContainer.Lily.Delete)
+	// sys.PUT("/lilies/:id/skills", ctrlContainer.Lily.UpdateSkills)
+	// sys.PUT("/lilies/:id/legions/:legion_id", ctrlContainer.Lily.ApplyLegion)
+
+	// TODO
+	sys.POST("/charm-creator", ctrlContainer.Charm.NewCharmCreator)
+	sys.POST("/charm-models", ctrlContainer.Charm.NewCharmModel)
+	// sys.POST("/lilies/:id/charms", ctrlContainer.Lily.NewCharms)
 
 	// TODO
 	// sys.POST("/legions", ctrlContainer.Legion.New)

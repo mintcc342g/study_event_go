@@ -3,6 +3,9 @@
 package ent
 
 import (
+	"study-event-go/ent/charm"
+	"study-event-go/ent/charmcreator"
+	"study-event-go/ent/charmmodel"
 	"study-event-go/ent/garden"
 	"study-event-go/ent/lily"
 	"study-event-go/ent/lilyskill"
@@ -17,6 +20,54 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	charmFields := schema.Charm{}.Fields()
+	_ = charmFields
+	// charmDescCreatedAt is the schema descriptor for created_at field.
+	charmDescCreatedAt := charmFields[1].Descriptor()
+	// charm.DefaultCreatedAt holds the default value on creation for the created_at field.
+	charm.DefaultCreatedAt = charmDescCreatedAt.Default.(func() time.Time)
+	// charmDescUpdatedAt is the schema descriptor for updated_at field.
+	charmDescUpdatedAt := charmFields[2].Descriptor()
+	// charm.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	charm.DefaultUpdatedAt = charmDescUpdatedAt.Default.(func() time.Time)
+	// charm.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	charm.UpdateDefaultUpdatedAt = charmDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// charmDescName is the schema descriptor for name field.
+	charmDescName := charmFields[4].Descriptor()
+	// charm.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	charm.NameValidator = charmDescName.Validators[0].(func(string) error)
+	charmcreatorFields := schema.CharmCreator{}.Fields()
+	_ = charmcreatorFields
+	// charmcreatorDescCreatedAt is the schema descriptor for created_at field.
+	charmcreatorDescCreatedAt := charmcreatorFields[1].Descriptor()
+	// charmcreator.DefaultCreatedAt holds the default value on creation for the created_at field.
+	charmcreator.DefaultCreatedAt = charmcreatorDescCreatedAt.Default.(func() time.Time)
+	// charmcreatorDescUpdatedAt is the schema descriptor for updated_at field.
+	charmcreatorDescUpdatedAt := charmcreatorFields[2].Descriptor()
+	// charmcreator.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	charmcreator.DefaultUpdatedAt = charmcreatorDescUpdatedAt.Default.(func() time.Time)
+	// charmcreator.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	charmcreator.UpdateDefaultUpdatedAt = charmcreatorDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// charmcreatorDescName is the schema descriptor for name field.
+	charmcreatorDescName := charmcreatorFields[4].Descriptor()
+	// charmcreator.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	charmcreator.NameValidator = charmcreatorDescName.Validators[0].(func(string) error)
+	charmmodelFields := schema.CharmModel{}.Fields()
+	_ = charmmodelFields
+	// charmmodelDescCreatedAt is the schema descriptor for created_at field.
+	charmmodelDescCreatedAt := charmmodelFields[1].Descriptor()
+	// charmmodel.DefaultCreatedAt holds the default value on creation for the created_at field.
+	charmmodel.DefaultCreatedAt = charmmodelDescCreatedAt.Default.(func() time.Time)
+	// charmmodelDescUpdatedAt is the schema descriptor for updated_at field.
+	charmmodelDescUpdatedAt := charmmodelFields[2].Descriptor()
+	// charmmodel.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	charmmodel.DefaultUpdatedAt = charmmodelDescUpdatedAt.Default.(func() time.Time)
+	// charmmodel.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	charmmodel.UpdateDefaultUpdatedAt = charmmodelDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// charmmodelDescName is the schema descriptor for name field.
+	charmmodelDescName := charmmodelFields[4].Descriptor()
+	// charmmodel.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	charmmodel.NameValidator = charmmodelDescName.Validators[0].(func(string) error)
 	gardenFields := schema.Garden{}.Fields()
 	_ = gardenFields
 	// gardenDescCreatedAt is the schema descriptor for created_at field.

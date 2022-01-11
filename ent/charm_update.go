@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"study-event-go/ent/charm"
 	"study-event-go/ent/predicate"
+	"study-event-go/types"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -26,6 +28,78 @@ func (cu *CharmUpdate) Where(ps ...predicate.Charm) *CharmUpdate {
 	return cu
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (cu *CharmUpdate) SetCreatedAt(t time.Time) *CharmUpdate {
+	cu.mutation.SetCreatedAt(t)
+	return cu
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (cu *CharmUpdate) SetNillableCreatedAt(t *time.Time) *CharmUpdate {
+	if t != nil {
+		cu.SetCreatedAt(*t)
+	}
+	return cu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cu *CharmUpdate) SetUpdatedAt(t time.Time) *CharmUpdate {
+	cu.mutation.SetUpdatedAt(t)
+	return cu
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (cu *CharmUpdate) SetDeletedAt(t time.Time) *CharmUpdate {
+	cu.mutation.SetDeletedAt(t)
+	return cu
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (cu *CharmUpdate) SetNillableDeletedAt(t *time.Time) *CharmUpdate {
+	if t != nil {
+		cu.SetDeletedAt(*t)
+	}
+	return cu
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (cu *CharmUpdate) ClearDeletedAt() *CharmUpdate {
+	cu.mutation.ClearDeletedAt()
+	return cu
+}
+
+// SetName sets the "name" field.
+func (cu *CharmUpdate) SetName(s string) *CharmUpdate {
+	cu.mutation.SetName(s)
+	return cu
+}
+
+// SetModelID sets the "model_id" field.
+func (cu *CharmUpdate) SetModelID(tmi types.CharmModelID) *CharmUpdate {
+	cu.mutation.ResetModelID()
+	cu.mutation.SetModelID(tmi)
+	return cu
+}
+
+// AddModelID adds tmi to the "model_id" field.
+func (cu *CharmUpdate) AddModelID(tmi types.CharmModelID) *CharmUpdate {
+	cu.mutation.AddModelID(tmi)
+	return cu
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (cu *CharmUpdate) SetOwnerID(ti types.LilyID) *CharmUpdate {
+	cu.mutation.ResetOwnerID()
+	cu.mutation.SetOwnerID(ti)
+	return cu
+}
+
+// AddOwnerID adds ti to the "owner_id" field.
+func (cu *CharmUpdate) AddOwnerID(ti types.LilyID) *CharmUpdate {
+	cu.mutation.AddOwnerID(ti)
+	return cu
+}
+
 // Mutation returns the CharmMutation object of the builder.
 func (cu *CharmUpdate) Mutation() *CharmMutation {
 	return cu.mutation
@@ -37,13 +111,20 @@ func (cu *CharmUpdate) Save(ctx context.Context) (int, error) {
 		err      error
 		affected int
 	)
+	cu.defaults()
 	if len(cu.hooks) == 0 {
+		if err = cu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = cu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*CharmMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = cu.check(); err != nil {
+				return 0, err
 			}
 			cu.mutation = mutation
 			affected, err = cu.sqlSave(ctx)
@@ -85,13 +166,31 @@ func (cu *CharmUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cu *CharmUpdate) defaults() {
+	if _, ok := cu.mutation.UpdatedAt(); !ok {
+		v := charm.UpdateDefaultUpdatedAt()
+		cu.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (cu *CharmUpdate) check() error {
+	if v, ok := cu.mutation.Name(); ok {
+		if err := charm.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
+		}
+	}
+	return nil
+}
+
 func (cu *CharmUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   charm.Table,
 			Columns: charm.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: charm.FieldID,
 			},
 		},
@@ -102,6 +201,68 @@ func (cu *CharmUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cu.mutation.CreatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: charm.FieldCreatedAt,
+		})
+	}
+	if value, ok := cu.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: charm.FieldUpdatedAt,
+		})
+	}
+	if value, ok := cu.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: charm.FieldDeletedAt,
+		})
+	}
+	if cu.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: charm.FieldDeletedAt,
+		})
+	}
+	if value, ok := cu.mutation.Name(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: charm.FieldName,
+		})
+	}
+	if value, ok := cu.mutation.ModelID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charm.FieldModelID,
+		})
+	}
+	if value, ok := cu.mutation.AddedModelID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charm.FieldModelID,
+		})
+	}
+	if value, ok := cu.mutation.OwnerID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charm.FieldOwnerID,
+		})
+	}
+	if value, ok := cu.mutation.AddedOwnerID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charm.FieldOwnerID,
+		})
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -122,6 +283,78 @@ type CharmUpdateOne struct {
 	mutation *CharmMutation
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (cuo *CharmUpdateOne) SetCreatedAt(t time.Time) *CharmUpdateOne {
+	cuo.mutation.SetCreatedAt(t)
+	return cuo
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (cuo *CharmUpdateOne) SetNillableCreatedAt(t *time.Time) *CharmUpdateOne {
+	if t != nil {
+		cuo.SetCreatedAt(*t)
+	}
+	return cuo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (cuo *CharmUpdateOne) SetUpdatedAt(t time.Time) *CharmUpdateOne {
+	cuo.mutation.SetUpdatedAt(t)
+	return cuo
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (cuo *CharmUpdateOne) SetDeletedAt(t time.Time) *CharmUpdateOne {
+	cuo.mutation.SetDeletedAt(t)
+	return cuo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (cuo *CharmUpdateOne) SetNillableDeletedAt(t *time.Time) *CharmUpdateOne {
+	if t != nil {
+		cuo.SetDeletedAt(*t)
+	}
+	return cuo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (cuo *CharmUpdateOne) ClearDeletedAt() *CharmUpdateOne {
+	cuo.mutation.ClearDeletedAt()
+	return cuo
+}
+
+// SetName sets the "name" field.
+func (cuo *CharmUpdateOne) SetName(s string) *CharmUpdateOne {
+	cuo.mutation.SetName(s)
+	return cuo
+}
+
+// SetModelID sets the "model_id" field.
+func (cuo *CharmUpdateOne) SetModelID(tmi types.CharmModelID) *CharmUpdateOne {
+	cuo.mutation.ResetModelID()
+	cuo.mutation.SetModelID(tmi)
+	return cuo
+}
+
+// AddModelID adds tmi to the "model_id" field.
+func (cuo *CharmUpdateOne) AddModelID(tmi types.CharmModelID) *CharmUpdateOne {
+	cuo.mutation.AddModelID(tmi)
+	return cuo
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (cuo *CharmUpdateOne) SetOwnerID(ti types.LilyID) *CharmUpdateOne {
+	cuo.mutation.ResetOwnerID()
+	cuo.mutation.SetOwnerID(ti)
+	return cuo
+}
+
+// AddOwnerID adds ti to the "owner_id" field.
+func (cuo *CharmUpdateOne) AddOwnerID(ti types.LilyID) *CharmUpdateOne {
+	cuo.mutation.AddOwnerID(ti)
+	return cuo
+}
+
 // Mutation returns the CharmMutation object of the builder.
 func (cuo *CharmUpdateOne) Mutation() *CharmMutation {
 	return cuo.mutation
@@ -140,13 +373,20 @@ func (cuo *CharmUpdateOne) Save(ctx context.Context) (*Charm, error) {
 		err  error
 		node *Charm
 	)
+	cuo.defaults()
 	if len(cuo.hooks) == 0 {
+		if err = cuo.check(); err != nil {
+			return nil, err
+		}
 		node, err = cuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*CharmMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = cuo.check(); err != nil {
+				return nil, err
 			}
 			cuo.mutation = mutation
 			node, err = cuo.sqlSave(ctx)
@@ -188,13 +428,31 @@ func (cuo *CharmUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cuo *CharmUpdateOne) defaults() {
+	if _, ok := cuo.mutation.UpdatedAt(); !ok {
+		v := charm.UpdateDefaultUpdatedAt()
+		cuo.mutation.SetUpdatedAt(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (cuo *CharmUpdateOne) check() error {
+	if v, ok := cuo.mutation.Name(); ok {
+		if err := charm.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf("ent: validator failed for field \"name\": %w", err)}
+		}
+	}
+	return nil
+}
+
 func (cuo *CharmUpdateOne) sqlSave(ctx context.Context) (_node *Charm, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   charm.Table,
 			Columns: charm.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint64,
 				Column: charm.FieldID,
 			},
 		},
@@ -222,6 +480,68 @@ func (cuo *CharmUpdateOne) sqlSave(ctx context.Context) (_node *Charm, err error
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cuo.mutation.CreatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: charm.FieldCreatedAt,
+		})
+	}
+	if value, ok := cuo.mutation.UpdatedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: charm.FieldUpdatedAt,
+		})
+	}
+	if value, ok := cuo.mutation.DeletedAt(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: charm.FieldDeletedAt,
+		})
+	}
+	if cuo.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: charm.FieldDeletedAt,
+		})
+	}
+	if value, ok := cuo.mutation.Name(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: charm.FieldName,
+		})
+	}
+	if value, ok := cuo.mutation.ModelID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charm.FieldModelID,
+		})
+	}
+	if value, ok := cuo.mutation.AddedModelID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charm.FieldModelID,
+		})
+	}
+	if value, ok := cuo.mutation.OwnerID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charm.FieldOwnerID,
+		})
+	}
+	if value, ok := cuo.mutation.AddedOwnerID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charm.FieldOwnerID,
+		})
 	}
 	_node = &Charm{config: cuo.config}
 	_spec.Assign = _node.assignValues

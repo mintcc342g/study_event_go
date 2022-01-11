@@ -165,7 +165,7 @@ func (c *CauseOfDeletion) UnmarshalJSON(data []byte) error {
 		"NON-HOSTILE DEATH": NonHostileDeath,
 		"KILLED IN ACTION":  KilledInAction,
 		"MISSING IN ACTION": MissingInAction,
-	}[strings.ToLower(strData)]
+	}[strings.ToUpper(strData)]
 
 	return nil
 }
@@ -201,7 +201,7 @@ func (a *ArsenalType) UnmarshalJSON(data []byte) error {
 		"NONE":     NoneTypeArsenal,
 		"COMPANY":  CompanyTypeArsenal,
 		"PERSONAL": PersonalTypeArsenal,
-	}[strings.ToLower(strData)]
+	}[strings.ToUpper(strData)]
 
 	return nil
 }

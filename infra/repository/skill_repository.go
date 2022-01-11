@@ -52,7 +52,7 @@ func (s *skillRepository) New(ctx context.Context, skill *entity.Skill) (*entity
 	return skill, nil
 }
 
-func (s *skillRepository) GetByName(ctx context.Context, name string) (*entity.Skill, error) {
+func (s *skillRepository) SkillByName(ctx context.Context, name string) (*entity.Skill, error) {
 
 	entModel, err := s.conn.Skill.
 		Query().

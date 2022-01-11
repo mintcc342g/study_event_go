@@ -44,6 +44,22 @@ func NewLily(lilyDTO *dto.Lily) (*Lily, error) {
 	}, nil
 }
 
+// NewCharms ...
+func (l *Lily) NewCharms(charmModelIDs []types.CharmModelID, models ...*CharmModel) error {
+	if len(charmModelIDs) != len(models) {
+		return errors.BadRequestf("invalid charm model ids")
+	}
+
+	for _, m := range models {
+		l.Charms = append(l.Charms, &Charm{
+			ModelID: m.ID,
+			OwnerID: l.ID,
+		})
+	}
+
+	return nil
+}
+
 // IsFirstPlace ...
 func (l *Lily) IsFirstPlace() bool {
 	return l.Rank == types.FirstPlace

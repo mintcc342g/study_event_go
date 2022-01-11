@@ -13,6 +13,7 @@ import (
 
 // RepositoryContainer ...
 type RepositoryContainer struct {
+	CharmRepo      interfaces.CharmRepository
 	EventRepo      interfaces.EventRepository
 	GardenRepo     interfaces.GardenRepository
 	LilyRepo       interfaces.LilyRepository
@@ -23,6 +24,7 @@ type RepositoryContainer struct {
 
 func newRepositoryContainer(db *ent.Client, redis redis.Cmdable, machineryServer *machinery.Server) *RepositoryContainer {
 	return &RepositoryContainer{
+		CharmRepo:      repository.NewCharmRepository(db),
 		EventRepo:      repository.NewMachineryRepository(machineryServer),
 		GardenRepo:     repository.NewGardenRepository(db),
 		LilyRepo:       repository.NewLilyRepository(db),

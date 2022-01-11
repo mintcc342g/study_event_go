@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Charm is the client for interacting with the Charm builders.
 	Charm *CharmClient
+	// CharmCreator is the client for interacting with the CharmCreator builders.
+	CharmCreator *CharmCreatorClient
 	// CharmModel is the client for interacting with the CharmModel builders.
 	CharmModel *CharmModelClient
 	// Garden is the client for interacting with the Garden builders.
@@ -162,6 +164,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Charm = NewCharmClient(tx.config)
+	tx.CharmCreator = NewCharmCreatorClient(tx.config)
 	tx.CharmModel = NewCharmModelClient(tx.config)
 	tx.Garden = NewGardenClient(tx.config)
 	tx.Lily = NewLilyClient(tx.config)

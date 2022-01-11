@@ -10,7 +10,13 @@ import (
 var (
 	// CharmsColumns holds the columns for the "charms" table.
 	CharmsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "model_id", Type: field.TypeUint64},
+		{Name: "owner_id", Type: field.TypeUint64},
 	}
 	// CharmsTable holds the schema information for the "charms" table.
 	CharmsTable = &schema.Table{
@@ -18,9 +24,29 @@ var (
 		Columns:    CharmsColumns,
 		PrimaryKey: []*schema.Column{CharmsColumns[0]},
 	}
+	// CharmCreatorsColumns holds the columns for the "charm_creators" table.
+	CharmCreatorsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "type", Type: field.TypeUint32},
+	}
+	// CharmCreatorsTable holds the schema information for the "charm_creators" table.
+	CharmCreatorsTable = &schema.Table{
+		Name:       "charm_creators",
+		Columns:    CharmCreatorsColumns,
+		PrimaryKey: []*schema.Column{CharmCreatorsColumns[0]},
+	}
 	// CharmModelsColumns holds the columns for the "charm_models" table.
 	CharmModelsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "creator_id", Type: field.TypeUint64},
 	}
 	// CharmModelsTable holds the schema information for the "charm_models" table.
 	CharmModelsTable = &schema.Table{
@@ -111,6 +137,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CharmsTable,
+		CharmCreatorsTable,
 		CharmModelsTable,
 		GardensTable,
 		LiliesTable,
