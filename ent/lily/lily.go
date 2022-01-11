@@ -18,8 +18,10 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
-	// FieldDeletionReason holds the string denoting the deletion_reason field in the database.
-	FieldDeletionReason = "deletion_reason"
+	// FieldCauseOfDeletion holds the string denoting the cause_of_deletion field in the database.
+	FieldCauseOfDeletion = "cause_of_deletion"
+	// FieldBirth holds the string denoting the birth field in the database.
+	FieldBirth = "birth"
 	// FieldFirstName holds the string denoting the first_name field in the database.
 	FieldFirstName = "first_name"
 	// FieldMiddleName holds the string denoting the middle_name field in the database.
@@ -28,10 +30,6 @@ const (
 	FieldLastName = "last_name"
 	// FieldRank holds the string denoting the rank field in the database.
 	FieldRank = "rank"
-	// FieldMainCharmID holds the string denoting the main_charm_id field in the database.
-	FieldMainCharmID = "main_charm_id"
-	// FieldSubCharmID holds the string denoting the sub_charm_id field in the database.
-	FieldSubCharmID = "sub_charm_id"
 	// FieldGardenID holds the string denoting the garden_id field in the database.
 	FieldGardenID = "garden_id"
 	// FieldLegionID holds the string denoting the legion_id field in the database.
@@ -46,13 +44,12 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
-	FieldDeletionReason,
+	FieldCauseOfDeletion,
+	FieldBirth,
 	FieldFirstName,
 	FieldMiddleName,
 	FieldLastName,
 	FieldRank,
-	FieldMainCharmID,
-	FieldSubCharmID,
 	FieldGardenID,
 	FieldLegionID,
 }
@@ -74,18 +71,14 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// DefaultDeletionReason holds the default value on creation for the "deletion_reason" field.
-	DefaultDeletionReason types.DeletionReason
+	// DefaultCauseOfDeletion holds the default value on creation for the "cause_of_deletion" field.
+	DefaultCauseOfDeletion types.CauseOfDeletion
 	// FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
 	FirstNameValidator func(string) error
 	// LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
 	LastNameValidator func(string) error
 	// DefaultRank holds the default value on creation for the "rank" field.
 	DefaultRank uint32
-	// DefaultMainCharmID holds the default value on creation for the "main_charm_id" field.
-	DefaultMainCharmID types.CharmID
-	// DefaultSubCharmID holds the default value on creation for the "sub_charm_id" field.
-	DefaultSubCharmID types.CharmID
 	// DefaultGardenID holds the default value on creation for the "garden_id" field.
 	DefaultGardenID types.GardenID
 	// DefaultLegionID holds the default value on creation for the "legion_id" field.

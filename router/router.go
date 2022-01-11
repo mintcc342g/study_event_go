@@ -11,31 +11,43 @@ func AssaultLilyRoute(sys *echo.Group, ctrlContainer *container.ControllerContai
 
 	// TODO: check authority with jwt
 
-	sys.POST("/mentorship", ctrlContainer.Mentorship.New)
-	sys.GET("/mentorship/:id", ctrlContainer.Mentorship.Get)
-	sys.GET("/mentorship", ctrlContainer.Mentorship.List)
-	sys.PUT("/mentorship/:id", ctrlContainer.Mentorship.Update)
-	sys.DELETE("/mentorship/:id", ctrlContainer.Mentorship.Delete)
+	sys.POST("/mentorships", ctrlContainer.Mentorship.New)
+	sys.GET("/mentorships/:id", ctrlContainer.Mentorship.Get)
+	sys.GET("/mentorships", ctrlContainer.Mentorship.List)
+	sys.PUT("/mentorships/:id", ctrlContainer.Mentorship.Update)
+	sys.DELETE("/mentorships/:id", ctrlContainer.Mentorship.Delete)
 
-	sys.POST("/garden", ctrlContainer.Garden.New)
-	sys.GET("/garden/:id", ctrlContainer.Garden.Get)
-	sys.GET("/garden", ctrlContainer.Garden.List)
-	sys.PUT("/garden/:id", ctrlContainer.Garden.Update)
-	sys.DELETE("/garden/:id", ctrlContainer.Garden.Delete)
-
-	// TODO
-	sys.POST("/skill", ctrlContainer.Skill.New)
-	// sys.GET("/skill", ctrlContainer.Skill.List)
-	// sys.GET("/skill/:id", ctrlContainer.Skill.Get)
-	// sys.PUT("/skill/:id", ctrlContainer.Skill.Update)
-	// sys.DELETE("/skill/:id", ctrlContainer.Skill.Delete)
+	sys.POST("/gardens", ctrlContainer.Garden.New)
+	sys.GET("/gardens/:id", ctrlContainer.Garden.Get)
+	sys.GET("/gardens", ctrlContainer.Garden.List)
+	sys.PUT("/gardens/:id", ctrlContainer.Garden.Update)
+	// sys.PUT("/gardens/:id/lilies", ctrlContainer.Garden.UpdateLilies)
+	sys.DELETE("/gardens/:id", ctrlContainer.Garden.Delete)
 
 	// TODO
-	// sys.POST("/lily", ctrlContainer.Lily.New)
-	// sys.GET("/lily", ctrlContainer.Lily.List)
-	// sys.GET("/lily/:id", ctrlContainer.Lily.Get)
-	// sys.PUT("/lily/:id", ctrlContainer.Lily.Update)
-	// sys.DELETE("/lily/:id", ctrlContainer.Lily.Delete)
+	sys.POST("/skills", ctrlContainer.Skill.New)
+	// sys.GET("/skills", ctrlContainer.Skill.List)
+	// sys.GET("/skills/:id", ctrlContainer.Skill.Get)
+	// sys.PUT("/skills/:id", ctrlContainer.Skill.Update)
+	// sys.DELETE("/skills/:id", ctrlContainer.Skill.Delete)
 
-	sys.POST("/garden/:id/alarm", ctrlContainer.Protection.Alarm)
+	// TODO
+	sys.POST("/lilies", ctrlContainer.Lily.New)
+	// sys.GET("/lilies", ctrlContainer.Lily.List)
+	// sys.GET("/lilies/:id", ctrlContainer.Lily.Get)
+	// sys.PUT("/lilies/:id", ctrlContainer.Lily.Update)
+	// sys.PUT("/lilies/:id/charms", ctrlContainer.Lily.UpdateCharms)
+	// sys.PUT("/lilies/:id/skills", ctrlContainer.Lily.UpdateSkills)
+	// sys.PUT("/lilies/:lily_id/legions/:id", ctrlContainer.Lily.ApplyLegion)
+	// sys.DELETE("/lilies/:id", ctrlContainer.Lily.Delete)
+
+	// TODO
+	// sys.POST("/legions", ctrlContainer.Legion.New)
+	// sys.GET("/legions", ctrlContainer.Legion.List)
+	// sys.GET("/legions/:id", ctrlContainer.Legion.Get)
+	// sys.PUT("/legions/:id", ctrlContainer.Legion.Update)
+	// sys.PUT("/legions/:id/lilies/:lily_id", ctrlContainer.Legion.ApproveLily)
+	// sys.DELETE("/legions/:id", ctrlContainer.Legion.Delete)
+
+	sys.POST("/gardens/:id/alarm", ctrlContainer.Protection.Alarm)
 }

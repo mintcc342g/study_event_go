@@ -23,8 +23,10 @@ type Lily struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
-	// DeletionReason holds the value of the "deletion_reason" field.
-	DeletionReason types.DeletionReason `json:"deletion_reason,omitempty"`
+	// CauseOfDeletion holds the value of the "cause_of_deletion" field.
+	CauseOfDeletion types.CauseOfDeletion `json:"cause_of_deletion,omitempty"`
+	// Birth holds the value of the "birth" field.
+	Birth *time.Time `json:"birth,omitempty"`
 	// FirstName holds the value of the "first_name" field.
 	FirstName string `json:"first_name,omitempty"`
 	// MiddleName holds the value of the "middle_name" field.
@@ -33,10 +35,6 @@ type Lily struct {
 	LastName string `json:"last_name,omitempty"`
 	// Rank holds the value of the "rank" field.
 	Rank uint32 `json:"rank,omitempty"`
-	// MainCharmID holds the value of the "main_charm_id" field.
-	MainCharmID types.CharmID `json:"main_charm_id,omitempty"`
-	// SubCharmID holds the value of the "sub_charm_id" field.
-	SubCharmID types.CharmID `json:"sub_charm_id,omitempty"`
 	// GardenID holds the value of the "garden_id" field.
 	GardenID types.GardenID `json:"garden_id,omitempty"`
 	// LegionID holds the value of the "legion_id" field.
@@ -48,11 +46,11 @@ func (*Lily) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case lily.FieldID, lily.FieldDeletionReason, lily.FieldRank, lily.FieldMainCharmID, lily.FieldSubCharmID, lily.FieldGardenID, lily.FieldLegionID:
+		case lily.FieldID, lily.FieldCauseOfDeletion, lily.FieldRank, lily.FieldGardenID, lily.FieldLegionID:
 			values[i] = new(sql.NullInt64)
 		case lily.FieldFirstName, lily.FieldMiddleName, lily.FieldLastName:
 			values[i] = new(sql.NullString)
-		case lily.FieldCreatedAt, lily.FieldUpdatedAt, lily.FieldDeletedAt:
+		case lily.FieldCreatedAt, lily.FieldUpdatedAt, lily.FieldDeletedAt, lily.FieldBirth:
 			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Lily", columns[i])
@@ -94,11 +92,18 @@ func (l *Lily) assignValues(columns []string, values []interface{}) error {
 				l.DeletedAt = new(time.Time)
 				*l.DeletedAt = value.Time
 			}
-		case lily.FieldDeletionReason:
+		case lily.FieldCauseOfDeletion:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field deletion_reason", values[i])
+				return fmt.Errorf("unexpected type %T for field cause_of_deletion", values[i])
 			} else if value.Valid {
-				l.DeletionReason = types.DeletionReason(value.Int64)
+				l.CauseOfDeletion = types.CauseOfDeletion(value.Int64)
+			}
+		case lily.FieldBirth:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field birth", values[i])
+			} else if value.Valid {
+				l.Birth = new(time.Time)
+				*l.Birth = value.Time
 			}
 		case lily.FieldFirstName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -123,18 +128,6 @@ func (l *Lily) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field rank", values[i])
 			} else if value.Valid {
 				l.Rank = uint32(value.Int64)
-			}
-		case lily.FieldMainCharmID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field main_charm_id", values[i])
-			} else if value.Valid {
-				l.MainCharmID = types.CharmID(value.Int64)
-			}
-		case lily.FieldSubCharmID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field sub_charm_id", values[i])
-			} else if value.Valid {
-				l.SubCharmID = types.CharmID(value.Int64)
 			}
 		case lily.FieldGardenID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -184,8 +177,12 @@ func (l *Lily) String() string {
 		builder.WriteString(", deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
-	builder.WriteString(", deletion_reason=")
-	builder.WriteString(fmt.Sprintf("%v", l.DeletionReason))
+	builder.WriteString(", cause_of_deletion=")
+	builder.WriteString(fmt.Sprintf("%v", l.CauseOfDeletion))
+	if v := l.Birth; v != nil {
+		builder.WriteString(", birth=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", first_name=")
 	builder.WriteString(l.FirstName)
 	builder.WriteString(", middle_name=")
@@ -194,10 +191,6 @@ func (l *Lily) String() string {
 	builder.WriteString(l.LastName)
 	builder.WriteString(", rank=")
 	builder.WriteString(fmt.Sprintf("%v", l.Rank))
-	builder.WriteString(", main_charm_id=")
-	builder.WriteString(fmt.Sprintf("%v", l.MainCharmID))
-	builder.WriteString(", sub_charm_id=")
-	builder.WriteString(fmt.Sprintf("%v", l.SubCharmID))
 	builder.WriteString(", garden_id=")
 	builder.WriteString(fmt.Sprintf("%v", l.GardenID))
 	builder.WriteString(", legion_id=")

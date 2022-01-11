@@ -65,16 +65,30 @@ func (lc *LilyCreate) SetNillableDeletedAt(t *time.Time) *LilyCreate {
 	return lc
 }
 
-// SetDeletionReason sets the "deletion_reason" field.
-func (lc *LilyCreate) SetDeletionReason(tr types.DeletionReason) *LilyCreate {
-	lc.mutation.SetDeletionReason(tr)
+// SetCauseOfDeletion sets the "cause_of_deletion" field.
+func (lc *LilyCreate) SetCauseOfDeletion(tod types.CauseOfDeletion) *LilyCreate {
+	lc.mutation.SetCauseOfDeletion(tod)
 	return lc
 }
 
-// SetNillableDeletionReason sets the "deletion_reason" field if the given value is not nil.
-func (lc *LilyCreate) SetNillableDeletionReason(tr *types.DeletionReason) *LilyCreate {
-	if tr != nil {
-		lc.SetDeletionReason(*tr)
+// SetNillableCauseOfDeletion sets the "cause_of_deletion" field if the given value is not nil.
+func (lc *LilyCreate) SetNillableCauseOfDeletion(tod *types.CauseOfDeletion) *LilyCreate {
+	if tod != nil {
+		lc.SetCauseOfDeletion(*tod)
+	}
+	return lc
+}
+
+// SetBirth sets the "birth" field.
+func (lc *LilyCreate) SetBirth(t time.Time) *LilyCreate {
+	lc.mutation.SetBirth(t)
+	return lc
+}
+
+// SetNillableBirth sets the "birth" field if the given value is not nil.
+func (lc *LilyCreate) SetNillableBirth(t *time.Time) *LilyCreate {
+	if t != nil {
+		lc.SetBirth(*t)
 	}
 	return lc
 }
@@ -107,34 +121,6 @@ func (lc *LilyCreate) SetRank(u uint32) *LilyCreate {
 func (lc *LilyCreate) SetNillableRank(u *uint32) *LilyCreate {
 	if u != nil {
 		lc.SetRank(*u)
-	}
-	return lc
-}
-
-// SetMainCharmID sets the "main_charm_id" field.
-func (lc *LilyCreate) SetMainCharmID(ti types.CharmID) *LilyCreate {
-	lc.mutation.SetMainCharmID(ti)
-	return lc
-}
-
-// SetNillableMainCharmID sets the "main_charm_id" field if the given value is not nil.
-func (lc *LilyCreate) SetNillableMainCharmID(ti *types.CharmID) *LilyCreate {
-	if ti != nil {
-		lc.SetMainCharmID(*ti)
-	}
-	return lc
-}
-
-// SetSubCharmID sets the "sub_charm_id" field.
-func (lc *LilyCreate) SetSubCharmID(ti types.CharmID) *LilyCreate {
-	lc.mutation.SetSubCharmID(ti)
-	return lc
-}
-
-// SetNillableSubCharmID sets the "sub_charm_id" field if the given value is not nil.
-func (lc *LilyCreate) SetNillableSubCharmID(ti *types.CharmID) *LilyCreate {
-	if ti != nil {
-		lc.SetSubCharmID(*ti)
 	}
 	return lc
 }
@@ -252,21 +238,13 @@ func (lc *LilyCreate) defaults() {
 		v := lily.DefaultUpdatedAt()
 		lc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := lc.mutation.DeletionReason(); !ok {
-		v := lily.DefaultDeletionReason
-		lc.mutation.SetDeletionReason(v)
+	if _, ok := lc.mutation.CauseOfDeletion(); !ok {
+		v := lily.DefaultCauseOfDeletion
+		lc.mutation.SetCauseOfDeletion(v)
 	}
 	if _, ok := lc.mutation.Rank(); !ok {
 		v := lily.DefaultRank
 		lc.mutation.SetRank(v)
-	}
-	if _, ok := lc.mutation.MainCharmID(); !ok {
-		v := lily.DefaultMainCharmID
-		lc.mutation.SetMainCharmID(v)
-	}
-	if _, ok := lc.mutation.SubCharmID(); !ok {
-		v := lily.DefaultSubCharmID
-		lc.mutation.SetSubCharmID(v)
 	}
 	if _, ok := lc.mutation.GardenID(); !ok {
 		v := lily.DefaultGardenID
@@ -286,8 +264,8 @@ func (lc *LilyCreate) check() error {
 	if _, ok := lc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
-	if _, ok := lc.mutation.DeletionReason(); !ok {
-		return &ValidationError{Name: "deletion_reason", err: errors.New(`ent: missing required field "deletion_reason"`)}
+	if _, ok := lc.mutation.CauseOfDeletion(); !ok {
+		return &ValidationError{Name: "cause_of_deletion", err: errors.New(`ent: missing required field "cause_of_deletion"`)}
 	}
 	if _, ok := lc.mutation.FirstName(); !ok {
 		return &ValidationError{Name: "first_name", err: errors.New(`ent: missing required field "first_name"`)}
@@ -310,12 +288,6 @@ func (lc *LilyCreate) check() error {
 	}
 	if _, ok := lc.mutation.Rank(); !ok {
 		return &ValidationError{Name: "rank", err: errors.New(`ent: missing required field "rank"`)}
-	}
-	if _, ok := lc.mutation.MainCharmID(); !ok {
-		return &ValidationError{Name: "main_charm_id", err: errors.New(`ent: missing required field "main_charm_id"`)}
-	}
-	if _, ok := lc.mutation.SubCharmID(); !ok {
-		return &ValidationError{Name: "sub_charm_id", err: errors.New(`ent: missing required field "sub_charm_id"`)}
 	}
 	if _, ok := lc.mutation.GardenID(); !ok {
 		return &ValidationError{Name: "garden_id", err: errors.New(`ent: missing required field "garden_id"`)}
@@ -381,13 +353,21 @@ func (lc *LilyCreate) createSpec() (*Lily, *sqlgraph.CreateSpec) {
 		})
 		_node.DeletedAt = &value
 	}
-	if value, ok := lc.mutation.DeletionReason(); ok {
+	if value, ok := lc.mutation.CauseOfDeletion(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint32,
 			Value:  value,
-			Column: lily.FieldDeletionReason,
+			Column: lily.FieldCauseOfDeletion,
 		})
-		_node.DeletionReason = value
+		_node.CauseOfDeletion = value
+	}
+	if value, ok := lc.mutation.Birth(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: lily.FieldBirth,
+		})
+		_node.Birth = &value
 	}
 	if value, ok := lc.mutation.FirstName(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -420,22 +400,6 @@ func (lc *LilyCreate) createSpec() (*Lily, *sqlgraph.CreateSpec) {
 			Column: lily.FieldRank,
 		})
 		_node.Rank = value
-	}
-	if value, ok := lc.mutation.MainCharmID(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: lily.FieldMainCharmID,
-		})
-		_node.MainCharmID = value
-	}
-	if value, ok := lc.mutation.SubCharmID(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: lily.FieldSubCharmID,
-		})
-		_node.SubCharmID = value
 	}
 	if value, ok := lc.mutation.GardenID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -549,15 +513,33 @@ func (u *LilyUpsert) ClearDeletedAt() *LilyUpsert {
 	return u
 }
 
-// SetDeletionReason sets the "deletion_reason" field.
-func (u *LilyUpsert) SetDeletionReason(v types.DeletionReason) *LilyUpsert {
-	u.Set(lily.FieldDeletionReason, v)
+// SetCauseOfDeletion sets the "cause_of_deletion" field.
+func (u *LilyUpsert) SetCauseOfDeletion(v types.CauseOfDeletion) *LilyUpsert {
+	u.Set(lily.FieldCauseOfDeletion, v)
 	return u
 }
 
-// UpdateDeletionReason sets the "deletion_reason" field to the value that was provided on create.
-func (u *LilyUpsert) UpdateDeletionReason() *LilyUpsert {
-	u.SetExcluded(lily.FieldDeletionReason)
+// UpdateCauseOfDeletion sets the "cause_of_deletion" field to the value that was provided on create.
+func (u *LilyUpsert) UpdateCauseOfDeletion() *LilyUpsert {
+	u.SetExcluded(lily.FieldCauseOfDeletion)
+	return u
+}
+
+// SetBirth sets the "birth" field.
+func (u *LilyUpsert) SetBirth(v time.Time) *LilyUpsert {
+	u.Set(lily.FieldBirth, v)
+	return u
+}
+
+// UpdateBirth sets the "birth" field to the value that was provided on create.
+func (u *LilyUpsert) UpdateBirth() *LilyUpsert {
+	u.SetExcluded(lily.FieldBirth)
+	return u
+}
+
+// ClearBirth clears the value of the "birth" field.
+func (u *LilyUpsert) ClearBirth() *LilyUpsert {
+	u.SetNull(lily.FieldBirth)
 	return u
 }
 
@@ -606,30 +588,6 @@ func (u *LilyUpsert) SetRank(v uint32) *LilyUpsert {
 // UpdateRank sets the "rank" field to the value that was provided on create.
 func (u *LilyUpsert) UpdateRank() *LilyUpsert {
 	u.SetExcluded(lily.FieldRank)
-	return u
-}
-
-// SetMainCharmID sets the "main_charm_id" field.
-func (u *LilyUpsert) SetMainCharmID(v types.CharmID) *LilyUpsert {
-	u.Set(lily.FieldMainCharmID, v)
-	return u
-}
-
-// UpdateMainCharmID sets the "main_charm_id" field to the value that was provided on create.
-func (u *LilyUpsert) UpdateMainCharmID() *LilyUpsert {
-	u.SetExcluded(lily.FieldMainCharmID)
-	return u
-}
-
-// SetSubCharmID sets the "sub_charm_id" field.
-func (u *LilyUpsert) SetSubCharmID(v types.CharmID) *LilyUpsert {
-	u.Set(lily.FieldSubCharmID, v)
-	return u
-}
-
-// UpdateSubCharmID sets the "sub_charm_id" field to the value that was provided on create.
-func (u *LilyUpsert) UpdateSubCharmID() *LilyUpsert {
-	u.SetExcluded(lily.FieldSubCharmID)
 	return u
 }
 
@@ -756,17 +714,38 @@ func (u *LilyUpsertOne) ClearDeletedAt() *LilyUpsertOne {
 	})
 }
 
-// SetDeletionReason sets the "deletion_reason" field.
-func (u *LilyUpsertOne) SetDeletionReason(v types.DeletionReason) *LilyUpsertOne {
+// SetCauseOfDeletion sets the "cause_of_deletion" field.
+func (u *LilyUpsertOne) SetCauseOfDeletion(v types.CauseOfDeletion) *LilyUpsertOne {
 	return u.Update(func(s *LilyUpsert) {
-		s.SetDeletionReason(v)
+		s.SetCauseOfDeletion(v)
 	})
 }
 
-// UpdateDeletionReason sets the "deletion_reason" field to the value that was provided on create.
-func (u *LilyUpsertOne) UpdateDeletionReason() *LilyUpsertOne {
+// UpdateCauseOfDeletion sets the "cause_of_deletion" field to the value that was provided on create.
+func (u *LilyUpsertOne) UpdateCauseOfDeletion() *LilyUpsertOne {
 	return u.Update(func(s *LilyUpsert) {
-		s.UpdateDeletionReason()
+		s.UpdateCauseOfDeletion()
+	})
+}
+
+// SetBirth sets the "birth" field.
+func (u *LilyUpsertOne) SetBirth(v time.Time) *LilyUpsertOne {
+	return u.Update(func(s *LilyUpsert) {
+		s.SetBirth(v)
+	})
+}
+
+// UpdateBirth sets the "birth" field to the value that was provided on create.
+func (u *LilyUpsertOne) UpdateBirth() *LilyUpsertOne {
+	return u.Update(func(s *LilyUpsert) {
+		s.UpdateBirth()
+	})
+}
+
+// ClearBirth clears the value of the "birth" field.
+func (u *LilyUpsertOne) ClearBirth() *LilyUpsertOne {
+	return u.Update(func(s *LilyUpsert) {
+		s.ClearBirth()
 	})
 }
 
@@ -823,34 +802,6 @@ func (u *LilyUpsertOne) SetRank(v uint32) *LilyUpsertOne {
 func (u *LilyUpsertOne) UpdateRank() *LilyUpsertOne {
 	return u.Update(func(s *LilyUpsert) {
 		s.UpdateRank()
-	})
-}
-
-// SetMainCharmID sets the "main_charm_id" field.
-func (u *LilyUpsertOne) SetMainCharmID(v types.CharmID) *LilyUpsertOne {
-	return u.Update(func(s *LilyUpsert) {
-		s.SetMainCharmID(v)
-	})
-}
-
-// UpdateMainCharmID sets the "main_charm_id" field to the value that was provided on create.
-func (u *LilyUpsertOne) UpdateMainCharmID() *LilyUpsertOne {
-	return u.Update(func(s *LilyUpsert) {
-		s.UpdateMainCharmID()
-	})
-}
-
-// SetSubCharmID sets the "sub_charm_id" field.
-func (u *LilyUpsertOne) SetSubCharmID(v types.CharmID) *LilyUpsertOne {
-	return u.Update(func(s *LilyUpsert) {
-		s.SetSubCharmID(v)
-	})
-}
-
-// UpdateSubCharmID sets the "sub_charm_id" field to the value that was provided on create.
-func (u *LilyUpsertOne) UpdateSubCharmID() *LilyUpsertOne {
-	return u.Update(func(s *LilyUpsert) {
-		s.UpdateSubCharmID()
 	})
 }
 
@@ -1146,17 +1097,38 @@ func (u *LilyUpsertBulk) ClearDeletedAt() *LilyUpsertBulk {
 	})
 }
 
-// SetDeletionReason sets the "deletion_reason" field.
-func (u *LilyUpsertBulk) SetDeletionReason(v types.DeletionReason) *LilyUpsertBulk {
+// SetCauseOfDeletion sets the "cause_of_deletion" field.
+func (u *LilyUpsertBulk) SetCauseOfDeletion(v types.CauseOfDeletion) *LilyUpsertBulk {
 	return u.Update(func(s *LilyUpsert) {
-		s.SetDeletionReason(v)
+		s.SetCauseOfDeletion(v)
 	})
 }
 
-// UpdateDeletionReason sets the "deletion_reason" field to the value that was provided on create.
-func (u *LilyUpsertBulk) UpdateDeletionReason() *LilyUpsertBulk {
+// UpdateCauseOfDeletion sets the "cause_of_deletion" field to the value that was provided on create.
+func (u *LilyUpsertBulk) UpdateCauseOfDeletion() *LilyUpsertBulk {
 	return u.Update(func(s *LilyUpsert) {
-		s.UpdateDeletionReason()
+		s.UpdateCauseOfDeletion()
+	})
+}
+
+// SetBirth sets the "birth" field.
+func (u *LilyUpsertBulk) SetBirth(v time.Time) *LilyUpsertBulk {
+	return u.Update(func(s *LilyUpsert) {
+		s.SetBirth(v)
+	})
+}
+
+// UpdateBirth sets the "birth" field to the value that was provided on create.
+func (u *LilyUpsertBulk) UpdateBirth() *LilyUpsertBulk {
+	return u.Update(func(s *LilyUpsert) {
+		s.UpdateBirth()
+	})
+}
+
+// ClearBirth clears the value of the "birth" field.
+func (u *LilyUpsertBulk) ClearBirth() *LilyUpsertBulk {
+	return u.Update(func(s *LilyUpsert) {
+		s.ClearBirth()
 	})
 }
 
@@ -1213,34 +1185,6 @@ func (u *LilyUpsertBulk) SetRank(v uint32) *LilyUpsertBulk {
 func (u *LilyUpsertBulk) UpdateRank() *LilyUpsertBulk {
 	return u.Update(func(s *LilyUpsert) {
 		s.UpdateRank()
-	})
-}
-
-// SetMainCharmID sets the "main_charm_id" field.
-func (u *LilyUpsertBulk) SetMainCharmID(v types.CharmID) *LilyUpsertBulk {
-	return u.Update(func(s *LilyUpsert) {
-		s.SetMainCharmID(v)
-	})
-}
-
-// UpdateMainCharmID sets the "main_charm_id" field to the value that was provided on create.
-func (u *LilyUpsertBulk) UpdateMainCharmID() *LilyUpsertBulk {
-	return u.Update(func(s *LilyUpsert) {
-		s.UpdateMainCharmID()
-	})
-}
-
-// SetSubCharmID sets the "sub_charm_id" field.
-func (u *LilyUpsertBulk) SetSubCharmID(v types.CharmID) *LilyUpsertBulk {
-	return u.Update(func(s *LilyUpsert) {
-		s.SetSubCharmID(v)
-	})
-}
-
-// UpdateSubCharmID sets the "sub_charm_id" field to the value that was provided on create.
-func (u *LilyUpsertBulk) UpdateSubCharmID() *LilyUpsertBulk {
-	return u.Update(func(s *LilyUpsert) {
-		s.UpdateSubCharmID()
 	})
 }
 

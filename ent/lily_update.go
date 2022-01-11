@@ -68,24 +68,44 @@ func (lu *LilyUpdate) ClearDeletedAt() *LilyUpdate {
 	return lu
 }
 
-// SetDeletionReason sets the "deletion_reason" field.
-func (lu *LilyUpdate) SetDeletionReason(tr types.DeletionReason) *LilyUpdate {
-	lu.mutation.ResetDeletionReason()
-	lu.mutation.SetDeletionReason(tr)
+// SetCauseOfDeletion sets the "cause_of_deletion" field.
+func (lu *LilyUpdate) SetCauseOfDeletion(tod types.CauseOfDeletion) *LilyUpdate {
+	lu.mutation.ResetCauseOfDeletion()
+	lu.mutation.SetCauseOfDeletion(tod)
 	return lu
 }
 
-// SetNillableDeletionReason sets the "deletion_reason" field if the given value is not nil.
-func (lu *LilyUpdate) SetNillableDeletionReason(tr *types.DeletionReason) *LilyUpdate {
-	if tr != nil {
-		lu.SetDeletionReason(*tr)
+// SetNillableCauseOfDeletion sets the "cause_of_deletion" field if the given value is not nil.
+func (lu *LilyUpdate) SetNillableCauseOfDeletion(tod *types.CauseOfDeletion) *LilyUpdate {
+	if tod != nil {
+		lu.SetCauseOfDeletion(*tod)
 	}
 	return lu
 }
 
-// AddDeletionReason adds tr to the "deletion_reason" field.
-func (lu *LilyUpdate) AddDeletionReason(tr types.DeletionReason) *LilyUpdate {
-	lu.mutation.AddDeletionReason(tr)
+// AddCauseOfDeletion adds tod to the "cause_of_deletion" field.
+func (lu *LilyUpdate) AddCauseOfDeletion(tod types.CauseOfDeletion) *LilyUpdate {
+	lu.mutation.AddCauseOfDeletion(tod)
+	return lu
+}
+
+// SetBirth sets the "birth" field.
+func (lu *LilyUpdate) SetBirth(t time.Time) *LilyUpdate {
+	lu.mutation.SetBirth(t)
+	return lu
+}
+
+// SetNillableBirth sets the "birth" field if the given value is not nil.
+func (lu *LilyUpdate) SetNillableBirth(t *time.Time) *LilyUpdate {
+	if t != nil {
+		lu.SetBirth(*t)
+	}
+	return lu
+}
+
+// ClearBirth clears the value of the "birth" field.
+func (lu *LilyUpdate) ClearBirth() *LilyUpdate {
+	lu.mutation.ClearBirth()
 	return lu
 }
 
@@ -125,48 +145,6 @@ func (lu *LilyUpdate) SetNillableRank(u *uint32) *LilyUpdate {
 // AddRank adds u to the "rank" field.
 func (lu *LilyUpdate) AddRank(u uint32) *LilyUpdate {
 	lu.mutation.AddRank(u)
-	return lu
-}
-
-// SetMainCharmID sets the "main_charm_id" field.
-func (lu *LilyUpdate) SetMainCharmID(ti types.CharmID) *LilyUpdate {
-	lu.mutation.ResetMainCharmID()
-	lu.mutation.SetMainCharmID(ti)
-	return lu
-}
-
-// SetNillableMainCharmID sets the "main_charm_id" field if the given value is not nil.
-func (lu *LilyUpdate) SetNillableMainCharmID(ti *types.CharmID) *LilyUpdate {
-	if ti != nil {
-		lu.SetMainCharmID(*ti)
-	}
-	return lu
-}
-
-// AddMainCharmID adds ti to the "main_charm_id" field.
-func (lu *LilyUpdate) AddMainCharmID(ti types.CharmID) *LilyUpdate {
-	lu.mutation.AddMainCharmID(ti)
-	return lu
-}
-
-// SetSubCharmID sets the "sub_charm_id" field.
-func (lu *LilyUpdate) SetSubCharmID(ti types.CharmID) *LilyUpdate {
-	lu.mutation.ResetSubCharmID()
-	lu.mutation.SetSubCharmID(ti)
-	return lu
-}
-
-// SetNillableSubCharmID sets the "sub_charm_id" field if the given value is not nil.
-func (lu *LilyUpdate) SetNillableSubCharmID(ti *types.CharmID) *LilyUpdate {
-	if ti != nil {
-		lu.SetSubCharmID(*ti)
-	}
-	return lu
-}
-
-// AddSubCharmID adds ti to the "sub_charm_id" field.
-func (lu *LilyUpdate) AddSubCharmID(ti types.CharmID) *LilyUpdate {
-	lu.mutation.AddSubCharmID(ti)
 	return lu
 }
 
@@ -346,18 +324,31 @@ func (lu *LilyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: lily.FieldDeletedAt,
 		})
 	}
-	if value, ok := lu.mutation.DeletionReason(); ok {
+	if value, ok := lu.mutation.CauseOfDeletion(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint32,
 			Value:  value,
-			Column: lily.FieldDeletionReason,
+			Column: lily.FieldCauseOfDeletion,
 		})
 	}
-	if value, ok := lu.mutation.AddedDeletionReason(); ok {
+	if value, ok := lu.mutation.AddedCauseOfDeletion(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint32,
 			Value:  value,
-			Column: lily.FieldDeletionReason,
+			Column: lily.FieldCauseOfDeletion,
+		})
+	}
+	if value, ok := lu.mutation.Birth(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: lily.FieldBirth,
+		})
+	}
+	if lu.mutation.BirthCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: lily.FieldBirth,
 		})
 	}
 	if value, ok := lu.mutation.FirstName(); ok {
@@ -393,34 +384,6 @@ func (lu *LilyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: lily.FieldRank,
-		})
-	}
-	if value, ok := lu.mutation.MainCharmID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: lily.FieldMainCharmID,
-		})
-	}
-	if value, ok := lu.mutation.AddedMainCharmID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: lily.FieldMainCharmID,
-		})
-	}
-	if value, ok := lu.mutation.SubCharmID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: lily.FieldSubCharmID,
-		})
-	}
-	if value, ok := lu.mutation.AddedSubCharmID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: lily.FieldSubCharmID,
 		})
 	}
 	if value, ok := lu.mutation.GardenID(); ok {
@@ -510,24 +473,44 @@ func (luo *LilyUpdateOne) ClearDeletedAt() *LilyUpdateOne {
 	return luo
 }
 
-// SetDeletionReason sets the "deletion_reason" field.
-func (luo *LilyUpdateOne) SetDeletionReason(tr types.DeletionReason) *LilyUpdateOne {
-	luo.mutation.ResetDeletionReason()
-	luo.mutation.SetDeletionReason(tr)
+// SetCauseOfDeletion sets the "cause_of_deletion" field.
+func (luo *LilyUpdateOne) SetCauseOfDeletion(tod types.CauseOfDeletion) *LilyUpdateOne {
+	luo.mutation.ResetCauseOfDeletion()
+	luo.mutation.SetCauseOfDeletion(tod)
 	return luo
 }
 
-// SetNillableDeletionReason sets the "deletion_reason" field if the given value is not nil.
-func (luo *LilyUpdateOne) SetNillableDeletionReason(tr *types.DeletionReason) *LilyUpdateOne {
-	if tr != nil {
-		luo.SetDeletionReason(*tr)
+// SetNillableCauseOfDeletion sets the "cause_of_deletion" field if the given value is not nil.
+func (luo *LilyUpdateOne) SetNillableCauseOfDeletion(tod *types.CauseOfDeletion) *LilyUpdateOne {
+	if tod != nil {
+		luo.SetCauseOfDeletion(*tod)
 	}
 	return luo
 }
 
-// AddDeletionReason adds tr to the "deletion_reason" field.
-func (luo *LilyUpdateOne) AddDeletionReason(tr types.DeletionReason) *LilyUpdateOne {
-	luo.mutation.AddDeletionReason(tr)
+// AddCauseOfDeletion adds tod to the "cause_of_deletion" field.
+func (luo *LilyUpdateOne) AddCauseOfDeletion(tod types.CauseOfDeletion) *LilyUpdateOne {
+	luo.mutation.AddCauseOfDeletion(tod)
+	return luo
+}
+
+// SetBirth sets the "birth" field.
+func (luo *LilyUpdateOne) SetBirth(t time.Time) *LilyUpdateOne {
+	luo.mutation.SetBirth(t)
+	return luo
+}
+
+// SetNillableBirth sets the "birth" field if the given value is not nil.
+func (luo *LilyUpdateOne) SetNillableBirth(t *time.Time) *LilyUpdateOne {
+	if t != nil {
+		luo.SetBirth(*t)
+	}
+	return luo
+}
+
+// ClearBirth clears the value of the "birth" field.
+func (luo *LilyUpdateOne) ClearBirth() *LilyUpdateOne {
+	luo.mutation.ClearBirth()
 	return luo
 }
 
@@ -567,48 +550,6 @@ func (luo *LilyUpdateOne) SetNillableRank(u *uint32) *LilyUpdateOne {
 // AddRank adds u to the "rank" field.
 func (luo *LilyUpdateOne) AddRank(u uint32) *LilyUpdateOne {
 	luo.mutation.AddRank(u)
-	return luo
-}
-
-// SetMainCharmID sets the "main_charm_id" field.
-func (luo *LilyUpdateOne) SetMainCharmID(ti types.CharmID) *LilyUpdateOne {
-	luo.mutation.ResetMainCharmID()
-	luo.mutation.SetMainCharmID(ti)
-	return luo
-}
-
-// SetNillableMainCharmID sets the "main_charm_id" field if the given value is not nil.
-func (luo *LilyUpdateOne) SetNillableMainCharmID(ti *types.CharmID) *LilyUpdateOne {
-	if ti != nil {
-		luo.SetMainCharmID(*ti)
-	}
-	return luo
-}
-
-// AddMainCharmID adds ti to the "main_charm_id" field.
-func (luo *LilyUpdateOne) AddMainCharmID(ti types.CharmID) *LilyUpdateOne {
-	luo.mutation.AddMainCharmID(ti)
-	return luo
-}
-
-// SetSubCharmID sets the "sub_charm_id" field.
-func (luo *LilyUpdateOne) SetSubCharmID(ti types.CharmID) *LilyUpdateOne {
-	luo.mutation.ResetSubCharmID()
-	luo.mutation.SetSubCharmID(ti)
-	return luo
-}
-
-// SetNillableSubCharmID sets the "sub_charm_id" field if the given value is not nil.
-func (luo *LilyUpdateOne) SetNillableSubCharmID(ti *types.CharmID) *LilyUpdateOne {
-	if ti != nil {
-		luo.SetSubCharmID(*ti)
-	}
-	return luo
-}
-
-// AddSubCharmID adds ti to the "sub_charm_id" field.
-func (luo *LilyUpdateOne) AddSubCharmID(ti types.CharmID) *LilyUpdateOne {
-	luo.mutation.AddSubCharmID(ti)
 	return luo
 }
 
@@ -812,18 +753,31 @@ func (luo *LilyUpdateOne) sqlSave(ctx context.Context) (_node *Lily, err error) 
 			Column: lily.FieldDeletedAt,
 		})
 	}
-	if value, ok := luo.mutation.DeletionReason(); ok {
+	if value, ok := luo.mutation.CauseOfDeletion(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint32,
 			Value:  value,
-			Column: lily.FieldDeletionReason,
+			Column: lily.FieldCauseOfDeletion,
 		})
 	}
-	if value, ok := luo.mutation.AddedDeletionReason(); ok {
+	if value, ok := luo.mutation.AddedCauseOfDeletion(); ok {
 		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint32,
 			Value:  value,
-			Column: lily.FieldDeletionReason,
+			Column: lily.FieldCauseOfDeletion,
+		})
+	}
+	if value, ok := luo.mutation.Birth(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: lily.FieldBirth,
+		})
+	}
+	if luo.mutation.BirthCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: lily.FieldBirth,
 		})
 	}
 	if value, ok := luo.mutation.FirstName(); ok {
@@ -859,34 +813,6 @@ func (luo *LilyUpdateOne) sqlSave(ctx context.Context) (_node *Lily, err error) 
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: lily.FieldRank,
-		})
-	}
-	if value, ok := luo.mutation.MainCharmID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: lily.FieldMainCharmID,
-		})
-	}
-	if value, ok := luo.mutation.AddedMainCharmID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: lily.FieldMainCharmID,
-		})
-	}
-	if value, ok := luo.mutation.SubCharmID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: lily.FieldSubCharmID,
-		})
-	}
-	if value, ok := luo.mutation.AddedSubCharmID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: lily.FieldSubCharmID,
 		})
 	}
 	if value, ok := luo.mutation.GardenID(); ok {

@@ -114,11 +114,18 @@ func DeletedAt(v time.Time) predicate.Lily {
 	})
 }
 
-// DeletionReason applies equality check predicate on the "deletion_reason" field. It's identical to DeletionReasonEQ.
-func DeletionReason(v types.DeletionReason) predicate.Lily {
+// CauseOfDeletion applies equality check predicate on the "cause_of_deletion" field. It's identical to CauseOfDeletionEQ.
+func CauseOfDeletion(v types.CauseOfDeletion) predicate.Lily {
 	vc := uint32(v)
 	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDeletionReason), vc))
+		s.Where(sql.EQ(s.C(FieldCauseOfDeletion), vc))
+	})
+}
+
+// Birth applies equality check predicate on the "birth" field. It's identical to BirthEQ.
+func Birth(v time.Time) predicate.Lily {
+	return predicate.Lily(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldBirth), v))
 	})
 }
 
@@ -147,22 +154,6 @@ func LastName(v string) predicate.Lily {
 func Rank(v uint32) predicate.Lily {
 	return predicate.Lily(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldRank), v))
-	})
-}
-
-// MainCharmID applies equality check predicate on the "main_charm_id" field. It's identical to MainCharmIDEQ.
-func MainCharmID(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldMainCharmID), vc))
-	})
-}
-
-// SubCharmID applies equality check predicate on the "sub_charm_id" field. It's identical to SubCharmIDEQ.
-func SubCharmID(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSubCharmID), vc))
 	})
 }
 
@@ -424,24 +415,24 @@ func DeletedAtNotNil() predicate.Lily {
 	})
 }
 
-// DeletionReasonEQ applies the EQ predicate on the "deletion_reason" field.
-func DeletionReasonEQ(v types.DeletionReason) predicate.Lily {
+// CauseOfDeletionEQ applies the EQ predicate on the "cause_of_deletion" field.
+func CauseOfDeletionEQ(v types.CauseOfDeletion) predicate.Lily {
 	vc := uint32(v)
 	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldDeletionReason), vc))
+		s.Where(sql.EQ(s.C(FieldCauseOfDeletion), vc))
 	})
 }
 
-// DeletionReasonNEQ applies the NEQ predicate on the "deletion_reason" field.
-func DeletionReasonNEQ(v types.DeletionReason) predicate.Lily {
+// CauseOfDeletionNEQ applies the NEQ predicate on the "cause_of_deletion" field.
+func CauseOfDeletionNEQ(v types.CauseOfDeletion) predicate.Lily {
 	vc := uint32(v)
 	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldDeletionReason), vc))
+		s.Where(sql.NEQ(s.C(FieldCauseOfDeletion), vc))
 	})
 }
 
-// DeletionReasonIn applies the In predicate on the "deletion_reason" field.
-func DeletionReasonIn(vs ...types.DeletionReason) predicate.Lily {
+// CauseOfDeletionIn applies the In predicate on the "cause_of_deletion" field.
+func CauseOfDeletionIn(vs ...types.CauseOfDeletion) predicate.Lily {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = uint32(vs[i])
@@ -453,12 +444,12 @@ func DeletionReasonIn(vs ...types.DeletionReason) predicate.Lily {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.In(s.C(FieldDeletionReason), v...))
+		s.Where(sql.In(s.C(FieldCauseOfDeletion), v...))
 	})
 }
 
-// DeletionReasonNotIn applies the NotIn predicate on the "deletion_reason" field.
-func DeletionReasonNotIn(vs ...types.DeletionReason) predicate.Lily {
+// CauseOfDeletionNotIn applies the NotIn predicate on the "cause_of_deletion" field.
+func CauseOfDeletionNotIn(vs ...types.CauseOfDeletion) predicate.Lily {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = uint32(vs[i])
@@ -470,39 +461,129 @@ func DeletionReasonNotIn(vs ...types.DeletionReason) predicate.Lily {
 			s.Where(sql.False())
 			return
 		}
-		s.Where(sql.NotIn(s.C(FieldDeletionReason), v...))
+		s.Where(sql.NotIn(s.C(FieldCauseOfDeletion), v...))
 	})
 }
 
-// DeletionReasonGT applies the GT predicate on the "deletion_reason" field.
-func DeletionReasonGT(v types.DeletionReason) predicate.Lily {
+// CauseOfDeletionGT applies the GT predicate on the "cause_of_deletion" field.
+func CauseOfDeletionGT(v types.CauseOfDeletion) predicate.Lily {
 	vc := uint32(v)
 	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldDeletionReason), vc))
+		s.Where(sql.GT(s.C(FieldCauseOfDeletion), vc))
 	})
 }
 
-// DeletionReasonGTE applies the GTE predicate on the "deletion_reason" field.
-func DeletionReasonGTE(v types.DeletionReason) predicate.Lily {
+// CauseOfDeletionGTE applies the GTE predicate on the "cause_of_deletion" field.
+func CauseOfDeletionGTE(v types.CauseOfDeletion) predicate.Lily {
 	vc := uint32(v)
 	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldDeletionReason), vc))
+		s.Where(sql.GTE(s.C(FieldCauseOfDeletion), vc))
 	})
 }
 
-// DeletionReasonLT applies the LT predicate on the "deletion_reason" field.
-func DeletionReasonLT(v types.DeletionReason) predicate.Lily {
+// CauseOfDeletionLT applies the LT predicate on the "cause_of_deletion" field.
+func CauseOfDeletionLT(v types.CauseOfDeletion) predicate.Lily {
 	vc := uint32(v)
 	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldDeletionReason), vc))
+		s.Where(sql.LT(s.C(FieldCauseOfDeletion), vc))
 	})
 }
 
-// DeletionReasonLTE applies the LTE predicate on the "deletion_reason" field.
-func DeletionReasonLTE(v types.DeletionReason) predicate.Lily {
+// CauseOfDeletionLTE applies the LTE predicate on the "cause_of_deletion" field.
+func CauseOfDeletionLTE(v types.CauseOfDeletion) predicate.Lily {
 	vc := uint32(v)
 	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldDeletionReason), vc))
+		s.Where(sql.LTE(s.C(FieldCauseOfDeletion), vc))
+	})
+}
+
+// BirthEQ applies the EQ predicate on the "birth" field.
+func BirthEQ(v time.Time) predicate.Lily {
+	return predicate.Lily(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldBirth), v))
+	})
+}
+
+// BirthNEQ applies the NEQ predicate on the "birth" field.
+func BirthNEQ(v time.Time) predicate.Lily {
+	return predicate.Lily(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldBirth), v))
+	})
+}
+
+// BirthIn applies the In predicate on the "birth" field.
+func BirthIn(vs ...time.Time) predicate.Lily {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Lily(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldBirth), v...))
+	})
+}
+
+// BirthNotIn applies the NotIn predicate on the "birth" field.
+func BirthNotIn(vs ...time.Time) predicate.Lily {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Lily(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldBirth), v...))
+	})
+}
+
+// BirthGT applies the GT predicate on the "birth" field.
+func BirthGT(v time.Time) predicate.Lily {
+	return predicate.Lily(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldBirth), v))
+	})
+}
+
+// BirthGTE applies the GTE predicate on the "birth" field.
+func BirthGTE(v time.Time) predicate.Lily {
+	return predicate.Lily(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldBirth), v))
+	})
+}
+
+// BirthLT applies the LT predicate on the "birth" field.
+func BirthLT(v time.Time) predicate.Lily {
+	return predicate.Lily(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldBirth), v))
+	})
+}
+
+// BirthLTE applies the LTE predicate on the "birth" field.
+func BirthLTE(v time.Time) predicate.Lily {
+	return predicate.Lily(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldBirth), v))
+	})
+}
+
+// BirthIsNil applies the IsNil predicate on the "birth" field.
+func BirthIsNil() predicate.Lily {
+	return predicate.Lily(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldBirth)))
+	})
+}
+
+// BirthNotNil applies the NotNil predicate on the "birth" field.
+func BirthNotNil() predicate.Lily {
+	return predicate.Lily(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldBirth)))
 	})
 }
 
@@ -912,170 +993,6 @@ func RankLT(v uint32) predicate.Lily {
 func RankLTE(v uint32) predicate.Lily {
 	return predicate.Lily(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldRank), v))
-	})
-}
-
-// MainCharmIDEQ applies the EQ predicate on the "main_charm_id" field.
-func MainCharmIDEQ(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldMainCharmID), vc))
-	})
-}
-
-// MainCharmIDNEQ applies the NEQ predicate on the "main_charm_id" field.
-func MainCharmIDNEQ(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldMainCharmID), vc))
-	})
-}
-
-// MainCharmIDIn applies the In predicate on the "main_charm_id" field.
-func MainCharmIDIn(vs ...types.CharmID) predicate.Lily {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = uint64(vs[i])
-	}
-	return predicate.Lily(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldMainCharmID), v...))
-	})
-}
-
-// MainCharmIDNotIn applies the NotIn predicate on the "main_charm_id" field.
-func MainCharmIDNotIn(vs ...types.CharmID) predicate.Lily {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = uint64(vs[i])
-	}
-	return predicate.Lily(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldMainCharmID), v...))
-	})
-}
-
-// MainCharmIDGT applies the GT predicate on the "main_charm_id" field.
-func MainCharmIDGT(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldMainCharmID), vc))
-	})
-}
-
-// MainCharmIDGTE applies the GTE predicate on the "main_charm_id" field.
-func MainCharmIDGTE(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldMainCharmID), vc))
-	})
-}
-
-// MainCharmIDLT applies the LT predicate on the "main_charm_id" field.
-func MainCharmIDLT(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldMainCharmID), vc))
-	})
-}
-
-// MainCharmIDLTE applies the LTE predicate on the "main_charm_id" field.
-func MainCharmIDLTE(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldMainCharmID), vc))
-	})
-}
-
-// SubCharmIDEQ applies the EQ predicate on the "sub_charm_id" field.
-func SubCharmIDEQ(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSubCharmID), vc))
-	})
-}
-
-// SubCharmIDNEQ applies the NEQ predicate on the "sub_charm_id" field.
-func SubCharmIDNEQ(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSubCharmID), vc))
-	})
-}
-
-// SubCharmIDIn applies the In predicate on the "sub_charm_id" field.
-func SubCharmIDIn(vs ...types.CharmID) predicate.Lily {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = uint64(vs[i])
-	}
-	return predicate.Lily(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldSubCharmID), v...))
-	})
-}
-
-// SubCharmIDNotIn applies the NotIn predicate on the "sub_charm_id" field.
-func SubCharmIDNotIn(vs ...types.CharmID) predicate.Lily {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = uint64(vs[i])
-	}
-	return predicate.Lily(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldSubCharmID), v...))
-	})
-}
-
-// SubCharmIDGT applies the GT predicate on the "sub_charm_id" field.
-func SubCharmIDGT(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSubCharmID), vc))
-	})
-}
-
-// SubCharmIDGTE applies the GTE predicate on the "sub_charm_id" field.
-func SubCharmIDGTE(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSubCharmID), vc))
-	})
-}
-
-// SubCharmIDLT applies the LT predicate on the "sub_charm_id" field.
-func SubCharmIDLT(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSubCharmID), vc))
-	})
-}
-
-// SubCharmIDLTE applies the LTE predicate on the "sub_charm_id" field.
-func SubCharmIDLTE(v types.CharmID) predicate.Lily {
-	vc := uint64(v)
-	return predicate.Lily(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSubCharmID), vc))
 	})
 }
 

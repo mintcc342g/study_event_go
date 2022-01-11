@@ -12,6 +12,10 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Charm is the client for interacting with the Charm builders.
+	Charm *CharmClient
+	// CharmModel is the client for interacting with the CharmModel builders.
+	CharmModel *CharmModelClient
 	// Garden is the client for interacting with the Garden builders.
 	Garden *GardenClient
 	// Lily is the client for interacting with the Lily builders.
@@ -157,6 +161,8 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Charm = NewCharmClient(tx.config)
+	tx.CharmModel = NewCharmModelClient(tx.config)
 	tx.Garden = NewGardenClient(tx.config)
 	tx.Lily = NewLilyClient(tx.config)
 	tx.LilySkill = NewLilySkillClient(tx.config)
@@ -171,7 +177,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Garden.QueryXXX(), the query will be executed
+// applies a query, for example: Charm.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

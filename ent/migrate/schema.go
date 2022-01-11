@@ -8,6 +8,26 @@ import (
 )
 
 var (
+	// CharmsColumns holds the columns for the "charms" table.
+	CharmsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+	}
+	// CharmsTable holds the schema information for the "charms" table.
+	CharmsTable = &schema.Table{
+		Name:       "charms",
+		Columns:    CharmsColumns,
+		PrimaryKey: []*schema.Column{CharmsColumns[0]},
+	}
+	// CharmModelsColumns holds the columns for the "charm_models" table.
+	CharmModelsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+	}
+	// CharmModelsTable holds the schema information for the "charm_models" table.
+	CharmModelsTable = &schema.Table{
+		Name:       "charm_models",
+		Columns:    CharmModelsColumns,
+		PrimaryKey: []*schema.Column{CharmModelsColumns[0]},
+	}
 	// GardensColumns holds the columns for the "gardens" table.
 	GardensColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
@@ -30,13 +50,12 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "deletion_reason", Type: field.TypeUint32, Default: 0},
+		{Name: "cause_of_deletion", Type: field.TypeUint32, Default: 0},
+		{Name: "birth", Type: field.TypeTime, Nullable: true},
 		{Name: "first_name", Type: field.TypeString},
 		{Name: "middle_name", Type: field.TypeString},
 		{Name: "last_name", Type: field.TypeString},
 		{Name: "rank", Type: field.TypeUint32, Default: 0},
-		{Name: "main_charm_id", Type: field.TypeUint64, Default: 0},
-		{Name: "sub_charm_id", Type: field.TypeUint64, Default: 0},
 		{Name: "garden_id", Type: field.TypeUint64, Default: 0},
 		{Name: "legion_id", Type: field.TypeUint64, Default: 0},
 	}
@@ -91,6 +110,8 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		CharmsTable,
+		CharmModelsTable,
 		GardensTable,
 		LiliesTable,
 		LilySkillsTable,

@@ -8,6 +8,32 @@ import (
 	"study-event-go/ent"
 )
 
+// The CharmFunc type is an adapter to allow the use of ordinary
+// function as Charm mutator.
+type CharmFunc func(context.Context, *ent.CharmMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CharmFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CharmMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CharmMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The CharmModelFunc type is an adapter to allow the use of ordinary
+// function as CharmModel mutator.
+type CharmModelFunc func(context.Context, *ent.CharmModelMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CharmModelFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CharmModelMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CharmModelMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The GardenFunc type is an adapter to allow the use of ordinary
 // function as Garden mutator.
 type GardenFunc func(context.Context, *ent.GardenMutation) (ent.Value, error)

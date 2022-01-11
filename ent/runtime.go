@@ -45,36 +45,28 @@ func init() {
 	lily.DefaultUpdatedAt = lilyDescUpdatedAt.Default.(func() time.Time)
 	// lily.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	lily.UpdateDefaultUpdatedAt = lilyDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// lilyDescDeletionReason is the schema descriptor for deletion_reason field.
-	lilyDescDeletionReason := lilyFields[4].Descriptor()
-	// lily.DefaultDeletionReason holds the default value on creation for the deletion_reason field.
-	lily.DefaultDeletionReason = types.DeletionReason(lilyDescDeletionReason.Default.(uint32))
+	// lilyDescCauseOfDeletion is the schema descriptor for cause_of_deletion field.
+	lilyDescCauseOfDeletion := lilyFields[4].Descriptor()
+	// lily.DefaultCauseOfDeletion holds the default value on creation for the cause_of_deletion field.
+	lily.DefaultCauseOfDeletion = types.CauseOfDeletion(lilyDescCauseOfDeletion.Default.(uint32))
 	// lilyDescFirstName is the schema descriptor for first_name field.
-	lilyDescFirstName := lilyFields[5].Descriptor()
+	lilyDescFirstName := lilyFields[6].Descriptor()
 	// lily.FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
 	lily.FirstNameValidator = lilyDescFirstName.Validators[0].(func(string) error)
 	// lilyDescLastName is the schema descriptor for last_name field.
-	lilyDescLastName := lilyFields[7].Descriptor()
+	lilyDescLastName := lilyFields[8].Descriptor()
 	// lily.LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
 	lily.LastNameValidator = lilyDescLastName.Validators[0].(func(string) error)
 	// lilyDescRank is the schema descriptor for rank field.
-	lilyDescRank := lilyFields[8].Descriptor()
+	lilyDescRank := lilyFields[9].Descriptor()
 	// lily.DefaultRank holds the default value on creation for the rank field.
 	lily.DefaultRank = lilyDescRank.Default.(uint32)
-	// lilyDescMainCharmID is the schema descriptor for main_charm_id field.
-	lilyDescMainCharmID := lilyFields[9].Descriptor()
-	// lily.DefaultMainCharmID holds the default value on creation for the main_charm_id field.
-	lily.DefaultMainCharmID = types.CharmID(lilyDescMainCharmID.Default.(uint64))
-	// lilyDescSubCharmID is the schema descriptor for sub_charm_id field.
-	lilyDescSubCharmID := lilyFields[10].Descriptor()
-	// lily.DefaultSubCharmID holds the default value on creation for the sub_charm_id field.
-	lily.DefaultSubCharmID = types.CharmID(lilyDescSubCharmID.Default.(uint64))
 	// lilyDescGardenID is the schema descriptor for garden_id field.
-	lilyDescGardenID := lilyFields[11].Descriptor()
+	lilyDescGardenID := lilyFields[10].Descriptor()
 	// lily.DefaultGardenID holds the default value on creation for the garden_id field.
 	lily.DefaultGardenID = types.GardenID(lilyDescGardenID.Default.(uint64))
 	// lilyDescLegionID is the schema descriptor for legion_id field.
-	lilyDescLegionID := lilyFields[12].Descriptor()
+	lilyDescLegionID := lilyFields[11].Descriptor()
 	// lily.DefaultLegionID holds the default value on creation for the legion_id field.
 	lily.DefaultLegionID = types.LegionID(lilyDescLegionID.Default.(uint64))
 	lilyskillFields := schema.LilySkill{}.Fields()

@@ -130,12 +130,12 @@ func (s *SkillType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DeletionReason ...
-type DeletionReason uint32
+// CauseOfDeletion ...
+type CauseOfDeletion uint32
 
-// DeletionReasons ...
+// CauseOfDeletion ...
 const (
-	NoneReason DeletionReason = iota
+	NoneReason CauseOfDeletion = iota
 	Retirement
 	NonHostileDeath
 	KilledInAction
@@ -143,28 +143,64 @@ const (
 )
 
 // String ...
-func (d DeletionReason) String() string {
-	return [...]string{"NONE", "RETIREMENT", "NON-HOSTILE DEATH", "KILLED IN ACTION", "MISSING IN ACTION"}[d]
+func (c CauseOfDeletion) String() string {
+	return [...]string{"NONE", "RETIREMENT", "NON-HOSTILE DEATH", "KILLED IN ACTION", "MISSING IN ACTION"}[c]
 }
 
 // MarshalJSON ...
-func (d *DeletionReason) MarshalJSON() ([]byte, error) {
-	return json.Marshal((*d).String())
+func (c *CauseOfDeletion) MarshalJSON() ([]byte, error) {
+	return json.Marshal((*c).String())
 }
 
 // UnmarshalJSON ...
-func (d *DeletionReason) UnmarshalJSON(data []byte) error {
+func (c *CauseOfDeletion) UnmarshalJSON(data []byte) error {
 	strData := strings.Trim(string(data), "\"")
 	if strData == "" {
 		return nil
 	}
 
-	*d = map[string]DeletionReason{
+	*c = map[string]CauseOfDeletion{
 		"NONE":              NoneReason,
 		"RETIREMENT":        Retirement,
 		"NON-HOSTILE DEATH": NonHostileDeath,
 		"KILLED IN ACTION":  KilledInAction,
 		"MISSING IN ACTION": MissingInAction,
+	}[strings.ToLower(strData)]
+
+	return nil
+}
+
+// ArsenalType ...
+type ArsenalType uint32
+
+// ArsenalType ...
+const (
+	NoneTypeArsenal ArsenalType = iota
+	CompanyTypeArsenal
+	PersonalTypeArsenal
+)
+
+// String ...
+func (a ArsenalType) String() string {
+	return [...]string{"NONE", "COMPANY", "PERSONAL"}[a]
+}
+
+// MarshalJSON ...
+func (a *ArsenalType) MarshalJSON() ([]byte, error) {
+	return json.Marshal((*a).String())
+}
+
+// UnmarshalJSON ...
+func (a *ArsenalType) UnmarshalJSON(data []byte) error {
+	strData := strings.Trim(string(data), "\"")
+	if strData == "" {
+		return nil
+	}
+
+	*a = map[string]ArsenalType{
+		"NONE":     NoneTypeArsenal,
+		"COMPANY":  CompanyTypeArsenal,
+		"PERSONAL": PersonalTypeArsenal,
 	}[strings.ToLower(strData)]
 
 	return nil

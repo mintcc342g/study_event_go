@@ -6,6 +6,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Charm is the predicate function for charm builders.
+type Charm func(*sql.Selector)
+
+// CharmModel is the predicate function for charmmodel builders.
+type CharmModel func(*sql.Selector)
+
 // Garden is the predicate function for garden builders.
 type Garden func(*sql.Selector)
 

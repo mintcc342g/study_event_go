@@ -66,14 +66,3 @@ func (m *Mentorship) DTO() *dto.Mentorship {
 		Name:      m.Name,
 	}
 }
-
-// GardenMentorship ...
-type GardenMentorship struct {
-	garden     *Garden
-	mentorship *Mentorship
-	createdAt  time.Time
-	updatedAt  time.Time
-	deletedAt  time.Time
-	mentor     *Lily
-	mentee     *Lily
-}
