@@ -23,12 +23,14 @@ type CharmModel struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
-	// Generation holds the value of the "generation" field.
-	Generation types.CharmModelGeneration `json:"generation,omitempty"`
 	// CreatorID holds the value of the "creator_id" field.
 	CreatorID types.CharmCreatorID `json:"creator_id,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Type holds the value of the "type" field.
+	Type types.CharmModelType `json:"type,omitempty"`
+	// Generation holds the value of the "generation" field.
+	Generation types.CharmModelGeneration `json:"generation,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -36,7 +38,7 @@ func (*CharmModel) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case charmmodel.FieldID, charmmodel.FieldGeneration, charmmodel.FieldCreatorID:
+		case charmmodel.FieldID, charmmodel.FieldCreatorID, charmmodel.FieldType, charmmodel.FieldGeneration:
 			values[i] = new(sql.NullInt64)
 		case charmmodel.FieldName:
 			values[i] = new(sql.NullString)
@@ -82,23 +84,29 @@ func (cm *CharmModel) assignValues(columns []string, values []interface{}) error
 				cm.DeletedAt = new(time.Time)
 				*cm.DeletedAt = value.Time
 			}
+		case charmmodel.FieldCreatorID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
+			} else if value.Valid {
+				cm.CreatorID = types.CharmCreatorID(value.Int64)
+			}
 		case charmmodel.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				cm.Name = value.String
 			}
+		case charmmodel.FieldType:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field type", values[i])
+			} else if value.Valid {
+				cm.Type = types.CharmModelType(value.Int64)
+			}
 		case charmmodel.FieldGeneration:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field generation", values[i])
 			} else if value.Valid {
 				cm.Generation = types.CharmModelGeneration(value.Int64)
-			}
-		case charmmodel.FieldCreatorID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
-			} else if value.Valid {
-				cm.CreatorID = types.CharmCreatorID(value.Int64)
 			}
 		}
 	}
@@ -136,12 +144,14 @@ func (cm *CharmModel) String() string {
 		builder.WriteString(", deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
-	builder.WriteString(", name=")
-	builder.WriteString(cm.Name)
-	builder.WriteString(", generation=")
-	builder.WriteString(fmt.Sprintf("%v", cm.Generation))
 	builder.WriteString(", creator_id=")
 	builder.WriteString(fmt.Sprintf("%v", cm.CreatorID))
+	builder.WriteString(", name=")
+	builder.WriteString(cm.Name)
+	builder.WriteString(", type=")
+	builder.WriteString(fmt.Sprintf("%v", cm.Type))
+	builder.WriteString(", generation=")
+	builder.WriteString(fmt.Sprintf("%v", cm.Generation))
 	builder.WriteByte(')')
 	return builder.String()
 }

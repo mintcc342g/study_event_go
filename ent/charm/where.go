@@ -121,14 +121,6 @@ func Name(v string) predicate.Charm {
 	})
 }
 
-// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v types.CharmType) predicate.Charm {
-	vc := uint32(v)
-	return predicate.Charm(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldType), vc))
-	})
-}
-
 // ModelID applies equality check predicate on the "model_id" field. It's identical to ModelIDEQ.
 func ModelID(v types.CharmModelID) predicate.Charm {
 	vc := uint64(v)
@@ -495,88 +487,6 @@ func NameEqualFold(v string) predicate.Charm {
 func NameContainsFold(v string) predicate.Charm {
 	return predicate.Charm(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldName), v))
-	})
-}
-
-// TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v types.CharmType) predicate.Charm {
-	vc := uint32(v)
-	return predicate.Charm(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldType), vc))
-	})
-}
-
-// TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v types.CharmType) predicate.Charm {
-	vc := uint32(v)
-	return predicate.Charm(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldType), vc))
-	})
-}
-
-// TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...types.CharmType) predicate.Charm {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = uint32(vs[i])
-	}
-	return predicate.Charm(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldType), v...))
-	})
-}
-
-// TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...types.CharmType) predicate.Charm {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = uint32(vs[i])
-	}
-	return predicate.Charm(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldType), v...))
-	})
-}
-
-// TypeGT applies the GT predicate on the "type" field.
-func TypeGT(v types.CharmType) predicate.Charm {
-	vc := uint32(v)
-	return predicate.Charm(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldType), vc))
-	})
-}
-
-// TypeGTE applies the GTE predicate on the "type" field.
-func TypeGTE(v types.CharmType) predicate.Charm {
-	vc := uint32(v)
-	return predicate.Charm(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldType), vc))
-	})
-}
-
-// TypeLT applies the LT predicate on the "type" field.
-func TypeLT(v types.CharmType) predicate.Charm {
-	vc := uint32(v)
-	return predicate.Charm(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldType), vc))
-	})
-}
-
-// TypeLTE applies the LTE predicate on the "type" field.
-func TypeLTE(v types.CharmType) predicate.Charm {
-	vc := uint32(v)
-	return predicate.Charm(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldType), vc))
 	})
 }
 

@@ -70,6 +70,7 @@ func (l *LilyController) NewCharms(c echo.Context) error {
 	var request struct {
 		LilyID        types.LilyID         `param:"id"`
 		CharmModelIDs []types.CharmModelID `json:"charm_model_ids"`
+		// Name          string               `json:"name"` // TODO
 	}
 	if err := c.Bind(&request); err != nil {
 		c.Logger().Error("LilyController Bind", "err", err)

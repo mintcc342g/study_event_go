@@ -17,12 +17,14 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
-	// FieldGeneration holds the string denoting the generation field in the database.
-	FieldGeneration = "generation"
 	// FieldCreatorID holds the string denoting the creator_id field in the database.
 	FieldCreatorID = "creator_id"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldType holds the string denoting the type field in the database.
+	FieldType = "type"
+	// FieldGeneration holds the string denoting the generation field in the database.
+	FieldGeneration = "generation"
 	// Table holds the table name of the charmmodel in the database.
 	Table = "charm_models"
 )
@@ -33,9 +35,10 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
-	FieldName,
-	FieldGeneration,
 	FieldCreatorID,
+	FieldName,
+	FieldType,
+	FieldGeneration,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

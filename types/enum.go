@@ -218,37 +218,37 @@ const (
 	FourthGeneration
 )
 
-// CharmType ...
-type CharmType uint32
+// CharmModelType ...
+type CharmModelType uint32
 
 // CharmType ...
 const (
-	NoneTypeCharm CharmType = iota
-	UniqueTypeCharm
-	MassProductionTypeCharm
+	NoneTypeModel CharmModelType = iota
+	UniqueTypeModel
+	MassProductionTypeModel
 )
 
 // String ...
-func (c CharmType) String() string {
+func (c CharmModelType) String() string {
 	return [...]string{"NONE", "UNIQUE", "MASS-PRODUCTION"}[c]
 }
 
 // MarshalJSON ...
-func (c *CharmType) MarshalJSON() ([]byte, error) {
+func (c *CharmModelType) MarshalJSON() ([]byte, error) {
 	return json.Marshal((*c).String())
 }
 
 // UnmarshalJSON ...
-func (c *CharmType) UnmarshalJSON(data []byte) error {
+func (c *CharmModelType) UnmarshalJSON(data []byte) error {
 	strData := strings.Trim(string(data), "\"")
 	if strData == "" {
 		return nil
 	}
 
-	*c = map[string]CharmType{
-		"NONE":            NoneTypeCharm,
-		"UNIQUE":          UniqueTypeCharm,
-		"MASS-PRODUCTION": MassProductionTypeCharm,
+	*c = map[string]CharmModelType{
+		"NONE":            NoneTypeModel,
+		"UNIQUE":          UniqueTypeModel,
+		"MASS-PRODUCTION": MassProductionTypeModel,
 	}[strings.ToUpper(strData)]
 
 	return nil

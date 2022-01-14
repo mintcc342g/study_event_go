@@ -59,8 +59,10 @@ func (h *CharmController) NewCharmModel(c echo.Context) (err error) {
 	ctx := c.Request().Context()
 
 	var request struct {
-		Name      string               `json:"name"`
-		CreatorID types.CharmCreatorID `json:"creator_id"`
+		CreatorID  types.CharmCreatorID       `json:"creator_id"`
+		Name       string                     `json:"name"`
+		Type       types.CharmModelType       `type:"type"`
+		Generation types.CharmModelGeneration `json:"generation"`
 	}
 	if err = c.Bind(&request); err != nil {
 		c.Logger().Error("CharmController Bind", "err", err)
@@ -68,8 +70,10 @@ func (h *CharmController) NewCharmModel(c echo.Context) (err error) {
 	}
 
 	charmModelDTO := &dto.CharmModel{
-		Name:      strings.TrimSpace(strings.ToLower(request.Name)),
-		CreatorID: request.CreatorID,
+		CreatorID:  request.CreatorID,
+		Name:       strings.TrimSpace(strings.ToLower(request.Name)),
+		Type:       request.Type,
+		Generation: request.Generation,
 	}
 
 	charmModelDTO, err = h.charmSvc.NewCharmModel(ctx, charmModelDTO)

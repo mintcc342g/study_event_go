@@ -65,21 +65,27 @@ func (cmc *CharmModelCreate) SetNillableDeletedAt(t *time.Time) *CharmModelCreat
 	return cmc
 }
 
+// SetCreatorID sets the "creator_id" field.
+func (cmc *CharmModelCreate) SetCreatorID(tci types.CharmCreatorID) *CharmModelCreate {
+	cmc.mutation.SetCreatorID(tci)
+	return cmc
+}
+
 // SetName sets the "name" field.
 func (cmc *CharmModelCreate) SetName(s string) *CharmModelCreate {
 	cmc.mutation.SetName(s)
 	return cmc
 }
 
-// SetGeneration sets the "generation" field.
-func (cmc *CharmModelCreate) SetGeneration(tmg types.CharmModelGeneration) *CharmModelCreate {
-	cmc.mutation.SetGeneration(tmg)
+// SetType sets the "type" field.
+func (cmc *CharmModelCreate) SetType(tmt types.CharmModelType) *CharmModelCreate {
+	cmc.mutation.SetType(tmt)
 	return cmc
 }
 
-// SetCreatorID sets the "creator_id" field.
-func (cmc *CharmModelCreate) SetCreatorID(tci types.CharmCreatorID) *CharmModelCreate {
-	cmc.mutation.SetCreatorID(tci)
+// SetGeneration sets the "generation" field.
+func (cmc *CharmModelCreate) SetGeneration(tmg types.CharmModelGeneration) *CharmModelCreate {
+	cmc.mutation.SetGeneration(tmg)
 	return cmc
 }
 
@@ -178,6 +184,9 @@ func (cmc *CharmModelCreate) check() error {
 	if _, ok := cmc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "updated_at"`)}
 	}
+	if _, ok := cmc.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`ent: missing required field "creator_id"`)}
+	}
 	if _, ok := cmc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
 	}
@@ -186,11 +195,11 @@ func (cmc *CharmModelCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "name": %w`, err)}
 		}
 	}
+	if _, ok := cmc.mutation.GetType(); !ok {
+		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "type"`)}
+	}
 	if _, ok := cmc.mutation.Generation(); !ok {
 		return &ValidationError{Name: "generation", err: errors.New(`ent: missing required field "generation"`)}
-	}
-	if _, ok := cmc.mutation.CreatorID(); !ok {
-		return &ValidationError{Name: "creator_id", err: errors.New(`ent: missing required field "creator_id"`)}
 	}
 	return nil
 }
@@ -250,6 +259,14 @@ func (cmc *CharmModelCreate) createSpec() (*CharmModel, *sqlgraph.CreateSpec) {
 		})
 		_node.DeletedAt = &value
 	}
+	if value, ok := cmc.mutation.CreatorID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charmmodel.FieldCreatorID,
+		})
+		_node.CreatorID = value
+	}
 	if value, ok := cmc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -258,6 +275,14 @@ func (cmc *CharmModelCreate) createSpec() (*CharmModel, *sqlgraph.CreateSpec) {
 		})
 		_node.Name = value
 	}
+	if value, ok := cmc.mutation.GetType(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charmmodel.FieldType,
+		})
+		_node.Type = value
+	}
 	if value, ok := cmc.mutation.Generation(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint32,
@@ -265,14 +290,6 @@ func (cmc *CharmModelCreate) createSpec() (*CharmModel, *sqlgraph.CreateSpec) {
 			Column: charmmodel.FieldGeneration,
 		})
 		_node.Generation = value
-	}
-	if value, ok := cmc.mutation.CreatorID(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: charmmodel.FieldCreatorID,
-		})
-		_node.CreatorID = value
 	}
 	return _node, _spec
 }
@@ -370,6 +387,18 @@ func (u *CharmModelUpsert) ClearDeletedAt() *CharmModelUpsert {
 	return u
 }
 
+// SetCreatorID sets the "creator_id" field.
+func (u *CharmModelUpsert) SetCreatorID(v types.CharmCreatorID) *CharmModelUpsert {
+	u.Set(charmmodel.FieldCreatorID, v)
+	return u
+}
+
+// UpdateCreatorID sets the "creator_id" field to the value that was provided on create.
+func (u *CharmModelUpsert) UpdateCreatorID() *CharmModelUpsert {
+	u.SetExcluded(charmmodel.FieldCreatorID)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *CharmModelUpsert) SetName(v string) *CharmModelUpsert {
 	u.Set(charmmodel.FieldName, v)
@@ -382,6 +411,18 @@ func (u *CharmModelUpsert) UpdateName() *CharmModelUpsert {
 	return u
 }
 
+// SetType sets the "type" field.
+func (u *CharmModelUpsert) SetType(v types.CharmModelType) *CharmModelUpsert {
+	u.Set(charmmodel.FieldType, v)
+	return u
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *CharmModelUpsert) UpdateType() *CharmModelUpsert {
+	u.SetExcluded(charmmodel.FieldType)
+	return u
+}
+
 // SetGeneration sets the "generation" field.
 func (u *CharmModelUpsert) SetGeneration(v types.CharmModelGeneration) *CharmModelUpsert {
 	u.Set(charmmodel.FieldGeneration, v)
@@ -391,18 +432,6 @@ func (u *CharmModelUpsert) SetGeneration(v types.CharmModelGeneration) *CharmMod
 // UpdateGeneration sets the "generation" field to the value that was provided on create.
 func (u *CharmModelUpsert) UpdateGeneration() *CharmModelUpsert {
 	u.SetExcluded(charmmodel.FieldGeneration)
-	return u
-}
-
-// SetCreatorID sets the "creator_id" field.
-func (u *CharmModelUpsert) SetCreatorID(v types.CharmCreatorID) *CharmModelUpsert {
-	u.Set(charmmodel.FieldCreatorID, v)
-	return u
-}
-
-// UpdateCreatorID sets the "creator_id" field to the value that was provided on create.
-func (u *CharmModelUpsert) UpdateCreatorID() *CharmModelUpsert {
-	u.SetExcluded(charmmodel.FieldCreatorID)
 	return u
 }
 
@@ -505,6 +534,20 @@ func (u *CharmModelUpsertOne) ClearDeletedAt() *CharmModelUpsertOne {
 	})
 }
 
+// SetCreatorID sets the "creator_id" field.
+func (u *CharmModelUpsertOne) SetCreatorID(v types.CharmCreatorID) *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetCreatorID(v)
+	})
+}
+
+// UpdateCreatorID sets the "creator_id" field to the value that was provided on create.
+func (u *CharmModelUpsertOne) UpdateCreatorID() *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateCreatorID()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *CharmModelUpsertOne) SetName(v string) *CharmModelUpsertOne {
 	return u.Update(func(s *CharmModelUpsert) {
@@ -519,6 +562,20 @@ func (u *CharmModelUpsertOne) UpdateName() *CharmModelUpsertOne {
 	})
 }
 
+// SetType sets the "type" field.
+func (u *CharmModelUpsertOne) SetType(v types.CharmModelType) *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetType(v)
+	})
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *CharmModelUpsertOne) UpdateType() *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateType()
+	})
+}
+
 // SetGeneration sets the "generation" field.
 func (u *CharmModelUpsertOne) SetGeneration(v types.CharmModelGeneration) *CharmModelUpsertOne {
 	return u.Update(func(s *CharmModelUpsert) {
@@ -530,20 +587,6 @@ func (u *CharmModelUpsertOne) SetGeneration(v types.CharmModelGeneration) *Charm
 func (u *CharmModelUpsertOne) UpdateGeneration() *CharmModelUpsertOne {
 	return u.Update(func(s *CharmModelUpsert) {
 		s.UpdateGeneration()
-	})
-}
-
-// SetCreatorID sets the "creator_id" field.
-func (u *CharmModelUpsertOne) SetCreatorID(v types.CharmCreatorID) *CharmModelUpsertOne {
-	return u.Update(func(s *CharmModelUpsert) {
-		s.SetCreatorID(v)
-	})
-}
-
-// UpdateCreatorID sets the "creator_id" field to the value that was provided on create.
-func (u *CharmModelUpsertOne) UpdateCreatorID() *CharmModelUpsertOne {
-	return u.Update(func(s *CharmModelUpsert) {
-		s.UpdateCreatorID()
 	})
 }
 
@@ -811,6 +854,20 @@ func (u *CharmModelUpsertBulk) ClearDeletedAt() *CharmModelUpsertBulk {
 	})
 }
 
+// SetCreatorID sets the "creator_id" field.
+func (u *CharmModelUpsertBulk) SetCreatorID(v types.CharmCreatorID) *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetCreatorID(v)
+	})
+}
+
+// UpdateCreatorID sets the "creator_id" field to the value that was provided on create.
+func (u *CharmModelUpsertBulk) UpdateCreatorID() *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateCreatorID()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *CharmModelUpsertBulk) SetName(v string) *CharmModelUpsertBulk {
 	return u.Update(func(s *CharmModelUpsert) {
@@ -825,6 +882,20 @@ func (u *CharmModelUpsertBulk) UpdateName() *CharmModelUpsertBulk {
 	})
 }
 
+// SetType sets the "type" field.
+func (u *CharmModelUpsertBulk) SetType(v types.CharmModelType) *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetType(v)
+	})
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *CharmModelUpsertBulk) UpdateType() *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateType()
+	})
+}
+
 // SetGeneration sets the "generation" field.
 func (u *CharmModelUpsertBulk) SetGeneration(v types.CharmModelGeneration) *CharmModelUpsertBulk {
 	return u.Update(func(s *CharmModelUpsert) {
@@ -836,20 +907,6 @@ func (u *CharmModelUpsertBulk) SetGeneration(v types.CharmModelGeneration) *Char
 func (u *CharmModelUpsertBulk) UpdateGeneration() *CharmModelUpsertBulk {
 	return u.Update(func(s *CharmModelUpsert) {
 		s.UpdateGeneration()
-	})
-}
-
-// SetCreatorID sets the "creator_id" field.
-func (u *CharmModelUpsertBulk) SetCreatorID(v types.CharmCreatorID) *CharmModelUpsertBulk {
-	return u.Update(func(s *CharmModelUpsert) {
-		s.SetCreatorID(v)
-	})
-}
-
-// UpdateCreatorID sets the "creator_id" field to the value that was provided on create.
-func (u *CharmModelUpsertBulk) UpdateCreatorID() *CharmModelUpsertBulk {
-	return u.Update(func(s *CharmModelUpsert) {
-		s.UpdateCreatorID()
 	})
 }
 

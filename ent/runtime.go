@@ -65,7 +65,7 @@ func init() {
 	// charmmodel.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	charmmodel.UpdateDefaultUpdatedAt = charmmodelDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// charmmodelDescName is the schema descriptor for name field.
-	charmmodelDescName := charmmodelFields[4].Descriptor()
+	charmmodelDescName := charmmodelFields[5].Descriptor()
 	// charmmodel.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	charmmodel.NameValidator = charmmodelDescName.Validators[0].(func(string) error)
 	gardenFields := schema.Garden{}.Fields()

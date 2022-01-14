@@ -68,9 +68,35 @@ func (cmu *CharmModelUpdate) ClearDeletedAt() *CharmModelUpdate {
 	return cmu
 }
 
+// SetCreatorID sets the "creator_id" field.
+func (cmu *CharmModelUpdate) SetCreatorID(tci types.CharmCreatorID) *CharmModelUpdate {
+	cmu.mutation.ResetCreatorID()
+	cmu.mutation.SetCreatorID(tci)
+	return cmu
+}
+
+// AddCreatorID adds tci to the "creator_id" field.
+func (cmu *CharmModelUpdate) AddCreatorID(tci types.CharmCreatorID) *CharmModelUpdate {
+	cmu.mutation.AddCreatorID(tci)
+	return cmu
+}
+
 // SetName sets the "name" field.
 func (cmu *CharmModelUpdate) SetName(s string) *CharmModelUpdate {
 	cmu.mutation.SetName(s)
+	return cmu
+}
+
+// SetType sets the "type" field.
+func (cmu *CharmModelUpdate) SetType(tmt types.CharmModelType) *CharmModelUpdate {
+	cmu.mutation.ResetType()
+	cmu.mutation.SetType(tmt)
+	return cmu
+}
+
+// AddType adds tmt to the "type" field.
+func (cmu *CharmModelUpdate) AddType(tmt types.CharmModelType) *CharmModelUpdate {
+	cmu.mutation.AddType(tmt)
 	return cmu
 }
 
@@ -84,19 +110,6 @@ func (cmu *CharmModelUpdate) SetGeneration(tmg types.CharmModelGeneration) *Char
 // AddGeneration adds tmg to the "generation" field.
 func (cmu *CharmModelUpdate) AddGeneration(tmg types.CharmModelGeneration) *CharmModelUpdate {
 	cmu.mutation.AddGeneration(tmg)
-	return cmu
-}
-
-// SetCreatorID sets the "creator_id" field.
-func (cmu *CharmModelUpdate) SetCreatorID(tci types.CharmCreatorID) *CharmModelUpdate {
-	cmu.mutation.ResetCreatorID()
-	cmu.mutation.SetCreatorID(tci)
-	return cmu
-}
-
-// AddCreatorID adds tci to the "creator_id" field.
-func (cmu *CharmModelUpdate) AddCreatorID(tci types.CharmCreatorID) *CharmModelUpdate {
-	cmu.mutation.AddCreatorID(tci)
 	return cmu
 }
 
@@ -229,11 +242,39 @@ func (cmu *CharmModelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: charmmodel.FieldDeletedAt,
 		})
 	}
+	if value, ok := cmu.mutation.CreatorID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charmmodel.FieldCreatorID,
+		})
+	}
+	if value, ok := cmu.mutation.AddedCreatorID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charmmodel.FieldCreatorID,
+		})
+	}
 	if value, ok := cmu.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
 			Column: charmmodel.FieldName,
+		})
+	}
+	if value, ok := cmu.mutation.GetType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charmmodel.FieldType,
+		})
+	}
+	if value, ok := cmu.mutation.AddedType(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charmmodel.FieldType,
 		})
 	}
 	if value, ok := cmu.mutation.Generation(); ok {
@@ -248,20 +289,6 @@ func (cmu *CharmModelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: charmmodel.FieldGeneration,
-		})
-	}
-	if value, ok := cmu.mutation.CreatorID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: charmmodel.FieldCreatorID,
-		})
-	}
-	if value, ok := cmu.mutation.AddedCreatorID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: charmmodel.FieldCreatorID,
 		})
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cmu.driver, _spec); err != nil {
@@ -323,9 +350,35 @@ func (cmuo *CharmModelUpdateOne) ClearDeletedAt() *CharmModelUpdateOne {
 	return cmuo
 }
 
+// SetCreatorID sets the "creator_id" field.
+func (cmuo *CharmModelUpdateOne) SetCreatorID(tci types.CharmCreatorID) *CharmModelUpdateOne {
+	cmuo.mutation.ResetCreatorID()
+	cmuo.mutation.SetCreatorID(tci)
+	return cmuo
+}
+
+// AddCreatorID adds tci to the "creator_id" field.
+func (cmuo *CharmModelUpdateOne) AddCreatorID(tci types.CharmCreatorID) *CharmModelUpdateOne {
+	cmuo.mutation.AddCreatorID(tci)
+	return cmuo
+}
+
 // SetName sets the "name" field.
 func (cmuo *CharmModelUpdateOne) SetName(s string) *CharmModelUpdateOne {
 	cmuo.mutation.SetName(s)
+	return cmuo
+}
+
+// SetType sets the "type" field.
+func (cmuo *CharmModelUpdateOne) SetType(tmt types.CharmModelType) *CharmModelUpdateOne {
+	cmuo.mutation.ResetType()
+	cmuo.mutation.SetType(tmt)
+	return cmuo
+}
+
+// AddType adds tmt to the "type" field.
+func (cmuo *CharmModelUpdateOne) AddType(tmt types.CharmModelType) *CharmModelUpdateOne {
+	cmuo.mutation.AddType(tmt)
 	return cmuo
 }
 
@@ -339,19 +392,6 @@ func (cmuo *CharmModelUpdateOne) SetGeneration(tmg types.CharmModelGeneration) *
 // AddGeneration adds tmg to the "generation" field.
 func (cmuo *CharmModelUpdateOne) AddGeneration(tmg types.CharmModelGeneration) *CharmModelUpdateOne {
 	cmuo.mutation.AddGeneration(tmg)
-	return cmuo
-}
-
-// SetCreatorID sets the "creator_id" field.
-func (cmuo *CharmModelUpdateOne) SetCreatorID(tci types.CharmCreatorID) *CharmModelUpdateOne {
-	cmuo.mutation.ResetCreatorID()
-	cmuo.mutation.SetCreatorID(tci)
-	return cmuo
-}
-
-// AddCreatorID adds tci to the "creator_id" field.
-func (cmuo *CharmModelUpdateOne) AddCreatorID(tci types.CharmCreatorID) *CharmModelUpdateOne {
-	cmuo.mutation.AddCreatorID(tci)
 	return cmuo
 }
 
@@ -508,11 +548,39 @@ func (cmuo *CharmModelUpdateOne) sqlSave(ctx context.Context) (_node *CharmModel
 			Column: charmmodel.FieldDeletedAt,
 		})
 	}
+	if value, ok := cmuo.mutation.CreatorID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charmmodel.FieldCreatorID,
+		})
+	}
+	if value, ok := cmuo.mutation.AddedCreatorID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint64,
+			Value:  value,
+			Column: charmmodel.FieldCreatorID,
+		})
+	}
 	if value, ok := cmuo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
 			Column: charmmodel.FieldName,
+		})
+	}
+	if value, ok := cmuo.mutation.GetType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charmmodel.FieldType,
+		})
+	}
+	if value, ok := cmuo.mutation.AddedType(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charmmodel.FieldType,
 		})
 	}
 	if value, ok := cmuo.mutation.Generation(); ok {
@@ -527,20 +595,6 @@ func (cmuo *CharmModelUpdateOne) sqlSave(ctx context.Context) (_node *CharmModel
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: charmmodel.FieldGeneration,
-		})
-	}
-	if value, ok := cmuo.mutation.CreatorID(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: charmmodel.FieldCreatorID,
-		})
-	}
-	if value, ok := cmuo.mutation.AddedCreatorID(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeUint64,
-			Value:  value,
-			Column: charmmodel.FieldCreatorID,
 		})
 	}
 	_node = &CharmModel{config: cmuo.config}

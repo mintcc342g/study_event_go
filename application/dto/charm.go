@@ -18,12 +18,14 @@ type Charm struct {
 
 // CharmModel ...
 type CharmModel struct {
-	ID        types.CharmModelID   `json:"id,omitempty"`
-	CreatedAt time.Time            `json:"created_at,omitempty"`
-	UpdatedAt time.Time            `json:"updated_at,omitempty"`
-	DeletedAt *time.Time           `json:"deleted_at,omitempty"`
-	Name      string               `json:"name,omitempty"`
-	CreatorID types.CharmCreatorID `json:"creator_id,omitempty"`
+	ID         types.CharmModelID         `json:"id,omitempty"`
+	CreatedAt  time.Time                  `json:"created_at,omitempty"`
+	UpdatedAt  time.Time                  `json:"updated_at,omitempty"`
+	DeletedAt  *time.Time                 `json:"deleted_at,omitempty"`
+	CreatorID  types.CharmCreatorID       `json:"creator_id,omitempty"`
+	Name       string                     `json:"name,omitempty"`
+	Type       types.CharmModelType       `json:"type,omitempty"`
+	Generation types.CharmModelGeneration `json:"generation,omitempty"`
 }
 
 // CharmCreator ...

@@ -15,7 +15,6 @@ type Charm struct {
 	UpdatedAt time.Time
 	DeletedAt *time.Time
 	Name      string
-	Type      types.CharmType
 	ModelID   types.CharmModelID
 	OwnerID   types.LilyID
 }
@@ -26,20 +25,23 @@ type CharmModel struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  *time.Time
-	Name       string
-	Generation types.CharmModelGeneration
 	CreatorID  types.CharmCreatorID
+	Name       string
+	Type       types.CharmModelType
+	Generation types.CharmModelGeneration
 }
 
 // DTO ...
 func (c *CharmModel) DTO() *dto.CharmModel {
 	return &dto.CharmModel{
-		ID:        c.ID,
-		CreatedAt: c.CreatedAt,
-		UpdatedAt: c.UpdatedAt,
-		DeletedAt: c.DeletedAt,
-		Name:      c.Name,
-		CreatorID: c.CreatorID,
+		ID:         c.ID,
+		CreatedAt:  c.CreatedAt,
+		UpdatedAt:  c.UpdatedAt,
+		DeletedAt:  c.DeletedAt,
+		Name:       c.Name,
+		Type:       c.Type,
+		Generation: c.Generation,
+		CreatorID:  c.CreatorID,
 	}
 }
 
@@ -75,9 +77,19 @@ func (c *CharmCreator) NewCharmModel(charmModelDTO *dto.CharmModel) (*CharmModel
 		return nil, errors.BadRequestf("invalid creator id")
 	}
 
+	if charmModelDTO.Type == types.NoneTypeModel {
+		return nil, errors.BadRequestf("invalid model type")
+	}
+
+	if charmModelDTO.Generation == types.NoneGeneration {
+		return nil, errors.BadRequestf("invalid model generation")
+	}
+
 	return &CharmModel{
-		Name:      charmModelDTO.Name,
-		CreatorID: c.ID,
+		Name:       charmModelDTO.Name,
+		Type:       charmModelDTO.Type,
+		Generation: charmModelDTO.Generation,
+		CreatorID:  c.ID,
 	}, nil
 }
 

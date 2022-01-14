@@ -20,9 +20,10 @@ func (CharmModel) Fields() []ent.Field {
 		field.Time("created_at").Default(time.Now),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 		field.Time("deleted_at").Nillable().Optional(),
-		field.String("name").Unique().NotEmpty(),
-		field.Uint32("generation").GoType(types.CharmModelGeneration(0)),
 		field.Uint64("creator_id").GoType(types.CharmCreatorID(0)),
+		field.String("name").Unique().NotEmpty(),
+		field.Uint32("type").GoType(types.CharmModelType(0)),
+		field.Uint32("generation").GoType(types.CharmModelGeneration(0)),
 	}
 }
 

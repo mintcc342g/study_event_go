@@ -114,10 +114,26 @@ func DeletedAt(v time.Time) predicate.CharmModel {
 	})
 }
 
+// CreatorID applies equality check predicate on the "creator_id" field. It's identical to CreatorIDEQ.
+func CreatorID(v types.CharmCreatorID) predicate.CharmModel {
+	vc := uint64(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCreatorID), vc))
+	})
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.CharmModel {
 	return predicate.CharmModel(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldName), v))
+	})
+}
+
+// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
+func Type(v types.CharmModelType) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldType), vc))
 	})
 }
 
@@ -126,14 +142,6 @@ func Generation(v types.CharmModelGeneration) predicate.CharmModel {
 	vc := uint32(v)
 	return predicate.CharmModel(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldGeneration), vc))
-	})
-}
-
-// CreatorID applies equality check predicate on the "creator_id" field. It's identical to CreatorIDEQ.
-func CreatorID(v types.CharmCreatorID) predicate.CharmModel {
-	vc := uint64(v)
-	return predicate.CharmModel(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatorID), vc))
 	})
 }
 
@@ -379,6 +387,88 @@ func DeletedAtNotNil() predicate.CharmModel {
 	})
 }
 
+// CreatorIDEQ applies the EQ predicate on the "creator_id" field.
+func CreatorIDEQ(v types.CharmCreatorID) predicate.CharmModel {
+	vc := uint64(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCreatorID), vc))
+	})
+}
+
+// CreatorIDNEQ applies the NEQ predicate on the "creator_id" field.
+func CreatorIDNEQ(v types.CharmCreatorID) predicate.CharmModel {
+	vc := uint64(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldCreatorID), vc))
+	})
+}
+
+// CreatorIDIn applies the In predicate on the "creator_id" field.
+func CreatorIDIn(vs ...types.CharmCreatorID) predicate.CharmModel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = uint64(vs[i])
+	}
+	return predicate.CharmModel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldCreatorID), v...))
+	})
+}
+
+// CreatorIDNotIn applies the NotIn predicate on the "creator_id" field.
+func CreatorIDNotIn(vs ...types.CharmCreatorID) predicate.CharmModel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = uint64(vs[i])
+	}
+	return predicate.CharmModel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldCreatorID), v...))
+	})
+}
+
+// CreatorIDGT applies the GT predicate on the "creator_id" field.
+func CreatorIDGT(v types.CharmCreatorID) predicate.CharmModel {
+	vc := uint64(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldCreatorID), vc))
+	})
+}
+
+// CreatorIDGTE applies the GTE predicate on the "creator_id" field.
+func CreatorIDGTE(v types.CharmCreatorID) predicate.CharmModel {
+	vc := uint64(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldCreatorID), vc))
+	})
+}
+
+// CreatorIDLT applies the LT predicate on the "creator_id" field.
+func CreatorIDLT(v types.CharmCreatorID) predicate.CharmModel {
+	vc := uint64(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldCreatorID), vc))
+	})
+}
+
+// CreatorIDLTE applies the LTE predicate on the "creator_id" field.
+func CreatorIDLTE(v types.CharmCreatorID) predicate.CharmModel {
+	vc := uint64(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldCreatorID), vc))
+	})
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.CharmModel {
 	return predicate.CharmModel(func(s *sql.Selector) {
@@ -490,6 +580,88 @@ func NameContainsFold(v string) predicate.CharmModel {
 	})
 }
 
+// TypeEQ applies the EQ predicate on the "type" field.
+func TypeEQ(v types.CharmModelType) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldType), vc))
+	})
+}
+
+// TypeNEQ applies the NEQ predicate on the "type" field.
+func TypeNEQ(v types.CharmModelType) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldType), vc))
+	})
+}
+
+// TypeIn applies the In predicate on the "type" field.
+func TypeIn(vs ...types.CharmModelType) predicate.CharmModel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = uint32(vs[i])
+	}
+	return predicate.CharmModel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldType), v...))
+	})
+}
+
+// TypeNotIn applies the NotIn predicate on the "type" field.
+func TypeNotIn(vs ...types.CharmModelType) predicate.CharmModel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = uint32(vs[i])
+	}
+	return predicate.CharmModel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldType), v...))
+	})
+}
+
+// TypeGT applies the GT predicate on the "type" field.
+func TypeGT(v types.CharmModelType) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldType), vc))
+	})
+}
+
+// TypeGTE applies the GTE predicate on the "type" field.
+func TypeGTE(v types.CharmModelType) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldType), vc))
+	})
+}
+
+// TypeLT applies the LT predicate on the "type" field.
+func TypeLT(v types.CharmModelType) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldType), vc))
+	})
+}
+
+// TypeLTE applies the LTE predicate on the "type" field.
+func TypeLTE(v types.CharmModelType) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldType), vc))
+	})
+}
+
 // GenerationEQ applies the EQ predicate on the "generation" field.
 func GenerationEQ(v types.CharmModelGeneration) predicate.CharmModel {
 	vc := uint32(v)
@@ -569,88 +741,6 @@ func GenerationLTE(v types.CharmModelGeneration) predicate.CharmModel {
 	vc := uint32(v)
 	return predicate.CharmModel(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldGeneration), vc))
-	})
-}
-
-// CreatorIDEQ applies the EQ predicate on the "creator_id" field.
-func CreatorIDEQ(v types.CharmCreatorID) predicate.CharmModel {
-	vc := uint64(v)
-	return predicate.CharmModel(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatorID), vc))
-	})
-}
-
-// CreatorIDNEQ applies the NEQ predicate on the "creator_id" field.
-func CreatorIDNEQ(v types.CharmCreatorID) predicate.CharmModel {
-	vc := uint64(v)
-	return predicate.CharmModel(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatorID), vc))
-	})
-}
-
-// CreatorIDIn applies the In predicate on the "creator_id" field.
-func CreatorIDIn(vs ...types.CharmCreatorID) predicate.CharmModel {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = uint64(vs[i])
-	}
-	return predicate.CharmModel(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldCreatorID), v...))
-	})
-}
-
-// CreatorIDNotIn applies the NotIn predicate on the "creator_id" field.
-func CreatorIDNotIn(vs ...types.CharmCreatorID) predicate.CharmModel {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = uint64(vs[i])
-	}
-	return predicate.CharmModel(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldCreatorID), v...))
-	})
-}
-
-// CreatorIDGT applies the GT predicate on the "creator_id" field.
-func CreatorIDGT(v types.CharmCreatorID) predicate.CharmModel {
-	vc := uint64(v)
-	return predicate.CharmModel(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreatorID), vc))
-	})
-}
-
-// CreatorIDGTE applies the GTE predicate on the "creator_id" field.
-func CreatorIDGTE(v types.CharmCreatorID) predicate.CharmModel {
-	vc := uint64(v)
-	return predicate.CharmModel(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreatorID), vc))
-	})
-}
-
-// CreatorIDLT applies the LT predicate on the "creator_id" field.
-func CreatorIDLT(v types.CharmCreatorID) predicate.CharmModel {
-	vc := uint64(v)
-	return predicate.CharmModel(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreatorID), vc))
-	})
-}
-
-// CreatorIDLTE applies the LTE predicate on the "creator_id" field.
-func CreatorIDLTE(v types.CharmCreatorID) predicate.CharmModel {
-	vc := uint64(v)
-	return predicate.CharmModel(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreatorID), vc))
 	})
 }
 
