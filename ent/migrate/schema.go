@@ -15,6 +15,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "type", Type: field.TypeUint32},
 		{Name: "model_id", Type: field.TypeUint64},
 		{Name: "owner_id", Type: field.TypeUint64},
 	}
@@ -46,6 +47,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "generation", Type: field.TypeUint32},
 		{Name: "creator_id", Type: field.TypeUint64},
 	}
 	// CharmModelsTable holds the schema information for the "charm_models" table.

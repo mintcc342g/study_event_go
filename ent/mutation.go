@@ -50,6 +50,8 @@ type CharmMutation struct {
 	updated_at    *time.Time
 	deleted_at    *time.Time
 	name          *string
+	_type         *types.CharmType
+	add_type      *types.CharmType
 	model_id      *types.CharmModelID
 	addmodel_id   *types.CharmModelID
 	owner_id      *types.LilyID
@@ -302,6 +304,62 @@ func (m *CharmMutation) ResetName() {
 	m.name = nil
 }
 
+// SetType sets the "type" field.
+func (m *CharmMutation) SetType(tt types.CharmType) {
+	m._type = &tt
+	m.add_type = nil
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *CharmMutation) GetType() (r types.CharmType, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the Charm entity.
+// If the Charm object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharmMutation) OldType(ctx context.Context) (v types.CharmType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// AddType adds tt to the "type" field.
+func (m *CharmMutation) AddType(tt types.CharmType) {
+	if m.add_type != nil {
+		*m.add_type += tt
+	} else {
+		m.add_type = &tt
+	}
+}
+
+// AddedType returns the value that was added to the "type" field in this mutation.
+func (m *CharmMutation) AddedType() (r types.CharmType, exists bool) {
+	v := m.add_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *CharmMutation) ResetType() {
+	m._type = nil
+	m.add_type = nil
+}
+
 // SetModelID sets the "model_id" field.
 func (m *CharmMutation) SetModelID(tmi types.CharmModelID) {
 	m.model_id = &tmi
@@ -433,7 +491,7 @@ func (m *CharmMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CharmMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, charm.FieldCreatedAt)
 	}
@@ -445,6 +503,9 @@ func (m *CharmMutation) Fields() []string {
 	}
 	if m.name != nil {
 		fields = append(fields, charm.FieldName)
+	}
+	if m._type != nil {
+		fields = append(fields, charm.FieldType)
 	}
 	if m.model_id != nil {
 		fields = append(fields, charm.FieldModelID)
@@ -468,6 +529,8 @@ func (m *CharmMutation) Field(name string) (ent.Value, bool) {
 		return m.DeletedAt()
 	case charm.FieldName:
 		return m.Name()
+	case charm.FieldType:
+		return m.GetType()
 	case charm.FieldModelID:
 		return m.ModelID()
 	case charm.FieldOwnerID:
@@ -489,6 +552,8 @@ func (m *CharmMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldDeletedAt(ctx)
 	case charm.FieldName:
 		return m.OldName(ctx)
+	case charm.FieldType:
+		return m.OldType(ctx)
 	case charm.FieldModelID:
 		return m.OldModelID(ctx)
 	case charm.FieldOwnerID:
@@ -530,6 +595,13 @@ func (m *CharmMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
+	case charm.FieldType:
+		v, ok := value.(types.CharmType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
 	case charm.FieldModelID:
 		v, ok := value.(types.CharmModelID)
 		if !ok {
@@ -552,6 +624,9 @@ func (m *CharmMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *CharmMutation) AddedFields() []string {
 	var fields []string
+	if m.add_type != nil {
+		fields = append(fields, charm.FieldType)
+	}
 	if m.addmodel_id != nil {
 		fields = append(fields, charm.FieldModelID)
 	}
@@ -566,6 +641,8 @@ func (m *CharmMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *CharmMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case charm.FieldType:
+		return m.AddedType()
 	case charm.FieldModelID:
 		return m.AddedModelID()
 	case charm.FieldOwnerID:
@@ -579,6 +656,13 @@ func (m *CharmMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *CharmMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case charm.FieldType:
+		v, ok := value.(types.CharmType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddType(v)
+		return nil
 	case charm.FieldModelID:
 		v, ok := value.(types.CharmModelID)
 		if !ok {
@@ -640,6 +724,9 @@ func (m *CharmMutation) ResetField(name string) error {
 		return nil
 	case charm.FieldName:
 		m.ResetName()
+		return nil
+	case charm.FieldType:
+		m.ResetType()
 		return nil
 	case charm.FieldModelID:
 		m.ResetModelID()
@@ -1281,6 +1368,8 @@ type CharmModelMutation struct {
 	updated_at    *time.Time
 	deleted_at    *time.Time
 	name          *string
+	generation    *types.CharmModelGeneration
+	addgeneration *types.CharmModelGeneration
 	creator_id    *types.CharmCreatorID
 	addcreator_id *types.CharmCreatorID
 	clearedFields map[string]struct{}
@@ -1531,6 +1620,62 @@ func (m *CharmModelMutation) ResetName() {
 	m.name = nil
 }
 
+// SetGeneration sets the "generation" field.
+func (m *CharmModelMutation) SetGeneration(tmg types.CharmModelGeneration) {
+	m.generation = &tmg
+	m.addgeneration = nil
+}
+
+// Generation returns the value of the "generation" field in the mutation.
+func (m *CharmModelMutation) Generation() (r types.CharmModelGeneration, exists bool) {
+	v := m.generation
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGeneration returns the old "generation" field's value of the CharmModel entity.
+// If the CharmModel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharmModelMutation) OldGeneration(ctx context.Context) (v types.CharmModelGeneration, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldGeneration is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldGeneration requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGeneration: %w", err)
+	}
+	return oldValue.Generation, nil
+}
+
+// AddGeneration adds tmg to the "generation" field.
+func (m *CharmModelMutation) AddGeneration(tmg types.CharmModelGeneration) {
+	if m.addgeneration != nil {
+		*m.addgeneration += tmg
+	} else {
+		m.addgeneration = &tmg
+	}
+}
+
+// AddedGeneration returns the value that was added to the "generation" field in this mutation.
+func (m *CharmModelMutation) AddedGeneration() (r types.CharmModelGeneration, exists bool) {
+	v := m.addgeneration
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetGeneration resets all changes to the "generation" field.
+func (m *CharmModelMutation) ResetGeneration() {
+	m.generation = nil
+	m.addgeneration = nil
+}
+
 // SetCreatorID sets the "creator_id" field.
 func (m *CharmModelMutation) SetCreatorID(tci types.CharmCreatorID) {
 	m.creator_id = &tci
@@ -1606,7 +1751,7 @@ func (m *CharmModelMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CharmModelMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, charmmodel.FieldCreatedAt)
 	}
@@ -1618,6 +1763,9 @@ func (m *CharmModelMutation) Fields() []string {
 	}
 	if m.name != nil {
 		fields = append(fields, charmmodel.FieldName)
+	}
+	if m.generation != nil {
+		fields = append(fields, charmmodel.FieldGeneration)
 	}
 	if m.creator_id != nil {
 		fields = append(fields, charmmodel.FieldCreatorID)
@@ -1638,6 +1786,8 @@ func (m *CharmModelMutation) Field(name string) (ent.Value, bool) {
 		return m.DeletedAt()
 	case charmmodel.FieldName:
 		return m.Name()
+	case charmmodel.FieldGeneration:
+		return m.Generation()
 	case charmmodel.FieldCreatorID:
 		return m.CreatorID()
 	}
@@ -1657,6 +1807,8 @@ func (m *CharmModelMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldDeletedAt(ctx)
 	case charmmodel.FieldName:
 		return m.OldName(ctx)
+	case charmmodel.FieldGeneration:
+		return m.OldGeneration(ctx)
 	case charmmodel.FieldCreatorID:
 		return m.OldCreatorID(ctx)
 	}
@@ -1696,6 +1848,13 @@ func (m *CharmModelMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
+	case charmmodel.FieldGeneration:
+		v, ok := value.(types.CharmModelGeneration)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGeneration(v)
+		return nil
 	case charmmodel.FieldCreatorID:
 		v, ok := value.(types.CharmCreatorID)
 		if !ok {
@@ -1711,6 +1870,9 @@ func (m *CharmModelMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *CharmModelMutation) AddedFields() []string {
 	var fields []string
+	if m.addgeneration != nil {
+		fields = append(fields, charmmodel.FieldGeneration)
+	}
 	if m.addcreator_id != nil {
 		fields = append(fields, charmmodel.FieldCreatorID)
 	}
@@ -1722,6 +1884,8 @@ func (m *CharmModelMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *CharmModelMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case charmmodel.FieldGeneration:
+		return m.AddedGeneration()
 	case charmmodel.FieldCreatorID:
 		return m.AddedCreatorID()
 	}
@@ -1733,6 +1897,13 @@ func (m *CharmModelMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *CharmModelMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case charmmodel.FieldGeneration:
+		v, ok := value.(types.CharmModelGeneration)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddGeneration(v)
+		return nil
 	case charmmodel.FieldCreatorID:
 		v, ok := value.(types.CharmCreatorID)
 		if !ok {
@@ -1787,6 +1958,9 @@ func (m *CharmModelMutation) ResetField(name string) error {
 		return nil
 	case charmmodel.FieldName:
 		m.ResetName()
+		return nil
+	case charmmodel.FieldGeneration:
+		m.ResetGeneration()
 		return nil
 	case charmmodel.FieldCreatorID:
 		m.ResetCreatorID()

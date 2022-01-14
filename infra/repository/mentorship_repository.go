@@ -24,7 +24,7 @@ func NewMentorshipRepository(conn *ent.Client) interfaces.MentorshipRepository {
 
 // TODO: logger
 
-func (m *mentorshipRepository) New(ctx context.Context, mentorship *entity.Mentorship) (*entity.Mentorship, error) {
+func (m *mentorshipRepository) Save(ctx context.Context, mentorship *entity.Mentorship) (*entity.Mentorship, error) {
 
 	id, err := m.conn.Mentorship.
 		Create().

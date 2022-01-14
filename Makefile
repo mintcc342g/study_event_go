@@ -29,7 +29,7 @@ M = $(shell printf "\033[34;1m▶\033[0m")
 
 ## Build all steps
 .PHONY: all
-all: all_info get tidy gen build
+all: all_info get tidy migrate build
 
 ifeq ($(OS),Windows_NT)
 all_info: ; @echo building all steps...
@@ -95,11 +95,11 @@ endif
 	$Q $(GO) run entgo.io/ent/cmd/ent init $(filter-out $@,$(MAKECMDGOALS))
 
 
-.PHONY: gen
-gen:
+.PHONY: migrate
+migrate:
 ifeq ($(OS),Windows_NT)
 	@echo generate ent...
 else
-	$(info $(M) generate ent… ) @
+	$(info $(M) migrate ent… ) @
 endif
 	$Q $(GO) generate ./ent

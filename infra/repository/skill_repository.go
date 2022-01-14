@@ -21,7 +21,7 @@ func NewSkillRepository(conn *ent.Client) interfaces.SkillRepository {
 	}
 }
 
-func (s *skillRepository) New(ctx context.Context, skill *entity.Skill) (*entity.Skill, error) {
+func (s *skillRepository) Save(ctx context.Context, skill *entity.Skill) (*entity.Skill, error) {
 
 	id, err := s.conn.Skill.
 		Create().

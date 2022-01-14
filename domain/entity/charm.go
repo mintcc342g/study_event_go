@@ -15,34 +15,20 @@ type Charm struct {
 	UpdatedAt time.Time
 	DeletedAt *time.Time
 	Name      string
+	Type      types.CharmType
 	ModelID   types.CharmModelID
 	OwnerID   types.LilyID
 }
 
 // CharmModel ...
 type CharmModel struct {
-	ID        types.CharmModelID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *time.Time
-	Name      string
-	CreatorID types.CharmCreatorID
-}
-
-// NewCharmModel ...
-func NewCharmModel(charmModelDTO *dto.CharmModel) (*CharmModel, error) {
-	if charmModelDTO.Name == "" {
-		return nil, errors.BadRequestf("invalid model name")
-	}
-
-	if charmModelDTO.CreatorID == 0 {
-		return nil, errors.BadRequestf("invalid creator id")
-	}
-
-	return &CharmModel{
-		Name:      charmModelDTO.Name,
-		CreatorID: charmModelDTO.CreatorID,
-	}, nil
+	ID         types.CharmModelID
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  *time.Time
+	Name       string
+	Generation types.CharmModelGeneration
+	CreatorID  types.CharmCreatorID
 }
 
 // DTO ...
@@ -76,6 +62,22 @@ func NewCharmCreator(charmCreatorDTO *dto.CharmCreator) (*CharmCreator, error) {
 	return &CharmCreator{
 		Name: charmCreatorDTO.Name,
 		Type: charmCreatorDTO.Type,
+	}, nil
+}
+
+// NewCharmModel ...
+func (c *CharmCreator) NewCharmModel(charmModelDTO *dto.CharmModel) (*CharmModel, error) {
+	if charmModelDTO.Name == "" {
+		return nil, errors.BadRequestf("invalid model name")
+	}
+
+	if charmModelDTO.CreatorID == 0 || c.ID != charmModelDTO.CreatorID {
+		return nil, errors.BadRequestf("invalid creator id")
+	}
+
+	return &CharmModel{
+		Name:      charmModelDTO.Name,
+		CreatorID: c.ID,
 	}, nil
 }
 

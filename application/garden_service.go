@@ -46,7 +46,7 @@ func (g *GardenService) New(ctx context.Context, gardenDTO *dto.Garden) (*dto.Ga
 		return nil, err
 	}
 
-	if garden, err = g.gardenRepo.New(ctx, garden); err != nil {
+	if garden, err = g.gardenRepo.Save(ctx, garden); err != nil {
 		return nil, err
 	}
 

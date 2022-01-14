@@ -8,7 +8,7 @@ import (
 
 // MentorshipRepository ...
 type MentorshipRepository interface {
-	New(ctx context.Context, mentorship *entity.Mentorship) (*entity.Mentorship, error)
+	Save(ctx context.Context, mentorship *entity.Mentorship) (*entity.Mentorship, error)
 	Mentorship(ctx context.Context, id types.MentorshipID) (*entity.Mentorship, error)
 	MentorshipByName(ctx context.Context, name string) (*entity.Mentorship, error)
 	Mentorships(ctx context.Context, offset uint32) ([]*entity.Mentorship, error)

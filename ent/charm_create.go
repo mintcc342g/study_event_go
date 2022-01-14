@@ -71,6 +71,12 @@ func (cc *CharmCreate) SetName(s string) *CharmCreate {
 	return cc
 }
 
+// SetType sets the "type" field.
+func (cc *CharmCreate) SetType(tt types.CharmType) *CharmCreate {
+	cc.mutation.SetType(tt)
+	return cc
+}
+
 // SetModelID sets the "model_id" field.
 func (cc *CharmCreate) SetModelID(tmi types.CharmModelID) *CharmCreate {
 	cc.mutation.SetModelID(tmi)
@@ -186,6 +192,9 @@ func (cc *CharmCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "name": %w`, err)}
 		}
 	}
+	if _, ok := cc.mutation.GetType(); !ok {
+		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "type"`)}
+	}
 	if _, ok := cc.mutation.ModelID(); !ok {
 		return &ValidationError{Name: "model_id", err: errors.New(`ent: missing required field "model_id"`)}
 	}
@@ -257,6 +266,14 @@ func (cc *CharmCreate) createSpec() (*Charm, *sqlgraph.CreateSpec) {
 			Column: charm.FieldName,
 		})
 		_node.Name = value
+	}
+	if value, ok := cc.mutation.GetType(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charm.FieldType,
+		})
+		_node.Type = value
 	}
 	if value, ok := cc.mutation.ModelID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -379,6 +396,18 @@ func (u *CharmUpsert) SetName(v string) *CharmUpsert {
 // UpdateName sets the "name" field to the value that was provided on create.
 func (u *CharmUpsert) UpdateName() *CharmUpsert {
 	u.SetExcluded(charm.FieldName)
+	return u
+}
+
+// SetType sets the "type" field.
+func (u *CharmUpsert) SetType(v types.CharmType) *CharmUpsert {
+	u.Set(charm.FieldType, v)
+	return u
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *CharmUpsert) UpdateType() *CharmUpsert {
+	u.SetExcluded(charm.FieldType)
 	return u
 }
 
@@ -516,6 +545,20 @@ func (u *CharmUpsertOne) SetName(v string) *CharmUpsertOne {
 func (u *CharmUpsertOne) UpdateName() *CharmUpsertOne {
 	return u.Update(func(s *CharmUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetType sets the "type" field.
+func (u *CharmUpsertOne) SetType(v types.CharmType) *CharmUpsertOne {
+	return u.Update(func(s *CharmUpsert) {
+		s.SetType(v)
+	})
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *CharmUpsertOne) UpdateType() *CharmUpsertOne {
+	return u.Update(func(s *CharmUpsert) {
+		s.UpdateType()
 	})
 }
 
@@ -822,6 +865,20 @@ func (u *CharmUpsertBulk) SetName(v string) *CharmUpsertBulk {
 func (u *CharmUpsertBulk) UpdateName() *CharmUpsertBulk {
 	return u.Update(func(s *CharmUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetType sets the "type" field.
+func (u *CharmUpsertBulk) SetType(v types.CharmType) *CharmUpsertBulk {
+	return u.Update(func(s *CharmUpsert) {
+		s.SetType(v)
+	})
+}
+
+// UpdateType sets the "type" field to the value that was provided on create.
+func (u *CharmUpsertBulk) UpdateType() *CharmUpsertBulk {
+	return u.Update(func(s *CharmUpsert) {
+		s.UpdateType()
 	})
 }
 

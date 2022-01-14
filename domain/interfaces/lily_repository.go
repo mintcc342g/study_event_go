@@ -8,7 +8,7 @@ import (
 
 // LilyRepository ...
 type LilyRepository interface {
-	New(ctx context.Context, lily *entity.Lily) (*entity.Lily, error)
+	Save(ctx context.Context, lily *entity.Lily) (*entity.Lily, error)
 	Lily(ctx context.Context, id types.LilyID) (*entity.Lily, error)
-	TopClassLilies(ctx context.Context, gardenID types.GardenID, memberCnt int) ([]*entity.Lily, error)
+	LiliesByRank(ctx context.Context, gardenID types.GardenID, rank int) ([]*entity.Lily, error)
 }

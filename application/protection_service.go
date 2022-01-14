@@ -54,7 +54,7 @@ func (p *ProtectionService) Alarm(ctx context.Context, alarmDTO *dto.Alarm) (err
 // sendTempleLegion
 func (p *ProtectionService) sendTempleLegion(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
 
-	lilies, err := p.lilyRepo.TopClassLilies(ctx, alarm.GardenID, alarm.MakeLegionMemberCount())
+	lilies, err := p.lilyRepo.LiliesByRank(ctx, alarm.GardenID, alarm.MakeLegionMemberCount()) // TODO: change logic
 	if err != nil {
 		return err
 	}

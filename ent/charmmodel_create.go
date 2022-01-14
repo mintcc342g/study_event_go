@@ -71,6 +71,12 @@ func (cmc *CharmModelCreate) SetName(s string) *CharmModelCreate {
 	return cmc
 }
 
+// SetGeneration sets the "generation" field.
+func (cmc *CharmModelCreate) SetGeneration(tmg types.CharmModelGeneration) *CharmModelCreate {
+	cmc.mutation.SetGeneration(tmg)
+	return cmc
+}
+
 // SetCreatorID sets the "creator_id" field.
 func (cmc *CharmModelCreate) SetCreatorID(tci types.CharmCreatorID) *CharmModelCreate {
 	cmc.mutation.SetCreatorID(tci)
@@ -180,6 +186,9 @@ func (cmc *CharmModelCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "name": %w`, err)}
 		}
 	}
+	if _, ok := cmc.mutation.Generation(); !ok {
+		return &ValidationError{Name: "generation", err: errors.New(`ent: missing required field "generation"`)}
+	}
 	if _, ok := cmc.mutation.CreatorID(); !ok {
 		return &ValidationError{Name: "creator_id", err: errors.New(`ent: missing required field "creator_id"`)}
 	}
@@ -248,6 +257,14 @@ func (cmc *CharmModelCreate) createSpec() (*CharmModel, *sqlgraph.CreateSpec) {
 			Column: charmmodel.FieldName,
 		})
 		_node.Name = value
+	}
+	if value, ok := cmc.mutation.Generation(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charmmodel.FieldGeneration,
+		})
+		_node.Generation = value
 	}
 	if value, ok := cmc.mutation.CreatorID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -362,6 +379,18 @@ func (u *CharmModelUpsert) SetName(v string) *CharmModelUpsert {
 // UpdateName sets the "name" field to the value that was provided on create.
 func (u *CharmModelUpsert) UpdateName() *CharmModelUpsert {
 	u.SetExcluded(charmmodel.FieldName)
+	return u
+}
+
+// SetGeneration sets the "generation" field.
+func (u *CharmModelUpsert) SetGeneration(v types.CharmModelGeneration) *CharmModelUpsert {
+	u.Set(charmmodel.FieldGeneration, v)
+	return u
+}
+
+// UpdateGeneration sets the "generation" field to the value that was provided on create.
+func (u *CharmModelUpsert) UpdateGeneration() *CharmModelUpsert {
+	u.SetExcluded(charmmodel.FieldGeneration)
 	return u
 }
 
@@ -487,6 +516,20 @@ func (u *CharmModelUpsertOne) SetName(v string) *CharmModelUpsertOne {
 func (u *CharmModelUpsertOne) UpdateName() *CharmModelUpsertOne {
 	return u.Update(func(s *CharmModelUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetGeneration sets the "generation" field.
+func (u *CharmModelUpsertOne) SetGeneration(v types.CharmModelGeneration) *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetGeneration(v)
+	})
+}
+
+// UpdateGeneration sets the "generation" field to the value that was provided on create.
+func (u *CharmModelUpsertOne) UpdateGeneration() *CharmModelUpsertOne {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateGeneration()
 	})
 }
 
@@ -779,6 +822,20 @@ func (u *CharmModelUpsertBulk) SetName(v string) *CharmModelUpsertBulk {
 func (u *CharmModelUpsertBulk) UpdateName() *CharmModelUpsertBulk {
 	return u.Update(func(s *CharmModelUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetGeneration sets the "generation" field.
+func (u *CharmModelUpsertBulk) SetGeneration(v types.CharmModelGeneration) *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.SetGeneration(v)
+	})
+}
+
+// UpdateGeneration sets the "generation" field to the value that was provided on create.
+func (u *CharmModelUpsertBulk) UpdateGeneration() *CharmModelUpsertBulk {
+	return u.Update(func(s *CharmModelUpsert) {
+		s.UpdateGeneration()
 	})
 }
 

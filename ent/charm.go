@@ -25,6 +25,8 @@ type Charm struct {
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Type holds the value of the "type" field.
+	Type types.CharmType `json:"type,omitempty"`
 	// ModelID holds the value of the "model_id" field.
 	ModelID types.CharmModelID `json:"model_id,omitempty"`
 	// OwnerID holds the value of the "owner_id" field.
@@ -36,7 +38,7 @@ func (*Charm) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case charm.FieldID, charm.FieldModelID, charm.FieldOwnerID:
+		case charm.FieldID, charm.FieldType, charm.FieldModelID, charm.FieldOwnerID:
 			values[i] = new(sql.NullInt64)
 		case charm.FieldName:
 			values[i] = new(sql.NullString)
@@ -88,6 +90,12 @@ func (c *Charm) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				c.Name = value.String
 			}
+		case charm.FieldType:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field type", values[i])
+			} else if value.Valid {
+				c.Type = types.CharmType(value.Int64)
+			}
 		case charm.FieldModelID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field model_id", values[i])
@@ -138,6 +146,8 @@ func (c *Charm) String() string {
 	}
 	builder.WriteString(", name=")
 	builder.WriteString(c.Name)
+	builder.WriteString(", type=")
+	builder.WriteString(fmt.Sprintf("%v", c.Type))
 	builder.WriteString(", model_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.ModelID))
 	builder.WriteString(", owner_id=")

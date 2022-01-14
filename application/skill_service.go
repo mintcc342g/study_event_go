@@ -38,7 +38,7 @@ func (g *SkillService) New(ctx context.Context, skillDTO *dto.Skill) (*dto.Skill
 		return nil, err
 	}
 
-	if skill, err = g.skillRepo.New(ctx, skill); err != nil {
+	if skill, err = g.skillRepo.Save(ctx, skill); err != nil {
 		return nil, err
 	}
 

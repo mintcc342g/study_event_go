@@ -205,3 +205,51 @@ func (a *ArsenalType) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+// CharmModelGeneration ...
+type CharmModelGeneration uint32
+
+// CharmModelGenerations ...
+const (
+	NoneGeneration CharmModelGeneration = iota
+	FirstGeneration
+	SecondGeneration
+	ThirdGeneration
+	FourthGeneration
+)
+
+// CharmType ...
+type CharmType uint32
+
+// CharmType ...
+const (
+	NoneTypeCharm CharmType = iota
+	UniqueTypeCharm
+	MassProductionTypeCharm
+)
+
+// String ...
+func (c CharmType) String() string {
+	return [...]string{"NONE", "UNIQUE", "MASS-PRODUCTION"}[c]
+}
+
+// MarshalJSON ...
+func (c *CharmType) MarshalJSON() ([]byte, error) {
+	return json.Marshal((*c).String())
+}
+
+// UnmarshalJSON ...
+func (c *CharmType) UnmarshalJSON(data []byte) error {
+	strData := strings.Trim(string(data), "\"")
+	if strData == "" {
+		return nil
+	}
+
+	*c = map[string]CharmType{
+		"NONE":            NoneTypeCharm,
+		"UNIQUE":          UniqueTypeCharm,
+		"MASS-PRODUCTION": MassProductionTypeCharm,
+	}[strings.ToUpper(strData)]
+
+	return nil
+}

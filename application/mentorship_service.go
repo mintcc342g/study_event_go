@@ -39,7 +39,7 @@ func (m *MentorshipService) New(ctx context.Context, mentorshipDTO *dto.Mentorsh
 		return nil, err
 	}
 
-	if mentorship, err = m.mentorshipRepo.New(ctx, mentorship); err != nil {
+	if mentorship, err = m.mentorshipRepo.Save(ctx, mentorship); err != nil {
 		return nil, err
 	}
 

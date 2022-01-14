@@ -121,6 +121,14 @@ func Name(v string) predicate.CharmModel {
 	})
 }
 
+// Generation applies equality check predicate on the "generation" field. It's identical to GenerationEQ.
+func Generation(v types.CharmModelGeneration) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldGeneration), vc))
+	})
+}
+
 // CreatorID applies equality check predicate on the "creator_id" field. It's identical to CreatorIDEQ.
 func CreatorID(v types.CharmCreatorID) predicate.CharmModel {
 	vc := uint64(v)
@@ -479,6 +487,88 @@ func NameEqualFold(v string) predicate.CharmModel {
 func NameContainsFold(v string) predicate.CharmModel {
 	return predicate.CharmModel(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldName), v))
+	})
+}
+
+// GenerationEQ applies the EQ predicate on the "generation" field.
+func GenerationEQ(v types.CharmModelGeneration) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldGeneration), vc))
+	})
+}
+
+// GenerationNEQ applies the NEQ predicate on the "generation" field.
+func GenerationNEQ(v types.CharmModelGeneration) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldGeneration), vc))
+	})
+}
+
+// GenerationIn applies the In predicate on the "generation" field.
+func GenerationIn(vs ...types.CharmModelGeneration) predicate.CharmModel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = uint32(vs[i])
+	}
+	return predicate.CharmModel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldGeneration), v...))
+	})
+}
+
+// GenerationNotIn applies the NotIn predicate on the "generation" field.
+func GenerationNotIn(vs ...types.CharmModelGeneration) predicate.CharmModel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = uint32(vs[i])
+	}
+	return predicate.CharmModel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldGeneration), v...))
+	})
+}
+
+// GenerationGT applies the GT predicate on the "generation" field.
+func GenerationGT(v types.CharmModelGeneration) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldGeneration), vc))
+	})
+}
+
+// GenerationGTE applies the GTE predicate on the "generation" field.
+func GenerationGTE(v types.CharmModelGeneration) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldGeneration), vc))
+	})
+}
+
+// GenerationLT applies the LT predicate on the "generation" field.
+func GenerationLT(v types.CharmModelGeneration) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldGeneration), vc))
+	})
+}
+
+// GenerationLTE applies the LTE predicate on the "generation" field.
+func GenerationLTE(v types.CharmModelGeneration) predicate.CharmModel {
+	vc := uint32(v)
+	return predicate.CharmModel(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldGeneration), vc))
 	})
 }
 

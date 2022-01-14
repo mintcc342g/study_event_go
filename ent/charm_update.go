@@ -74,6 +74,19 @@ func (cu *CharmUpdate) SetName(s string) *CharmUpdate {
 	return cu
 }
 
+// SetType sets the "type" field.
+func (cu *CharmUpdate) SetType(tt types.CharmType) *CharmUpdate {
+	cu.mutation.ResetType()
+	cu.mutation.SetType(tt)
+	return cu
+}
+
+// AddType adds tt to the "type" field.
+func (cu *CharmUpdate) AddType(tt types.CharmType) *CharmUpdate {
+	cu.mutation.AddType(tt)
+	return cu
+}
+
 // SetModelID sets the "model_id" field.
 func (cu *CharmUpdate) SetModelID(tmi types.CharmModelID) *CharmUpdate {
 	cu.mutation.ResetModelID()
@@ -236,6 +249,20 @@ func (cu *CharmUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: charm.FieldName,
 		})
 	}
+	if value, ok := cu.mutation.GetType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charm.FieldType,
+		})
+	}
+	if value, ok := cu.mutation.AddedType(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charm.FieldType,
+		})
+	}
 	if value, ok := cu.mutation.ModelID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint64,
@@ -326,6 +353,19 @@ func (cuo *CharmUpdateOne) ClearDeletedAt() *CharmUpdateOne {
 // SetName sets the "name" field.
 func (cuo *CharmUpdateOne) SetName(s string) *CharmUpdateOne {
 	cuo.mutation.SetName(s)
+	return cuo
+}
+
+// SetType sets the "type" field.
+func (cuo *CharmUpdateOne) SetType(tt types.CharmType) *CharmUpdateOne {
+	cuo.mutation.ResetType()
+	cuo.mutation.SetType(tt)
+	return cuo
+}
+
+// AddType adds tt to the "type" field.
+func (cuo *CharmUpdateOne) AddType(tt types.CharmType) *CharmUpdateOne {
+	cuo.mutation.AddType(tt)
 	return cuo
 }
 
@@ -513,6 +553,20 @@ func (cuo *CharmUpdateOne) sqlSave(ctx context.Context) (_node *Charm, err error
 			Type:   field.TypeString,
 			Value:  value,
 			Column: charm.FieldName,
+		})
+	}
+	if value, ok := cuo.mutation.GetType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charm.FieldType,
+		})
+	}
+	if value, ok := cuo.mutation.AddedType(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charm.FieldType,
 		})
 	}
 	if value, ok := cuo.mutation.ModelID(); ok {

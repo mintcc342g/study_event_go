@@ -23,7 +23,7 @@ func NewCharmRepository(conn *ent.Client) interfaces.CharmRepository {
 	}
 }
 
-func (c *charmRepository) NewCreator(ctx context.Context, creator *entity.CharmCreator) (*entity.CharmCreator, error) {
+func (c *charmRepository) SaveCreator(ctx context.Context, creator *entity.CharmCreator) (*entity.CharmCreator, error) {
 
 	entModel, err := c.conn.CharmCreator.
 		Create().
@@ -65,7 +65,7 @@ func (c *charmRepository) Creator(ctx context.Context, id types.CharmCreatorID) 
 	}, nil
 }
 
-func (c *charmRepository) NewModel(ctx context.Context, model *entity.CharmModel) (*entity.CharmModel, error) {
+func (c *charmRepository) SaveModel(ctx context.Context, model *entity.CharmModel) (*entity.CharmModel, error) {
 
 	entModel, err := c.conn.CharmModel.
 		Create().
@@ -112,7 +112,7 @@ func (c *charmRepository) ModelsByIDs(ctx context.Context, ids []types.CharmMode
 	return models, nil
 }
 
-func (c *charmRepository) RegistCharms(ctx context.Context, charms ...*entity.Charm) ([]*entity.Charm, error) {
+func (c *charmRepository) SaveCharms(ctx context.Context, charms ...*entity.Charm) ([]*entity.Charm, error) {
 
 	bulk := make([]*ent.CharmCreate, len(charms))
 	for i, v := range charms {

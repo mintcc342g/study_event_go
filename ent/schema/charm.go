@@ -21,6 +21,7 @@ func (Charm) Fields() []ent.Field {
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 		field.Time("deleted_at").Nillable().Optional(),
 		field.String("name").Unique().NotEmpty(),
+		field.Uint32("type").GoType(types.CharmType(0)),
 		field.Uint64("model_id").GoType(types.CharmModelID(0)),
 		field.Uint64("owner_id").GoType(types.LilyID(0)),
 	}

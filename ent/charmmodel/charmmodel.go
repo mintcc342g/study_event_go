@@ -19,6 +19,8 @@ const (
 	FieldDeletedAt = "deleted_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldGeneration holds the string denoting the generation field in the database.
+	FieldGeneration = "generation"
 	// FieldCreatorID holds the string denoting the creator_id field in the database.
 	FieldCreatorID = "creator_id"
 	// Table holds the table name of the charmmodel in the database.
@@ -32,6 +34,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldDeletedAt,
 	FieldName,
+	FieldGeneration,
 	FieldCreatorID,
 }
 

@@ -44,8 +44,8 @@ func NewLily(lilyDTO *dto.Lily) (*Lily, error) {
 	}, nil
 }
 
-// NewCharms ...
-func (l *Lily) NewCharms(charmModelIDs []types.CharmModelID, models ...*CharmModel) error {
+// ContractWith ...
+func (l *Lily) ContractWith(charmModelIDs []types.CharmModelID, models ...*CharmModel) error {
 	if len(charmModelIDs) != len(models) {
 		return errors.BadRequestf("invalid charm model ids")
 	}

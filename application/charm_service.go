@@ -33,7 +33,7 @@ func (c *CharmService) NewCharmCreator(ctx context.Context, charmCreatorDTO *dto
 		return nil, err
 	}
 
-	if charmCreator, err = c.charmRepo.NewCreator(ctx, charmCreator); err != nil {
+	if charmCreator, err = c.charmRepo.SaveCreator(ctx, charmCreator); err != nil {
 		return nil, err
 	}
 
@@ -45,16 +45,17 @@ func (c *CharmService) NewCharmModel(ctx context.Context, charmModelDTO *dto.Cha
 
 	// TODO: requestor check with ctx
 
-	if _, err := c.charmRepo.Creator(ctx, charmModelDTO.CreatorID); err != nil {
-		return nil, err
-	}
-
-	charmModel, err := entity.NewCharmModel(charmModelDTO)
+	creator, err := c.charmRepo.Creator(ctx, charmModelDTO.CreatorID)
 	if err != nil {
 		return nil, err
 	}
 
-	if charmModel, err = c.charmRepo.NewModel(ctx, charmModel); err != nil {
+	charmModel, err := creator.NewCharmModel(charmModelDTO)
+	if err != nil {
+		return nil, err
+	}
+
+	if charmModel, err = c.charmRepo.SaveModel(ctx, charmModel); err != nil {
 		return nil, err
 	}
 

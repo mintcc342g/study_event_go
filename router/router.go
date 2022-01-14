@@ -43,7 +43,7 @@ func AssaultLilyRoute(sys *echo.Group, ctrlContainer *container.ControllerContai
 	// TODO
 	sys.POST("/charm-creator", ctrlContainer.Charm.NewCharmCreator)
 	sys.POST("/charm-models", ctrlContainer.Charm.NewCharmModel)
-	// sys.POST("/lilies/:id/charms", ctrlContainer.Lily.NewCharms)
+	sys.POST("/lilies/:id/charms", ctrlContainer.Lily.NewCharms)
 
 	// TODO
 	// sys.POST("/legions", ctrlContainer.Legion.New)

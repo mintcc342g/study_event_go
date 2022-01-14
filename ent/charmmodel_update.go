@@ -74,6 +74,19 @@ func (cmu *CharmModelUpdate) SetName(s string) *CharmModelUpdate {
 	return cmu
 }
 
+// SetGeneration sets the "generation" field.
+func (cmu *CharmModelUpdate) SetGeneration(tmg types.CharmModelGeneration) *CharmModelUpdate {
+	cmu.mutation.ResetGeneration()
+	cmu.mutation.SetGeneration(tmg)
+	return cmu
+}
+
+// AddGeneration adds tmg to the "generation" field.
+func (cmu *CharmModelUpdate) AddGeneration(tmg types.CharmModelGeneration) *CharmModelUpdate {
+	cmu.mutation.AddGeneration(tmg)
+	return cmu
+}
+
 // SetCreatorID sets the "creator_id" field.
 func (cmu *CharmModelUpdate) SetCreatorID(tci types.CharmCreatorID) *CharmModelUpdate {
 	cmu.mutation.ResetCreatorID()
@@ -223,6 +236,20 @@ func (cmu *CharmModelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: charmmodel.FieldName,
 		})
 	}
+	if value, ok := cmu.mutation.Generation(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charmmodel.FieldGeneration,
+		})
+	}
+	if value, ok := cmu.mutation.AddedGeneration(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charmmodel.FieldGeneration,
+		})
+	}
 	if value, ok := cmu.mutation.CreatorID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUint64,
@@ -299,6 +326,19 @@ func (cmuo *CharmModelUpdateOne) ClearDeletedAt() *CharmModelUpdateOne {
 // SetName sets the "name" field.
 func (cmuo *CharmModelUpdateOne) SetName(s string) *CharmModelUpdateOne {
 	cmuo.mutation.SetName(s)
+	return cmuo
+}
+
+// SetGeneration sets the "generation" field.
+func (cmuo *CharmModelUpdateOne) SetGeneration(tmg types.CharmModelGeneration) *CharmModelUpdateOne {
+	cmuo.mutation.ResetGeneration()
+	cmuo.mutation.SetGeneration(tmg)
+	return cmuo
+}
+
+// AddGeneration adds tmg to the "generation" field.
+func (cmuo *CharmModelUpdateOne) AddGeneration(tmg types.CharmModelGeneration) *CharmModelUpdateOne {
+	cmuo.mutation.AddGeneration(tmg)
 	return cmuo
 }
 
@@ -473,6 +513,20 @@ func (cmuo *CharmModelUpdateOne) sqlSave(ctx context.Context) (_node *CharmModel
 			Type:   field.TypeString,
 			Value:  value,
 			Column: charmmodel.FieldName,
+		})
+	}
+	if value, ok := cmuo.mutation.Generation(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charmmodel.FieldGeneration,
+		})
+	}
+	if value, ok := cmuo.mutation.AddedGeneration(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: charmmodel.FieldGeneration,
 		})
 	}
 	if value, ok := cmuo.mutation.CreatorID(); ok {

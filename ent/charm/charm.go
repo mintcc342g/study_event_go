@@ -19,6 +19,8 @@ const (
 	FieldDeletedAt = "deleted_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldType holds the string denoting the type field in the database.
+	FieldType = "type"
 	// FieldModelID holds the string denoting the model_id field in the database.
 	FieldModelID = "model_id"
 	// FieldOwnerID holds the string denoting the owner_id field in the database.
@@ -34,6 +36,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldDeletedAt,
 	FieldName,
+	FieldType,
 	FieldModelID,
 	FieldOwnerID,
 }

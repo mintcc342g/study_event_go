@@ -23,7 +23,7 @@ func NewLilyRepository(conn *ent.Client) interfaces.LilyRepository {
 	}
 }
 
-func (l *lilyRepository) New(ctx context.Context, lily *entity.Lily) (*entity.Lily, error) {
+func (l *lilyRepository) Save(ctx context.Context, lily *entity.Lily) (*entity.Lily, error) {
 
 	entModel, err := l.conn.Lily.
 		Create().
@@ -77,6 +77,6 @@ func (l *lilyRepository) Lily(ctx context.Context, id types.LilyID) (*entity.Lil
 	}, nil
 }
 
-func (l *lilyRepository) TopClassLilies(ctx context.Context, gardenID types.GardenID, memberCnt int) ([]*entity.Lily, error) {
+func (l *lilyRepository) LiliesByRank(ctx context.Context, gardenID types.GardenID, rank int) ([]*entity.Lily, error) {
 	return nil, nil
 }

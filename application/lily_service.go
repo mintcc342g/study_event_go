@@ -45,7 +45,7 @@ func (l *LilyService) New(ctx context.Context, lilyDTO *dto.Lily) (*dto.Lily, er
 		return nil, err
 	}
 
-	if lily, err = l.lilyRepo.New(ctx, lily); err != nil {
+	if lily, err = l.lilyRepo.Save(ctx, lily); err != nil {
 		return nil, err
 	}
 
@@ -55,7 +55,8 @@ func (l *LilyService) New(ctx context.Context, lilyDTO *dto.Lily) (*dto.Lily, er
 // NewCharms ...
 func (l *LilyService) NewCharms(ctx context.Context, lilyID types.LilyID, charmModelIDs []types.CharmModelID) (results []*dto.Charm, err error) {
 
-	// TODO: requestor check with ctx
+	// TODO: requestor and creator check with ctx
+
 	lily, err := l.lilyRepo.Lily(ctx, lilyID)
 	if err != nil {
 		return
@@ -66,11 +67,11 @@ func (l *LilyService) NewCharms(ctx context.Context, lilyID types.LilyID, charmM
 		return
 	}
 
-	if err = lily.NewCharms(charmModelIDs, charmModels...); err != nil {
+	if err = lily.ContractWith(charmModelIDs, charmModels...); err != nil {
 		return
 	}
 
-	charms, err := l.charmRepo.RegistCharms(ctx, lily.Charms...)
+	charms, err := l.charmRepo.SaveCharms(ctx, lily.Charms...)
 	if err != nil {
 		return
 	}

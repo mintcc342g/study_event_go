@@ -22,7 +22,7 @@ func NewGardenRepository(conn *ent.Client) interfaces.GardenRepository {
 	}
 }
 
-func (g *gardenRepository) New(ctx context.Context, garden *entity.Garden) (*entity.Garden, error) {
+func (g *gardenRepository) Save(ctx context.Context, garden *entity.Garden) (*entity.Garden, error) {
 
 	id, err := g.conn.Garden.
 		Create().
