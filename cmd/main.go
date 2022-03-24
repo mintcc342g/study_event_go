@@ -14,6 +14,7 @@ import (
 	"study-event-go/ent"
 	"study-event-go/router"
 	"study-event-go/types"
+	"study-event-go/worker"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/RichardKnop/machinery/v1"
@@ -58,8 +59,8 @@ func main() {
 	e := echoInit(configs)
 	signal := sigInit(e)
 	rds := redisInit(configs, e)
-	machineryServer := machineryInit(configs, e)
 	db := dbInit(configs, e)
+	machineryServer := initMachineryServer(configs, e)
 
 	repoContainer, err := container.InitRepositoryContainer(db, rds, machineryServer)
 	if err != nil {
@@ -70,8 +71,13 @@ func main() {
 	svcContainer := container.InitServiceContainer(repoContainer)
 	ctrlContainer := container.InitControllerContainer(svcContainer, repoContainer)
 
-	if err := handlerInit(e, ctrlContainer, signal); err != nil {
-		e.Logger.Error("handlerInit Error")
+	if err := initHandler(e, ctrlContainer, signal); err != nil {
+		e.Logger.Error("initHandler Error")
+		os.Exit(1)
+	}
+
+	if err := initMachineryWorker(configs, machineryServer, repoContainer); err != nil {
+		e.Logger.Error("initMachineryWorker Error")
 		os.Exit(1)
 	}
 
@@ -159,7 +165,7 @@ func redisInit(configs *conf.ViperConfig, e *echo.Echo) redis.Cmdable {
 	return rds
 }
 
-func machineryInit(configs *conf.ViperConfig, e *echo.Echo) *machinery.Server {
+func initMachineryServer(configs *conf.ViperConfig, e *echo.Echo) *machinery.Server {
 	broker := configs.GetString("broker_host")
 
 	mConf := &config.Config{
@@ -170,16 +176,55 @@ func machineryInit(configs *conf.ViperConfig, e *echo.Echo) *machinery.Server {
 
 	server, err := machinery.NewServer(mConf)
 	if err != nil {
-		e.Logger.Error("machineryInit NewServer", "broker", broker, "err", err) // todo: logger
+		e.Logger.Error("initMachineryServer NewServer", "broker", broker, "err", err) // todo: logger
 		os.Exit(1)
 	}
 
 	return server
 }
 
-func handlerInit(e *echo.Echo, ctrlContainer *container.ControllerContainer, signal <-chan os.Signal) error {
+func initMachineryWorker(configs *conf.ViperConfig, server *machinery.Server, repoContainer *container.RepositoryContainer) error {
+	if err := registerTasks(server, repoContainer); err != nil {
+		return err
+	}
+
+	if err := runTaskWorker(configs, server); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func registerTasks(server *machinery.Server, repoContainer *container.RepositoryContainer) error {
+	eventWorker := worker.NewEventWorker(repoContainer)
+
+	tasks := map[string]interface{}{
+		types.LegionSortieEvent: eventWorker.ProcessLegionSortieEvent,
+	}
+
+	if err := server.RegisterTasks(tasks); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func runTaskWorker(configs *conf.ViperConfig, server *machinery.Server) error {
+	workerName := configs.GetString("worker_name")
+	consumerTag := 0
+
+	worker := server.NewWorker(workerName, consumerTag)
+
+	go worker.Launch() // waiting for messages
+
+	return nil
+}
+
+func initHandler(e *echo.Echo, ctrlContainer *container.ControllerContainer, signal <-chan os.Signal) error {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+
+	// TODO: request ID
 
 	api := e.Group("/api")
 	ver := api.Group("/v1")

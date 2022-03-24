@@ -85,14 +85,14 @@ func (l *lilyRepository) Lily(ctx context.Context, id types.LilyID) (*entity.Lil
 	}, nil
 }
 
-func (l *lilyRepository) LiliesByRank(ctx context.Context, gardenID types.GardenID, rank uint32) ([]*entity.Lily, error) {
+func (l *lilyRepository) LiliesByOrderedRank(ctx context.Context, gardenID types.GardenID, cnt uint32) ([]*entity.Lily, error) {
 
 	entModels, err := l.conn.Lily.Query().
 		Where(
 			entLily.GardenID(gardenID),
 		).
-		Limit(int(rank)).
-		Order(ent.Desc(entLily.FieldRank)).
+		Limit(int(cnt)).
+		Order(ent.Asc(entLily.FieldRank)).
 		All(ctx)
 	if err != nil {
 		// logger

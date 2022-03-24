@@ -27,20 +27,26 @@ func (m *machineryRepository) SendLegionSortieEvent(ctx context.Context, sortieE
 		Name: types.LegionSortieEvent,
 		Args: []tasks.Arg{
 			{
+				Name:  "gardenID",
+				Type:  "uint64",
+				Value: sortieEvent.GardenID,
+			},
+			{
 				Name:  "location",
 				Type:  "string",
 				Value: sortieEvent.Location,
 			},
 			{
-				Name:  "legion",
-				Type:  "interface{}",
-				Value: sortieEvent.Legion,
+				Name:  "legionMemberCount",
+				Type:  "uint32",
+				Value: sortieEvent.LegionMemberCount,
 			},
-			{
-				Name:  "huges",
-				Type:  "[]interface{}",
-				Value: sortieEvent.Huges,
-			},
+			// TODO
+			// {
+			// 	Name:  "requestID",
+			// 	Type:  "string",
+			// 	Value: util.GetRequestID(ctx),
+			// },
 		},
 	}
 

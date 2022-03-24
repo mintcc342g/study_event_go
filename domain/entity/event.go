@@ -1,19 +1,17 @@
 package entity
 
-import "study-event-go/domain/vo"
-
 // SortieEvent ...
 type SortieEvent struct {
-	Location string
-	Legion   *Legion
-	Huges    []*vo.Huge
+	GardenID          uint64
+	Location          string
+	LegionMemberCount uint32
 }
 
 // NewSortieEvent ...
-func NewSortieEvent(alarm *Alarm, legion *Legion) *SortieEvent {
+func NewSortieEvent(alarm *Alarm) *SortieEvent {
 	return &SortieEvent{
-		Location: alarm.CaveLocation,
-		Legion:   legion,
-		Huges:    alarm.Huges,
+		GardenID:          uint64(alarm.GardenID),
+		Location:          alarm.CaveLocation,
+		LegionMemberCount: uint32(alarm.LegionMemberCount),
 	}
 }

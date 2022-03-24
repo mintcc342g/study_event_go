@@ -25,6 +25,7 @@ func init() {
 		"db_name":     "lily",
 		"db_user":     "root",
 		"db_pass":     "",
+		"worker_name": "study_event_go_worker",
 	})
 }
 

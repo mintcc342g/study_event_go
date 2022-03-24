@@ -44,25 +44,14 @@ func (p *ProtectionService) Alarm(ctx context.Context, alarmDTO *dto.Alarm) (err
 	}
 
 	if alarm.IsSevere() && garden.IsTopLegionSystem() {
-		return p.makeTopLegion(ctx, garden, alarm)
+		return p.sendSortieEvent(ctx, alarm)
 	}
 
 	return p.startNormalBattle(ctx, garden, alarm)
 }
 
-func (p *ProtectionService) makeTopLegion(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
-
-	lilies, err := p.lilyRepo.LiliesByRank(ctx, alarm.GardenID, alarm.LegionMemberCount)
-	if err != nil {
-		return err
-	}
-
-	legion, err := garden.NewTopLegion(lilies)
-	if err != nil {
-		return err
-	}
-
-	event := entity.NewSortieEvent(alarm, legion)
+func (p *ProtectionService) sendSortieEvent(ctx context.Context, alarm *entity.Alarm) (err error) {
+	event := entity.NewSortieEvent(alarm)
 
 	if err = p.eventRepo.SendLegionSortieEvent(ctx, event); err != nil {
 		return err
@@ -75,6 +64,5 @@ func (p *ProtectionService) makeTopLegion(ctx context.Context, garden *entity.Ga
 func (p *ProtectionService) startNormalBattle(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
 
 	// TODO: send push notification to all lilies in the garden
-
 	return nil
 }
