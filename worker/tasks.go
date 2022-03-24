@@ -47,5 +47,7 @@ func (w *EventWorker) ProcessLegionSortieEvent(gardenID uint64, location string,
 	for i, l := range legion.Members {
 		println("[ANNOUNCEMENT]", fmt.Sprintf("%d)", i), l.Name.FullName())
 	}
+	println("[ANNOUNCEMENT]", fmt.Sprintf("GO TO %s NOW IF YOU ARE A MEMBER OF THE LEGION!", location))
+
 	return nil
 }
