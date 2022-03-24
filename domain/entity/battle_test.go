@@ -4,6 +4,7 @@ import (
 	"study-event-go/application/dto"
 	"study-event-go/domain/entity"
 	"study-event-go/domain/vo"
+	"study-event-go/types"
 
 	"github.com/juju/errors"
 	. "github.com/onsi/ginkgo"
@@ -15,6 +16,8 @@ var _ = Describe("Test Battle Domain", func() {
 	var (
 		alarmDTO *dto.Alarm
 		alarm    *entity.Alarm
+
+		garden *entity.Garden
 
 		expectedError error
 	)
@@ -28,8 +31,8 @@ var _ = Describe("Test Battle Domain", func() {
 					Class: 1,
 					Type:  0,
 				}},
-				TotalCount: 3,
-				AlertLevel: 2,
+				TotalHugeCount: 3,
+				AlertLevel:     2,
 			}
 
 			alarm = &entity.Alarm{
@@ -39,14 +42,16 @@ var _ = Describe("Test Battle Domain", func() {
 					Class: 1,
 					Type:  0,
 				}},
-				TotalCount: 3,
-				AlertLevel: 2,
+				TotalHugeCount: 3,
+				AlertLevel:     2,
 			}
+
+			garden = &entity.Garden{}
 		})
 
 		Context("pass to create a new alarm", func() {
 			It("should not error", func() {
-				result, err := entity.NewAlarm(alarmDTO)
+				result, err := entity.NewAlarm(garden, alarmDTO)
 				Expect(result).To(Equal(alarm))
 				Expect(err).NotTo(HaveOccurred())
 			})
@@ -59,7 +64,7 @@ var _ = Describe("Test Battle Domain", func() {
 			})
 
 			It("should be error", func() {
-				result, err := entity.NewAlarm(alarmDTO)
+				result, err := entity.NewAlarm(garden, alarmDTO)
 				Expect(result).To(BeNil())
 				Expect(err.Error()).To(Equal(expectedError.Error()))
 			})
@@ -72,20 +77,20 @@ var _ = Describe("Test Battle Domain", func() {
 			})
 
 			It("should be error", func() {
-				result, err := entity.NewAlarm(alarmDTO)
+				result, err := entity.NewAlarm(garden, alarmDTO)
 				Expect(result).To(BeNil())
 				Expect(err.Error()).To(Equal(expectedError.Error()))
 			})
 		})
 
-		Context("fail to create a new alarm by invalid total count", func() {
+		Context("fail to create a new alarm by invalid total huge count", func() {
 			BeforeEach(func() {
-				alarmDTO.TotalCount = 0
-				expectedError = errors.BadRequestf("invalid total count")
+				alarmDTO.TotalHugeCount = 0
+				expectedError = errors.BadRequestf("invalid total huge count")
 			})
 
 			It("should be error", func() {
-				result, err := entity.NewAlarm(alarmDTO)
+				result, err := entity.NewAlarm(garden, alarmDTO)
 				Expect(result).To(BeNil())
 				Expect(err.Error()).To(Equal(expectedError.Error()))
 			})
@@ -98,7 +103,21 @@ var _ = Describe("Test Battle Domain", func() {
 			})
 
 			It("should be error", func() {
-				result, err := entity.NewAlarm(alarmDTO)
+				result, err := entity.NewAlarm(garden, alarmDTO)
+				Expect(result).To(BeNil())
+				Expect(err.Error()).To(Equal(expectedError.Error()))
+			})
+		})
+
+		Context("fail to create a new alarm by invalid legion member count", func() {
+			BeforeEach(func() {
+				garden.LegionSystem = types.TopLegionSystem
+				alarmDTO.LegionMemberCount = 0
+				expectedError = errors.BadRequestf("invalid legion member count")
+			})
+
+			It("should be error", func() {
+				result, err := entity.NewAlarm(garden, alarmDTO)
 				Expect(result).To(BeNil())
 				Expect(err.Error()).To(Equal(expectedError.Error()))
 			})

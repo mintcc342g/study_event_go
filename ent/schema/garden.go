@@ -24,6 +24,8 @@ func (Garden) Fields() []ent.Field {
 		field.String("location"),
 		field.Uint64("mentorship_id").
 			GoType(types.MentorshipID(0)),
+		field.Uint32("legion_system").
+			GoType(types.LegionSystem(0)),
 	}
 }
 

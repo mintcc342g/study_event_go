@@ -4,11 +4,12 @@ import "study-event-go/types"
 
 // Alarm ...
 type Alarm struct {
-	GardenID     types.GardenID
-	CaveLocation string
-	Huges        []*Huge
-	TotalCount   uint32
-	AlertLevel   types.AlertLevel
+	GardenID          types.GardenID
+	CaveLocation      string
+	Huges             []*Huge
+	TotalHugeCount    uint32
+	AlertLevel        types.AlertLevel
+	LegionMemberCount uint32
 }
 
 // Huge ...

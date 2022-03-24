@@ -14,4 +14,5 @@ type Garden struct {
 	Name         string             `json:"name,omitempty"`
 	Location     string             `json:"location,omitempty"`
 	MentorshipID types.MentorshipID `json:"mentorship_id,omitempty"`
+	LegionSystem types.LegionSystem `json:"legion_system,omitempty"`
 }

@@ -29,6 +29,7 @@ func (g *gardenRepository) Save(ctx context.Context, garden *entity.Garden) (*en
 		SetName(garden.Name).
 		SetLocation(garden.Location).
 		SetMentorshipID(garden.MentorshipID).
+		SetLegionSystem(garden.LegionSystem).
 		OnConflict().
 		UpdateLocation().
 		UpdateMentorshipID().
@@ -53,6 +54,7 @@ func (g *gardenRepository) Save(ctx context.Context, garden *entity.Garden) (*en
 	garden.Name = entModel.Name
 	garden.Location = entModel.Location
 	garden.MentorshipID = entModel.MentorshipID
+	garden.LegionSystem = entModel.LegionSystem
 
 	return garden, nil
 }
@@ -78,6 +80,7 @@ func (g *gardenRepository) Garden(ctx context.Context, id types.GardenID) (*enti
 		Name:         entModel.Name,
 		Location:     entModel.Location,
 		MentorshipID: entModel.MentorshipID,
+		LegionSystem: entModel.LegionSystem,
 	}, nil
 }
 
@@ -105,6 +108,7 @@ func (g *gardenRepository) GardenByName(ctx context.Context, name string) (*enti
 		Name:         entModel.Name,
 		Location:     entModel.Location,
 		MentorshipID: entModel.MentorshipID,
+		LegionSystem: entModel.LegionSystem,
 	}, nil
 }
 
@@ -132,6 +136,7 @@ func (g *gardenRepository) Gardens(ctx context.Context, offset uint32) ([]*entit
 			Name:         v.Name,
 			Location:     v.Location,
 			MentorshipID: v.MentorshipID,
+			LegionSystem: v.LegionSystem,
 		}
 	}
 
@@ -145,6 +150,7 @@ func (g *gardenRepository) Update(ctx context.Context, garden *entity.Garden) (*
 		SetName(garden.Name).
 		SetLocation(garden.Location).
 		SetMentorshipID(garden.MentorshipID).
+		SetLegionSystem(garden.LegionSystem).
 		SetNillableDeletedAt(garden.DeletedAt).
 		Save(ctx)
 	if err != nil {
@@ -159,6 +165,7 @@ func (g *gardenRepository) Update(ctx context.Context, garden *entity.Garden) (*
 	garden.Name = entModel.Name
 	garden.Location = entModel.Location
 	garden.MentorshipID = entModel.MentorshipID
+	garden.LegionSystem = entModel.LegionSystem
 
 	return garden, nil
 }

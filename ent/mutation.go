@@ -2030,6 +2030,8 @@ type GardenMutation struct {
 	location         *string
 	mentorship_id    *types.MentorshipID
 	addmentorship_id *types.MentorshipID
+	legion_system    *types.LegionSystem
+	addlegion_system *types.LegionSystem
 	clearedFields    map[string]struct{}
 	done             bool
 	oldValue         func(context.Context) (*Garden, error)
@@ -2370,6 +2372,62 @@ func (m *GardenMutation) ResetMentorshipID() {
 	m.addmentorship_id = nil
 }
 
+// SetLegionSystem sets the "legion_system" field.
+func (m *GardenMutation) SetLegionSystem(ts types.LegionSystem) {
+	m.legion_system = &ts
+	m.addlegion_system = nil
+}
+
+// LegionSystem returns the value of the "legion_system" field in the mutation.
+func (m *GardenMutation) LegionSystem() (r types.LegionSystem, exists bool) {
+	v := m.legion_system
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLegionSystem returns the old "legion_system" field's value of the Garden entity.
+// If the Garden object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GardenMutation) OldLegionSystem(ctx context.Context) (v types.LegionSystem, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldLegionSystem is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldLegionSystem requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLegionSystem: %w", err)
+	}
+	return oldValue.LegionSystem, nil
+}
+
+// AddLegionSystem adds ts to the "legion_system" field.
+func (m *GardenMutation) AddLegionSystem(ts types.LegionSystem) {
+	if m.addlegion_system != nil {
+		*m.addlegion_system += ts
+	} else {
+		m.addlegion_system = &ts
+	}
+}
+
+// AddedLegionSystem returns the value that was added to the "legion_system" field in this mutation.
+func (m *GardenMutation) AddedLegionSystem() (r types.LegionSystem, exists bool) {
+	v := m.addlegion_system
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLegionSystem resets all changes to the "legion_system" field.
+func (m *GardenMutation) ResetLegionSystem() {
+	m.legion_system = nil
+	m.addlegion_system = nil
+}
+
 // Where appends a list predicates to the GardenMutation builder.
 func (m *GardenMutation) Where(ps ...predicate.Garden) {
 	m.predicates = append(m.predicates, ps...)
@@ -2389,7 +2447,7 @@ func (m *GardenMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GardenMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, garden.FieldCreatedAt)
 	}
@@ -2407,6 +2465,9 @@ func (m *GardenMutation) Fields() []string {
 	}
 	if m.mentorship_id != nil {
 		fields = append(fields, garden.FieldMentorshipID)
+	}
+	if m.legion_system != nil {
+		fields = append(fields, garden.FieldLegionSystem)
 	}
 	return fields
 }
@@ -2428,6 +2489,8 @@ func (m *GardenMutation) Field(name string) (ent.Value, bool) {
 		return m.Location()
 	case garden.FieldMentorshipID:
 		return m.MentorshipID()
+	case garden.FieldLegionSystem:
+		return m.LegionSystem()
 	}
 	return nil, false
 }
@@ -2449,6 +2512,8 @@ func (m *GardenMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldLocation(ctx)
 	case garden.FieldMentorshipID:
 		return m.OldMentorshipID(ctx)
+	case garden.FieldLegionSystem:
+		return m.OldLegionSystem(ctx)
 	}
 	return nil, fmt.Errorf("unknown Garden field %s", name)
 }
@@ -2500,6 +2565,13 @@ func (m *GardenMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetMentorshipID(v)
 		return nil
+	case garden.FieldLegionSystem:
+		v, ok := value.(types.LegionSystem)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLegionSystem(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Garden field %s", name)
 }
@@ -2511,6 +2583,9 @@ func (m *GardenMutation) AddedFields() []string {
 	if m.addmentorship_id != nil {
 		fields = append(fields, garden.FieldMentorshipID)
 	}
+	if m.addlegion_system != nil {
+		fields = append(fields, garden.FieldLegionSystem)
+	}
 	return fields
 }
 
@@ -2521,6 +2596,8 @@ func (m *GardenMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case garden.FieldMentorshipID:
 		return m.AddedMentorshipID()
+	case garden.FieldLegionSystem:
+		return m.AddedLegionSystem()
 	}
 	return nil, false
 }
@@ -2536,6 +2613,13 @@ func (m *GardenMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddMentorshipID(v)
+		return nil
+	case garden.FieldLegionSystem:
+		v, ok := value.(types.LegionSystem)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLegionSystem(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Garden numeric field %s", name)
@@ -2590,6 +2674,9 @@ func (m *GardenMutation) ResetField(name string) error {
 		return nil
 	case garden.FieldMentorshipID:
 		m.ResetMentorshipID()
+		return nil
+	case garden.FieldLegionSystem:
+		m.ResetLegionSystem()
 		return nil
 	}
 	return fmt.Errorf("unknown Garden field %s", name)

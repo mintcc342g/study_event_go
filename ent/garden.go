@@ -29,6 +29,8 @@ type Garden struct {
 	Location string `json:"location,omitempty"`
 	// MentorshipID holds the value of the "mentorship_id" field.
 	MentorshipID types.MentorshipID `json:"mentorship_id,omitempty"`
+	// LegionSystem holds the value of the "legion_system" field.
+	LegionSystem types.LegionSystem `json:"legion_system,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -36,7 +38,7 @@ func (*Garden) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case garden.FieldID, garden.FieldMentorshipID:
+		case garden.FieldID, garden.FieldMentorshipID, garden.FieldLegionSystem:
 			values[i] = new(sql.NullInt64)
 		case garden.FieldName, garden.FieldLocation:
 			values[i] = new(sql.NullString)
@@ -100,6 +102,12 @@ func (ga *Garden) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				ga.MentorshipID = types.MentorshipID(value.Int64)
 			}
+		case garden.FieldLegionSystem:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field legion_system", values[i])
+			} else if value.Valid {
+				ga.LegionSystem = types.LegionSystem(value.Int64)
+			}
 		}
 	}
 	return nil
@@ -142,6 +150,8 @@ func (ga *Garden) String() string {
 	builder.WriteString(ga.Location)
 	builder.WriteString(", mentorship_id=")
 	builder.WriteString(fmt.Sprintf("%v", ga.MentorshipID))
+	builder.WriteString(", legion_system=")
+	builder.WriteString(fmt.Sprintf("%v", ga.LegionSystem))
 	builder.WriteByte(')')
 	return builder.String()
 }

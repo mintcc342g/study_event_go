@@ -93,6 +93,19 @@ func (gu *GardenUpdate) AddMentorshipID(ti types.MentorshipID) *GardenUpdate {
 	return gu
 }
 
+// SetLegionSystem sets the "legion_system" field.
+func (gu *GardenUpdate) SetLegionSystem(ts types.LegionSystem) *GardenUpdate {
+	gu.mutation.ResetLegionSystem()
+	gu.mutation.SetLegionSystem(ts)
+	return gu
+}
+
+// AddLegionSystem adds ts to the "legion_system" field.
+func (gu *GardenUpdate) AddLegionSystem(ts types.LegionSystem) *GardenUpdate {
+	gu.mutation.AddLegionSystem(ts)
+	return gu
+}
+
 // Mutation returns the GardenMutation object of the builder.
 func (gu *GardenUpdate) Mutation() *GardenMutation {
 	return gu.mutation
@@ -250,6 +263,20 @@ func (gu *GardenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: garden.FieldMentorshipID,
 		})
 	}
+	if value, ok := gu.mutation.LegionSystem(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: garden.FieldLegionSystem,
+		})
+	}
+	if value, ok := gu.mutation.AddedLegionSystem(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: garden.FieldLegionSystem,
+		})
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, gu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{garden.Label}
@@ -331,6 +358,19 @@ func (guo *GardenUpdateOne) SetMentorshipID(ti types.MentorshipID) *GardenUpdate
 // AddMentorshipID adds ti to the "mentorship_id" field.
 func (guo *GardenUpdateOne) AddMentorshipID(ti types.MentorshipID) *GardenUpdateOne {
 	guo.mutation.AddMentorshipID(ti)
+	return guo
+}
+
+// SetLegionSystem sets the "legion_system" field.
+func (guo *GardenUpdateOne) SetLegionSystem(ts types.LegionSystem) *GardenUpdateOne {
+	guo.mutation.ResetLegionSystem()
+	guo.mutation.SetLegionSystem(ts)
+	return guo
+}
+
+// AddLegionSystem adds ts to the "legion_system" field.
+func (guo *GardenUpdateOne) AddLegionSystem(ts types.LegionSystem) *GardenUpdateOne {
+	guo.mutation.AddLegionSystem(ts)
 	return guo
 }
 
@@ -513,6 +553,20 @@ func (guo *GardenUpdateOne) sqlSave(ctx context.Context) (_node *Garden, err err
 			Type:   field.TypeUint64,
 			Value:  value,
 			Column: garden.FieldMentorshipID,
+		})
+	}
+	if value, ok := guo.mutation.LegionSystem(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: garden.FieldLegionSystem,
+		})
+	}
+	if value, ok := guo.mutation.AddedLegionSystem(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: garden.FieldLegionSystem,
 		})
 	}
 	_node = &Garden{config: guo.config}

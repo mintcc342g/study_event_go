@@ -253,3 +253,13 @@ func (c *CharmModelType) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+// LegionSystem ...
+type LegionSystem uint32
+
+// LegionSystems ...
+const (
+	NoneLegionSystem LegionSystem = iota
+	TopLegionSystem
+	AutonomicLegionSystem
+)

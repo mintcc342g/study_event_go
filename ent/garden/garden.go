@@ -23,6 +23,8 @@ const (
 	FieldLocation = "location"
 	// FieldMentorshipID holds the string denoting the mentorship_id field in the database.
 	FieldMentorshipID = "mentorship_id"
+	// FieldLegionSystem holds the string denoting the legion_system field in the database.
+	FieldLegionSystem = "legion_system"
 	// Table holds the table name of the garden in the database.
 	Table = "gardens"
 )
@@ -36,6 +38,7 @@ var Columns = []string{
 	FieldName,
 	FieldLocation,
 	FieldMentorshipID,
+	FieldLegionSystem,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

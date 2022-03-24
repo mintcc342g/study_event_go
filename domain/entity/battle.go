@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"math/rand"
 	"strings"
 	"study-event-go/application/dto"
 	"study-event-go/domain/vo"
@@ -12,26 +11,32 @@ import (
 
 // Alarm ...
 type Alarm struct {
-	ID           types.AlarmID
-	GardenID     types.GardenID
-	CaveLocation string
-	Huges        []*vo.Huge
-	TotalCount   uint32
-	AlertLevel   types.AlertLevel
+	ID                types.AlarmID
+	GardenID          types.GardenID
+	CaveLocation      string
+	Huges             []*vo.Huge
+	TotalHugeCount    uint32
+	AlertLevel        types.AlertLevel
+	LegionMemberCount uint32
 }
 
 // NewAlarm ...
-func NewAlarm(alarmDTO *dto.Alarm) (*Alarm, error) {
+func NewAlarm(garden *Garden, alarmDTO *dto.Alarm) (*Alarm, error) {
 	if err := validateAlarmDTO(alarmDTO); err != nil {
 		return nil, err
 	}
 
+	if garden.IsTopLegionSystem() && alarmDTO.LegionMemberCount == 0 {
+		return nil, errors.BadRequestf("invalid legion member count")
+	}
+
 	alarm := &Alarm{
-		GardenID:     alarmDTO.GardenID,
-		CaveLocation: alarmDTO.CaveLocation,
-		TotalCount:   alarmDTO.TotalCount,
-		AlertLevel:   alarmDTO.AlertLevel,
-		Huges:        []*vo.Huge{},
+		GardenID:          alarmDTO.GardenID,
+		CaveLocation:      alarmDTO.CaveLocation,
+		Huges:             []*vo.Huge{},
+		TotalHugeCount:    alarmDTO.TotalHugeCount,
+		AlertLevel:        alarmDTO.AlertLevel,
+		LegionMemberCount: alarmDTO.LegionMemberCount,
 	}
 
 	for _, huge := range alarmDTO.Huges {
@@ -55,8 +60,8 @@ func validateAlarmDTO(alarmDTO *dto.Alarm) error {
 		return errors.BadRequestf("invalid cave location")
 	}
 
-	if alarmDTO.TotalCount == 0 {
-		return errors.BadRequestf("invalid total count")
+	if alarmDTO.TotalHugeCount == 0 {
+		return errors.BadRequestf("invalid total huge count")
 	}
 
 	if len(alarmDTO.Huges) <= 0 {
@@ -69,9 +74,4 @@ func validateAlarmDTO(alarmDTO *dto.Alarm) error {
 // IsSevere ...
 func (a *Alarm) IsSevere() bool {
 	return a.AlertLevel == types.LevelThree
-}
-
-// MakeLegionMemberCount ...
-func (a *Alarm) MakeLegionMemberCount() int {
-	return rand.Intn(types.TempleLegionMaxNumber-types.TempleLegionMinNumber) + types.TempleLegionMinNumber
 }

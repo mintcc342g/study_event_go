@@ -65,6 +65,7 @@ var (
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "location", Type: field.TypeString},
 		{Name: "mentorship_id", Type: field.TypeUint64},
+		{Name: "legion_system", Type: field.TypeUint32},
 	}
 	// GardensTable holds the schema information for the "gardens" table.
 	GardensTable = &schema.Table{

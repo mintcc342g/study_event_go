@@ -136,6 +136,14 @@ func MentorshipID(v types.MentorshipID) predicate.Garden {
 	})
 }
 
+// LegionSystem applies equality check predicate on the "legion_system" field. It's identical to LegionSystemEQ.
+func LegionSystem(v types.LegionSystem) predicate.Garden {
+	vc := uint32(v)
+	return predicate.Garden(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldLegionSystem), vc))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Garden {
 	return predicate.Garden(func(s *sql.Selector) {
@@ -679,6 +687,88 @@ func MentorshipIDLTE(v types.MentorshipID) predicate.Garden {
 	vc := uint64(v)
 	return predicate.Garden(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldMentorshipID), vc))
+	})
+}
+
+// LegionSystemEQ applies the EQ predicate on the "legion_system" field.
+func LegionSystemEQ(v types.LegionSystem) predicate.Garden {
+	vc := uint32(v)
+	return predicate.Garden(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldLegionSystem), vc))
+	})
+}
+
+// LegionSystemNEQ applies the NEQ predicate on the "legion_system" field.
+func LegionSystemNEQ(v types.LegionSystem) predicate.Garden {
+	vc := uint32(v)
+	return predicate.Garden(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldLegionSystem), vc))
+	})
+}
+
+// LegionSystemIn applies the In predicate on the "legion_system" field.
+func LegionSystemIn(vs ...types.LegionSystem) predicate.Garden {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = uint32(vs[i])
+	}
+	return predicate.Garden(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldLegionSystem), v...))
+	})
+}
+
+// LegionSystemNotIn applies the NotIn predicate on the "legion_system" field.
+func LegionSystemNotIn(vs ...types.LegionSystem) predicate.Garden {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = uint32(vs[i])
+	}
+	return predicate.Garden(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldLegionSystem), v...))
+	})
+}
+
+// LegionSystemGT applies the GT predicate on the "legion_system" field.
+func LegionSystemGT(v types.LegionSystem) predicate.Garden {
+	vc := uint32(v)
+	return predicate.Garden(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldLegionSystem), vc))
+	})
+}
+
+// LegionSystemGTE applies the GTE predicate on the "legion_system" field.
+func LegionSystemGTE(v types.LegionSystem) predicate.Garden {
+	vc := uint32(v)
+	return predicate.Garden(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldLegionSystem), vc))
+	})
+}
+
+// LegionSystemLT applies the LT predicate on the "legion_system" field.
+func LegionSystemLT(v types.LegionSystem) predicate.Garden {
+	vc := uint32(v)
+	return predicate.Garden(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldLegionSystem), vc))
+	})
+}
+
+// LegionSystemLTE applies the LTE predicate on the "legion_system" field.
+func LegionSystemLTE(v types.LegionSystem) predicate.Garden {
+	vc := uint32(v)
+	return predicate.Garden(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldLegionSystem), vc))
 	})
 }
 

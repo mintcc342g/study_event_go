@@ -42,6 +42,14 @@ func (l *lilyRepository) Save(ctx context.Context, lily *entity.Lily) (*entity.L
 	lily.ID = entModel.ID
 	lily.CreatedAt = entModel.CreatedAt
 	lily.UpdatedAt = entModel.UpdatedAt
+	lily.Name = &vo.Name{
+		First:  entModel.FirstName,
+		Middle: entModel.MiddleName,
+		Last:   entModel.LastName,
+	}
+	lily.Birth = *entModel.Birth
+	lily.Rank = entModel.Rank
+	lily.GardenID = entModel.GardenID
 
 	return lily, nil
 }
@@ -77,6 +85,39 @@ func (l *lilyRepository) Lily(ctx context.Context, id types.LilyID) (*entity.Lil
 	}, nil
 }
 
-func (l *lilyRepository) LiliesByRank(ctx context.Context, gardenID types.GardenID, rank int) ([]*entity.Lily, error) {
-	return nil, nil
+func (l *lilyRepository) LiliesByRank(ctx context.Context, gardenID types.GardenID, rank uint32) ([]*entity.Lily, error) {
+
+	entModels, err := l.conn.Lily.Query().
+		Where(
+			entLily.GardenID(gardenID),
+		).
+		Limit(int(rank)).
+		Order(ent.Desc(entLily.FieldRank)).
+		All(ctx)
+	if err != nil {
+		// logger
+		return nil, errors.New("internal server error")
+	}
+
+	lilies := make([]*entity.Lily, len(entModels))
+	for i, v := range entModels {
+		lilies[i] = &entity.Lily{
+			ID:              v.ID,
+			CreatedAt:       v.CreatedAt,
+			UpdatedAt:       v.UpdatedAt,
+			DeletedAt:       v.DeletedAt,
+			CauseOfDeletion: v.CauseOfDeletion,
+			Name: &vo.Name{
+				First:  v.FirstName,
+				Middle: v.MiddleName,
+				Last:   v.LastName,
+			},
+			Birth:    *v.Birth,
+			Rank:     v.Rank,
+			GardenID: v.GardenID,
+			LegionID: v.LegionID,
+		}
+	}
+
+	return lilies, nil
 }

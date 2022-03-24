@@ -30,13 +30,14 @@ func (p *ProtectionController) Alarm(c echo.Context) (err error) {
 
 	var request struct {
 		GardenID     types.GardenID `param:"id"`
-		CaveLocation string         `json:"caveLocation"`
+		CaveLocation string         `json:"cave_location"`
 		Huges        []struct {
-			HugeClass types.HugeClass `json:"hugeClass"`
-			HugeType  types.HugeType  `json:"hugeType"`
+			HugeClass types.HugeClass `json:"huge_class"`
+			HugeType  types.HugeType  `json:"huge_type"`
 		} `json:"huges"`
-		TotalCount uint32           `json:"totalCount"`
-		AlertLevel types.AlertLevel `json:"alertLevel"`
+		TotalHugeCount    uint32           `json:"total_huge_count"`
+		AlertLevel        types.AlertLevel `json:"alert_level"`
+		LegionMemberCount uint32           `json:"legion_member_count"`
 	}
 	if err = c.Bind(&request); err != nil {
 		c.Logger().Error("ProtectionController Bind", "err", err)

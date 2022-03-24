@@ -32,6 +32,7 @@ func (g *GardenController) New(c echo.Context) (err error) {
 		Name         string             `json:"name"`
 		Location     string             `json:"location"`
 		MentorshipID types.MentorshipID `json:"mentorship_id"`
+		LegionSystem types.LegionSystem `json:"legion_system"`
 	}
 	if err = c.Bind(&request); err != nil {
 		c.Logger().Error("GardenController Bind", "err", err)
@@ -42,6 +43,7 @@ func (g *GardenController) New(c echo.Context) (err error) {
 		Name:         strings.TrimSpace(strings.ToLower(request.Name)),
 		Location:     strings.TrimSpace(strings.ToLower(request.Location)),
 		MentorshipID: request.MentorshipID,
+		LegionSystem: request.LegionSystem,
 	}
 
 	gardenDTO, err = g.gardenSvc.New(ctx, gardenDTO)
@@ -113,6 +115,7 @@ func (g *GardenController) Update(c echo.Context) (err error) {
 		Name         string             `json:"name"`
 		Location     string             `json:"location"`
 		MentorshipID types.MentorshipID `json:"mentorship_id"`
+		LegionSystem types.LegionSystem `json:"legion_system"`
 	}
 	if err = c.Bind(&request); err != nil {
 		c.Logger().Error("GardenController Bind", "err", err)
@@ -124,6 +127,7 @@ func (g *GardenController) Update(c echo.Context) (err error) {
 		Name:         strings.TrimSpace(strings.ToLower(request.Name)),
 		Location:     strings.TrimSpace(strings.ToLower(request.Location)),
 		MentorshipID: request.MentorshipID,
+		LegionSystem: request.LegionSystem,
 	}
 
 	gardenDTO, err = g.gardenSvc.Update(ctx, gardenDTO)

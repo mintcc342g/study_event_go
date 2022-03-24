@@ -17,6 +17,7 @@ type Garden struct {
 	Name         string
 	Location     string
 	MentorshipID types.MentorshipID
+	LegionSystem types.LegionSystem
 	Legions      []*Legion
 	Lilies       []*Lily
 }
@@ -31,20 +32,29 @@ func NewGarden(gardenDTO *dto.Garden) (*Garden, error) {
 		return nil, errors.BadRequestf("invalid location")
 	}
 
+	if gardenDTO.LegionSystem == types.NoneLegionSystem {
+		return nil, errors.BadRequestf("invalid legion system")
+	}
+
 	return &Garden{
 		Name:         gardenDTO.Name,
 		Location:     gardenDTO.Location,
 		MentorshipID: gardenDTO.MentorshipID,
+		LegionSystem: gardenDTO.LegionSystem,
 	}, nil
 }
 
-// NewTempleLegion ...
-func (g *Garden) NewTempleLegion(lilies []*Lily) (*Legion, error) {
-
-	if !g.IsLudovic() {
+// NewTopLegion ...
+func (g *Garden) NewTopLegion(lilies []*Lily) (*Legion, error) {
+	switch g.Name {
+	case types.LudovicMissionSchool:
+		return g.newTempleLegion(lilies)
+	default:
 		return nil, errors.BadRequestf("invalid garden")
 	}
+}
 
+func (g *Garden) newTempleLegion(lilies []*Lily) (*Legion, error) {
 	legion := &Legion{
 		Members: lilies,
 	}
@@ -63,11 +73,6 @@ func (g *Garden) EqualID(id uint64) bool {
 	return g.ID == types.GardenID(id)
 }
 
-// IsLudovic ...
-func (g *Garden) IsLudovic() bool {
-	return g.Name == types.LudovicMissionSchool
-}
-
 // isDuplicatedName ...
 func (g *Garden) isDuplicatedName(comparable *Garden) error {
 	if comparable != nil && g.ID != comparable.ID && g.Name == comparable.Name {
@@ -75,6 +80,16 @@ func (g *Garden) isDuplicatedName(comparable *Garden) error {
 	}
 
 	return nil
+}
+
+// IsTopLegionSystem ...
+func (g *Garden) IsTopLegionSystem() bool {
+	return g.LegionSystem == types.TopLegionSystem
+}
+
+// IsAutonomicLegionSystem ...
+func (g *Garden) IsAutonomicLegionSystem() bool {
+	return g.LegionSystem == types.AutonomicLegionSystem
 }
 
 // Update ...
@@ -93,6 +108,10 @@ func (g *Garden) Update(req *dto.Garden, comparable *Garden) (err error) {
 
 	if req.MentorshipID != 0 {
 		g.MentorshipID = req.MentorshipID
+	}
+
+	if req.LegionSystem != types.NoneLegionSystem {
+		g.LegionSystem = req.LegionSystem
 	}
 
 	return

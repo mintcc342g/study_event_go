@@ -83,6 +83,12 @@ func (gc *GardenCreate) SetMentorshipID(ti types.MentorshipID) *GardenCreate {
 	return gc
 }
 
+// SetLegionSystem sets the "legion_system" field.
+func (gc *GardenCreate) SetLegionSystem(ts types.LegionSystem) *GardenCreate {
+	gc.mutation.SetLegionSystem(ts)
+	return gc
+}
+
 // SetID sets the "id" field.
 func (gc *GardenCreate) SetID(ti types.GardenID) *GardenCreate {
 	gc.mutation.SetID(ti)
@@ -192,6 +198,9 @@ func (gc *GardenCreate) check() error {
 	if _, ok := gc.mutation.MentorshipID(); !ok {
 		return &ValidationError{Name: "mentorship_id", err: errors.New(`ent: missing required field "mentorship_id"`)}
 	}
+	if _, ok := gc.mutation.LegionSystem(); !ok {
+		return &ValidationError{Name: "legion_system", err: errors.New(`ent: missing required field "legion_system"`)}
+	}
 	return nil
 }
 
@@ -273,6 +282,14 @@ func (gc *GardenCreate) createSpec() (*Garden, *sqlgraph.CreateSpec) {
 			Column: garden.FieldMentorshipID,
 		})
 		_node.MentorshipID = value
+	}
+	if value, ok := gc.mutation.LegionSystem(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: garden.FieldLegionSystem,
+		})
+		_node.LegionSystem = value
 	}
 	return _node, _spec
 }
@@ -403,6 +420,18 @@ func (u *GardenUpsert) SetMentorshipID(v types.MentorshipID) *GardenUpsert {
 // UpdateMentorshipID sets the "mentorship_id" field to the value that was provided on create.
 func (u *GardenUpsert) UpdateMentorshipID() *GardenUpsert {
 	u.SetExcluded(garden.FieldMentorshipID)
+	return u
+}
+
+// SetLegionSystem sets the "legion_system" field.
+func (u *GardenUpsert) SetLegionSystem(v types.LegionSystem) *GardenUpsert {
+	u.Set(garden.FieldLegionSystem, v)
+	return u
+}
+
+// UpdateLegionSystem sets the "legion_system" field to the value that was provided on create.
+func (u *GardenUpsert) UpdateLegionSystem() *GardenUpsert {
+	u.SetExcluded(garden.FieldLegionSystem)
 	return u
 }
 
@@ -544,6 +573,20 @@ func (u *GardenUpsertOne) SetMentorshipID(v types.MentorshipID) *GardenUpsertOne
 func (u *GardenUpsertOne) UpdateMentorshipID() *GardenUpsertOne {
 	return u.Update(func(s *GardenUpsert) {
 		s.UpdateMentorshipID()
+	})
+}
+
+// SetLegionSystem sets the "legion_system" field.
+func (u *GardenUpsertOne) SetLegionSystem(v types.LegionSystem) *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetLegionSystem(v)
+	})
+}
+
+// UpdateLegionSystem sets the "legion_system" field to the value that was provided on create.
+func (u *GardenUpsertOne) UpdateLegionSystem() *GardenUpsertOne {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateLegionSystem()
 	})
 }
 
@@ -850,6 +893,20 @@ func (u *GardenUpsertBulk) SetMentorshipID(v types.MentorshipID) *GardenUpsertBu
 func (u *GardenUpsertBulk) UpdateMentorshipID() *GardenUpsertBulk {
 	return u.Update(func(s *GardenUpsert) {
 		s.UpdateMentorshipID()
+	})
+}
+
+// SetLegionSystem sets the "legion_system" field.
+func (u *GardenUpsertBulk) SetLegionSystem(v types.LegionSystem) *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.SetLegionSystem(v)
+	})
+}
+
+// UpdateLegionSystem sets the "legion_system" field to the value that was provided on create.
+func (u *GardenUpsertBulk) UpdateLegionSystem() *GardenUpsertBulk {
+	return u.Update(func(s *GardenUpsert) {
+		s.UpdateLegionSystem()
 	})
 }
 

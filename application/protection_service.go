@@ -32,34 +32,32 @@ func (p *ProtectionService) Alarm(ctx context.Context, alarmDTO *dto.Alarm) (err
 
 	// TODO: requestor check with ctx
 	// TODO: logger
-	// TODO: db
 
 	garden, err := p.gardenRepo.Garden(ctx, alarmDTO.GardenID)
 	if err != nil {
 		return err
 	}
 
-	alarm, err := entity.NewAlarm(alarmDTO)
+	alarm, err := entity.NewAlarm(garden, alarmDTO)
 	if err != nil {
 		return err
 	}
 
-	if alarm.IsSevere() && garden.IsLudovic() {
-		return p.sendTempleLegion(ctx, garden, alarm)
+	if alarm.IsSevere() && garden.IsTopLegionSystem() {
+		return p.makeTopLegion(ctx, garden, alarm)
 	}
 
 	return p.startNormalBattle(ctx, garden, alarm)
 }
 
-// sendTempleLegion
-func (p *ProtectionService) sendTempleLegion(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
+func (p *ProtectionService) makeTopLegion(ctx context.Context, garden *entity.Garden, alarm *entity.Alarm) (err error) {
 
-	lilies, err := p.lilyRepo.LiliesByRank(ctx, alarm.GardenID, alarm.MakeLegionMemberCount()) // TODO: change logic
+	lilies, err := p.lilyRepo.LiliesByRank(ctx, alarm.GardenID, alarm.LegionMemberCount)
 	if err != nil {
 		return err
 	}
 
-	legion, err := garden.NewTempleLegion(lilies)
+	legion, err := garden.NewTopLegion(lilies)
 	if err != nil {
 		return err
 	}
