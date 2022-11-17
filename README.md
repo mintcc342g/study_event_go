@@ -1,37 +1,38 @@
 # Study Event-Driven Architecture with Golang
 
 - Go 1.15
-- Machinery V1
+- Machinery v1
 
 <br/>
 
 ## Run Server
-
-- for MacOS and Windows
-
+### With a local binary
+#### Build
 ```bash
 # 1. run redis
 $ docker run -p 6379:6379 redis 
 
 # 2. compile the project
 $ make all
-
-
-# 3-1. run the server for MacOS
-$ ./bin/study-websocket-go
-
-# 3-2. run the server for Windows
-$ ./bin/study-event-go.exe
-
-# 3-3. You can use the debug mod of VSCode to click the button 'Launch'
 ```
+
+#### For MacOS
+```bash
+$ ./bin/study-websocket-go
+```
+#### For Windows
+```bash
+$ ./bin/study-event-go.exe
+```
+#### For VSCode
+- Click the button 'Launch'
 
 <br/>
 
-## Event Test
+## Send a task
+- You need to make data of Garden and Lily in the DB
 
-- You need to make data of Garden and Lily
-- cURL example
+### With cURL
 ```bash
 $ curl --location --request POST '0.0.0.0:4567/api/v1/assault-lily/gardens/1/alarm' \
 --header 'Content-Type: application/json' \
@@ -53,7 +54,7 @@ $ curl --location --request POST '0.0.0.0:4567/api/v1/assault-lily/gardens/1/ala
 }'
 ```
 
-- result on console
+### Result on the console
 ```bash
 [ANNOUNCEMENT] LEGION IS CREATED!!!
 [ANNOUNCEMENT] THE MEMBER IS ...
